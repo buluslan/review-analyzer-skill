@@ -1,8 +1,6 @@
-# E-commerce Review Deep Analysis Skill
-
 <div align="center">
 
-# Review Analyzer Skill
+# Review Deep Analysis Skill
 
 **An AI-Powered Multi-Scenario Review Content Deep Analysis Tool**
 
