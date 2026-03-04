@@ -7,6 +7,7 @@
 **An AI-Powered Multi-Scenario Review Content Deep Analysis Tool**
 
 For the latest AI industry insights, AI+ecommerce/advertising practices, and reflections on human-AI collaboration, follow our WeChat Official Account: 【新西楼】
+
 ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
