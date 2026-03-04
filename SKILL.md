@@ -1,7 +1,7 @@
 ---
 name: review-analyzer-skill
 description: |
-  AI驱动的电商评论深度分析工具,支持CLI深度模式和Gemini快速模式。提供22维度智能标签、黑金奢华可视化看板、四位一体VOC系统(6套3D头像)。
+  AI驱动的电商评论深度分析工具,支持CLI本地模式和Gemini增强模式。提供22维度智能标签、黑金奢华可视化看板、四位一体VOC系统(6套3D头像)。
 
   触发词使用场景:
   - 用户需要分析电商产品评论(Amazon/eBay/AliExpress等)
@@ -11,7 +11,7 @@ description: |
   - 用户提到"电商评论分析"、"评论分析"、"竞品分析"、"用户洞察"、"VOC分析"等关键词
 
   核心能力:
-  - 双模洞察系统: CLI深度模式(使用Claude配额) + Gemini快速模式(API付费)
+  - 双模洞察系统: CLI本地模式(使用内置模型) + Gemini增强模式(API付费)
   - 22维度智能标签系统: 人群/场景/功能/质量/服务/体验/市场/情感
   - 黑金奢华可视化看板: 董事会高管汇报级别HTML报告
   - 四位一体VOC系统: 6套3D头像,立体化用户画像
@@ -25,8 +25,8 @@ description: |
 
   技术要求:
   - Python 3.9+
-  - Claude Code CLI(CLI深度模式必需)
-  - Gemini API Key(Gemini快速模式可选)
+  - Claude Code CLI(CLI本地模式必需)
+  - Gemini API Key(Gemini增强模式可选)
 
 license: MIT
 author: Buluu@新西楼
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 
 # 配置环境变量(可选,仅Gemini模式需要)
 cp .env.example .env
-# 编辑.env,添加GEMINI_API_KEY(如需使用Gemini快速模式)
+# 编辑.env,添加GEMINI_API_KEY(如需使用Gemini增强模式)
 ```
 
 ### 2. 使用 Skill 分析评论
@@ -177,22 +177,22 @@ python3 main.py "<文件路径>" \
 
 ## 双模洞察系统
 
-### CLI深度模式(默认)
-- **技术实现**: 通过subprocess调用Claude CLI
+### CLI本地模式(默认)
+- **技术实现**: 直接使用Claude Code内置模型执行
 - **成本**: 使用您的Claude配额,不产生额外API费用
 - **优势**: 深度推理,高质量洞察,适合关键分析
 - **适用场景**: 重要产品分析、深度洞察需求
 
-### Gemini快速模式
+### Gemini增强模式
 - **技术实现**: 使用Gemini API
-- **成本**: 需要GEMINI_API_KEY,约$0.001/产品
-- **优势**: 快速生成,适合批量分析
-- **适用场景**: 快速扫描、大批量产品分析
+- **成本**: 需要GEMINI_API_KEY,产生API费用
+- **优势**: 增强分析能力,支持更多功能
+- **适用场景**: 需要增强分析能力、大批量产品分析
 
 **选择建议**:
-- 单个产品或小批量分析 → 使用CLI深度模式
-- 大批量产品初步筛选 → 使用Gemini快速模式
-- 关键决策支持 → 必须使用CLI深度模式
+- 单个产品或小批量分析 → 使用CLI本地模式
+- 大批量产品初步筛选 → 使用Gemini增强模式
+- 关键决策支持 → 必须使用CLI本地模式
 
 ---
 
@@ -340,12 +340,12 @@ tags:
 
 ### Q2: CLI模式和Gemini模式如何选择?
 **A**:
-- **CLI模式**: 使用您的Claude配额,深度推理,适合重要分析
-- **Gemini模式**: 需要API Key,快速生成,适合批量分析
-- **建议**: 小批量用CLI,大批量用Gemini
+- **CLI本地模式**: 使用Claude Code内置模型,深度推理,适合重要分析
+- **Gemini增强模式**: 需要API Key,增强分析能力,适合大批量分析
+- **建议**: 小批量用CLI本地模式,大批量用Gemini增强模式
 
 ### Q3: 为什么需要Claude CLI?
-**A**: CLI深度模式需要Claude CLI进行AI推理。安装命令:
+**A**: CLI本地模式需要Claude Code内置模型进行AI推理。
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
@@ -358,9 +358,9 @@ npm install -g @anthropic-ai/claude-code
 
 ### Q6: 分析速度很慢怎么办?
 **A**:
-1. 使用Gemini快速模式(`--mode gemini`)
+1. 使用Gemini增强模式(`--mode 2` 或 `--mode 3`)
 2. 减少分析的评论数量
-3. 检查网络连接(CLI模式需要调用Claude API)
+3. 检查网络连接
 
 ---
 
@@ -431,8 +431,8 @@ review-analyzer/
 |------|------|
 | **操作系统** | macOS / Linux / Windows |
 | **Python** | 3.9 或更高版本 |
-| **Claude CLI** | Claude Code CLI(必需,用于CLI深度模式) |
-| **Gemini API** | Gemini API Key(可选,用于Gemini快速模式) |
+| **Claude CLI** | Claude Code CLI(必需,用于CLI本地模式) |
+| **Gemini API** | Gemini API Key(可选,用于Gemini增强模式) |
 | **内存** | 建议 4GB+ |
 | **磁盘空间** | 建议 500MB+ |
 
@@ -461,7 +461,7 @@ AI: 调用评论分析工具
 ### 场景3: 市场调研
 ```
 用户: "批量分析这10个产品的评论"
-AI: 使用Gemini快速模式
+AI: 使用Gemini增强模式
      → 批量分析10个产品
      → 生成综合趋势报告
      → 识别市场机会点
@@ -480,19 +480,19 @@ AI: 分析评论数据
 
 ## 性能和成本
 
-### CLI深度模式
+### CLI本地模式
 - **成本**: 使用Claude配额,无额外API费用
-- **速度**: 约2-5分钟/100条评论
+- **速度**: 取决于Claude API响应速度
 - **质量**: 深度推理,高质量洞察
 
-### Gemini快速模式
-- **成本**: 约$0.001/产品(按100条评论计)
-- **速度**: 约30-60秒/产品
-- **质量**: 快速生成,适合初步分析
+### Gemini增强模式
+- **成本**: 需要Gemini API Key,产生API费用
+- **速度**: 通常较快,具体取决于Gemini API响应
+- **质量**: 增强分析能力,适合大批量分析
 
 ### 批量分析建议
-- **小批量(<10产品)**: 使用CLI深度模式
-- **大批量(>50产品)**: 使用Gemini快速模式筛选 + CLI深度模式重点分析
+- **小批量(<10产品)**: 使用CLI本地模式
+- **大批量(>50产品)**: 使用Gemini增强模式筛选 + CLI本地模式重点分析
 - **中等批量(10-50产品)**: 根据预算和需求灵活选择
 
 ---
