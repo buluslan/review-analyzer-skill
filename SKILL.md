@@ -17,6 +17,14 @@ description: |
   - 四位一体VOC系统: 6套3D头像,立体化用户画像
   - 三位一体输出: CSV标签数据 + Markdown洞察报告 + HTML可视化看板
 
+  强制交互约束(绝对级):
+  ❗ 无论任何情况,当用户触发评论分析时,AI Agent 必须先通过 AskUserQuestion 工具依次向用户收集以下三个参数,再执行分析命令:
+  1. 分析数量(多少条评论)
+  2. AI引擎模式(CLI/混动/Gemini)
+  3. 报告署名
+  严禁自行填充默认值或猜测用户意图。这是本 Skill 的最高优先级规则。
+  如果用户明确表示"都用默认值"或"你决定",才可以使用默认值(100条/模式1/AI Assistant)。
+
   渐进式披露逻辑:
   1. 首次使用时,引导用户克隆主仓库并安装依赖
   2. 提供清晰的快速开始命令和参数说明
@@ -95,13 +103,21 @@ python scripts/analyze.py path/to/reviews.csv --mode 3 --gemini-key "YOUR_KEY"
 
 ## 执行流程
 
-**重要**: 本工具必须在交互式终端中运行才能使用交互式菜单。
+> **❗ 绝对约束: AI Agent 必须先问,后执行。严禁跳过第一步。**
+>
+> 由于本工具在 AI Agent 子进程中无法使用原生交互式菜单,
+> AI Agent 必须通过 AskUserQuestion 工具充当"虚拟交互式菜单",
+> 向用户依次收集三个关键参数后,再执行分析命令。
+> **任何情况下都不得跳过此步骤。**
+>
+> **⚠️ 严禁使用 `wc -l` 统计评论数！** 必须以 Python 代码运行后的控制台输出为准。
+> CSV 文件中一条评论可能包含换行符，占据多个物理行。`wc -l` 统计的是物理行数，不是评论数。
 
 当用户请求分析评论时,按以下步骤执行:
 
-### 第一步:使用AskUserQuestion收集参数
+### 第一步:使用AskUserQuestion收集参数(必须执行,不可跳过)
 
-AI Agent 应使用 AskUserQuestion 工具依次收集以下参数:
+AI Agent 必须使用 AskUserQuestion 工具依次收集以下参数:
 
 #### Q1:分析数量
 ```yaml
@@ -121,13 +137,36 @@ options:
 question: "🤖 请选择 AI 引擎组合:"
 header: "AI模式"
 options:
-  - label: "1. Claude CLI 模式"
-    description: "全流程使用内置模型,无需API Key,消耗Claude配额"
-  - label: "2. CLI+Gemini混动"
-    description: "文字报告CLI,看板Gemini,需API Key"
-  - label: "3. Gemini增强模式 (推荐)"
-    description: "高质量快速分析,需API Key"
+  - label: "1. Gemini增强模式 (推荐)"
+    description: "调用Gemini API,使用【Gemini 3.1 flash】生成洞察报告,使用【Gemini 3.1 pro】生成可视化看板(需要API Key,产生费用)"
+  - label: "2. Claude CLI+Gemini混动模式"
+    description: "文字报告使用Claude Code内置模型,可视化看板使用【Gemini 3.1 pro】生成(需要API Key,产生费用)"
+ - label: "3. Claude CLI 本地模式"
+    description: "使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成"
 ```
+
+#### Q2.5:Gemini API Key 确认(仅当用户选择模式2或3时必须执行)
+
+> **❗ 强制规则：选择模式2或3后,必须确认 API Key 可用性。禁止跳过,禁止自动回退。**
+
+如果用户选择了模式2或3,AI Agent **必须**执行以下步骤:
+
+1. **检查 `.env` 文件**中是否已配置 `GEMINI_API_KEY`
+2. **如果已配置**: 告知用户"检测到已配置的 Gemini API Key",继续执行
+3. **如果未配置**: 必须通过 AskUserQuestion 询问用户:
+
+```yaml
+question: "🔑 未检测到 Gemini API Key,请选择:"
+header: "API Key 配置"
+options:
+  - label: "手动输入 API Key"
+    description: "请提供您的 Gemini API Key"
+  - label: "回退到 Claude CLI 本地模式"
+    description: "放弃 Gemini 模式,使用本地模式运行"
+```
+
+> **⚠️ 严禁自动静默回退！** 如果 API Key 不可用,必须明确告知用户并让用户做出选择。
+> 不允许在用户不知情的情况下自动降级到本地模式。
 
 #### Q3:报告署名
 ```yaml
@@ -137,11 +176,15 @@ default: "AI Assistant"
 options:
   - label: "使用默认"
     description: "AI Assistant"
-  - label: "自定义"
-    description: "输入您的署名"
 ```
 
-### 第二步:执行分析
+### 第二步:执行分析(必须在第一步完成后才能执行)
+
+> **⚠️ 严禁跳过第一步！** AI Agent 必须先通过 AskUserQuestion 完成所有问题的收集，
+> 然后将用户的回答作为命令行参数传入。严禁自行填写默认值或猜测用户意图。
+> 如果用户明确表示"使用默认值"或"你决定"，则使用默认值（100条/模式1/AI Assistant）。
+> **如果用户选择了 Gemini 模式但 API Key 不可用，必须让用户手动选择回退，禁止自动回退。**
+
 
 收集参数后,执行以下命令:
 

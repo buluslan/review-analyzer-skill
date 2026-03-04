@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 import sys
+import logging
 
 try:
     import jinja2
@@ -25,6 +26,9 @@ except ImportError:
     GEMINI_AVAILABLE = False
 
 from src.config import config, mask_api_key
+
+# 配置日志
+logger = logging.getLogger(__name__)
 
 
 def _load_json_template() -> Dict:

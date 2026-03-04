@@ -21,7 +21,7 @@ try:
 except ImportError:
     GEMINI_AVAILABLE = False
 
-from src.config import config
+from src.config import config, mask_api_key
 from src.prompts.templates import get_insights_prompt_md, get_insights_prompt_txt
 
 # 配置日志
@@ -172,7 +172,7 @@ def _generate_via_gemini(
 
     try:
         # 安全地记录API Key配置（仅显示后4位）
-        logger.debug(f"配置 Gemini API Key: {config.mask_api_key(config.GEMINI_API_KEY)}")
+        logger.debug(f"配置 Gemini API Key: {mask_api_key(config.GEMINI_API_KEY)}")
         genai.configure(api_key=config.GEMINI_API_KEY)
         model = genai.GenerativeModel(
             model_name=config.GEMINI_MODEL,

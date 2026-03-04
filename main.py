@@ -28,12 +28,9 @@ from src.config import config, mask_api_key
 def print_intro():
     """打印工具详细说明（向导第一步）"""
     print("""
-🚀 欢迎使用 Amazon 商品评论 AI 深度分析工具 V1.0
+🚀 欢迎使用  多场景评论内容 AI 深度分析工具 V1.0 Created By Buluu@新西楼
 ============================================================
-工具定义: 电商评论AI深度洞察器 (V1.0 Created By Buluu@新西楼)
-
-核心产出: 针对您提供的原始评论数据，逐条进行22个维度标签挖掘、
-        生成深度洞察分析文字报告、高品质的可视化看板。
+核心功能: 针对您提供的原始评论数据，逐条进行22个维度标签挖掘、生成深度洞察分析文字报告、高品质的可视化看板。
 
 支持模式:
 [Claude CLI 模式] 调用系统原生指令，使用您Claude Code中的内置模型，
@@ -77,18 +74,18 @@ def config_wizard(total_available: int,
 
     # Q2 (推理引擎选择)
     print("\n🤖 [向导 2/3] 请选择 AI 引擎组合：")
-    print("   (标签挖掘环节，默认使用您Claude Code中的内置模型)")
     print()
-    print("   [1] Claude CLI 模式")
-    print("       调用系统原生指令，全流程均使用您Claude Code中的内置模型")
-    print("       无需配置API Key")
+    print("   [1] Claude CLI 本地模式")
+    print("       使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成")
+    print()
     print("   [2] Claude CLI+Gemini混动模式")
-    print("       文字报告使用内置模型")
-    print("       可视化看板调用 【Gemini 3.1 pro】，需配置 API Key")
-    print("   [3] Gemini增强模式")
-    print("       (推荐) 推理质量极大增强")
-    print("       生成文字报告调用【Gemini 3.1 flash】")
-    print("       生成可视化看板调用【Gemini 3.1 pro】，需配置 API Key")
+    print("       文字报告使用Claude Code内置模型")
+    print("       可视化看板使用【Gemini 3.1 pro】生成（需要API Key，产生费用）")
+    print()
+    print("   [3] Gemini增强模式（推荐）")
+    print("       调用Gemini API")
+    print("       使用【Gemini 3.1 flash】生成洞察报告")
+    print("       使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）")
     print()
     mode_names = {"1": "Claude CLI 全程", "2": "CLI+Gemini混动", "3": "Gemini增强"}
     if preset_mode is not None:
@@ -160,49 +157,32 @@ def main():
 
     parser = argparse.ArgumentParser(description="Amazon Review Analyzer V1.0")
     parser.add_argument("input_file", help="输入 CSV/Excel 文件路径")
-    parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
+    parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=100)
     # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
-    parser.add_argument("--mode", choices=["1", "2", "3"], default=None,
+    parser.add_argument("--mode", choices=["1", "2", "3"], default="1",
                         help="分析模式: 1=全程CLI(免费), 2=混动(打标CLI+看板Gemini), 3=全程Gemini")
-    parser.add_argument("--creator", help="报告署名/品牌", default=None)
+    parser.add_argument("--creator", help="报告署名/品牌", default="AI Assistant")
     parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
     args = parser.parse_args()
 
-    # 检查是否需要交互式向导
-    needs_interaction = (args.max_reviews is None or args.mode is None or args.creator is None)
+    # 判断用户是否通过命令行显式提供了三个关键参数
+    # 如果用户一个都没提供（全走默认值），且在 TTY 环境，则启动向导
+    _explicitly_provided = any([
+        '--max-reviews' in sys.argv,
+        '--mode' in sys.argv,
+        '--creator' in sys.argv
+    ])
+    needs_interaction = not _explicitly_provided
 
-    # 如果需要交互但不在TTY环境，报错退出
+    # 非交互环境 + 用户未显式提供参数 → 静默使用默认值，不阻塞执行
     if needs_interaction and not is_interactive_environment():
-        print("=" * 70)
-        print("❌ 错误：交互式参数缺失，且检测到非交互式环境")
-        print("=" * 70)
-        print()
-        print("当前运行环境不支持交互式输入（无TTY终端），")
-        print("且以下参数未通过命令行提供：")
-        if args.max_reviews is None:
-            print("  - --max-reviews (分析数量)")
-        if args.mode is None:
-            print("  - --mode (运行模式)")
-        if args.creator is None:
-            print("  - --creator (报告署名)")
-        print()
-        print("【解决方法】请选择以下方式之一：")
-        print()
-        print("【方式1】在终端中直接运行（推荐，可使用交互式菜单）")
-        print("  cd <项目根目录>")
-        print(f"  python3 main.py '{args.input_file}'")
-        print()
-        print("【方式2】提供完整参数通过命令行运行")
-        print(f"  python3 main.py '{args.input_file}' \\")
-        print("    --max-reviews 100 \\")
-        print("    --mode 1 \\")
-        print("    --creator 'AI Assistant' \\")
-        print("    --output-dir ./output")
-        print()
-        print("=" * 70)
-        sys.exit(1)
+        print(f"\n💡 检测到非交互式环境，将使用默认配置运行：")
+        print(f"   📊 分析数量: {args.max_reviews} 条")
+        print(f"   🤖 运行模式: Claude CLI 全程 (模式 {args.mode})")
+        print(f"   ✍️  报告署名: {args.creator}")
+        print(f"   (可通过 --max-reviews / --mode / --creator 参数自定义)\n")
 
     # 打印工具说明（向导第一步）
     print_intro()
@@ -219,26 +199,26 @@ def main():
     print(f"📄 成功加载表格：检测到 {total_available} 条有效评论记录")
 
     # 3. 配置合并 (优先级：命令行 > 向导 > 默认)
-    # 仅在缺少参数时启用交互式向导
-    if args.max_reviews and args.mode and args.creator:
-        # 所有参数都已提供，跳过向导
-        print(f"\n✅ 检测到完整命令行参数，跳过交互式向导")
+    if not needs_interaction or not is_interactive_environment():
+        # 参数已就绪（显式提供或默认值），跳过向导
+        if _explicitly_provided:
+            print(f"\n✅ 检测到完整命令行参数，跳过交互式向导")
         max_reviews = args.max_reviews
         mode = args.mode
         creator = args.creator
     else:
-        # 缺少部分参数，启用向导
+        # 在 TTY 环境且未显式提供参数 → 启动交互式向导
         wizard_max_reviews, wizard_mode, wizard_creator = config_wizard(
             total_available=total_available,
-            preset_max=args.max_reviews,
-            preset_mode=args.mode,
-            preset_creator=args.creator
+            preset_max=args.max_reviews if '--max-reviews' in sys.argv else None,
+            preset_mode=args.mode if '--mode' in sys.argv else None,
+            preset_creator=args.creator if '--creator' in sys.argv else None
         )
         print()  # 向导结束后添加空行
-        # 合并配置
-        max_reviews = args.max_reviews or wizard_max_reviews
-        mode = args.mode or wizard_mode
-        creator = args.creator or wizard_creator
+        # 合并配置：向导结果优先
+        max_reviews = wizard_max_reviews
+        mode = wizard_mode
+        creator = wizard_creator
 
     # 应用配置
     if max_reviews:
