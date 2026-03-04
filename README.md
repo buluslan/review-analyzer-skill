@@ -1,4 +1,4 @@
-# 电商评论深度分析Skill
+# 评论深度分析Skill
 
 <div align="center">
 
