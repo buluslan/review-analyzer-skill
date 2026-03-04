@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product_name or 'Amazon Review Analysis' }} - 评论分析报告</title>
+    <style>
+        /* ============================================
+           DATA-JOURNALIST DASHBOARD
+           Editorial financial publication aesthetic
+           ============================================ */
+
+        :root {
+            /* Color Palette - Deep editorial tones with warm accents */
+            --bg-deep: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2128;
+            --bg-elevated: #21262d;
+
+            /* Text hierarchy */
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+
+            /* Accent colors - unexpected warm palette against dark */
+            --accent-gold: #d29922;
+            --accent-coral: #ff7b72;
+            --accent-teal: #7ee787;
+            --accent-blue: #79c0ff;
+            --accent-purple: #d2a8ff;
+
+            /* Sentiment colors */
+            --sentiment-strong-positive: #3fb950;
+            --sentiment-positive: #7ee787;
+            --sentiment-neutral: #8b949e;
+            --sentiment-negative: #ff7b72;
+            --sentiment-strong-negative: #da3633;
+
+            /* Spacing scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Typography */
+            --font-display: 'Palatino', 'Georgia', serif;
+            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+            --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           BACKGROUND TEXTURE
+           ============================================ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(210, 153, 34, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(121, 192, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================
+           CONTAINER & LAYOUT
+           ============================================ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================
+           HEADER - Editorial masthead style
+           ============================================ */
+        .header {
+            padding: var(--space-2xl) 0;
+            border-bottom: 1px solid rgba(210, 153, 34, 0.2);
+            margin-bottom: var(--space-2xl);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+        }
+
+        .header-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .header-meta-item::before {
+            content: '●';
+            color: var(--accent-gold);
+            font-size: 0.5rem;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* ============================================
+           SUMMARY CARDS - Stat grid
+           ============================================ */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--card-accent, var(--accent-gold));
+            opacity: 0.7;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-card-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-sm);
+        }
+
+        .summary-card-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .summary-card-unit {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-left: var(--space-xs);
+        }
+
+        /* ============================================
+           SECTION HEADERS
+           ============================================ */
+        .section {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-number {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--accent-gold);
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* ============================================
+           USER PERSONAS - Character cards
+           ============================================ */
+        .personas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .persona-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at corner, var(--persona-color, var(--accent-gold)) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+
+        .persona-name {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .persona-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--persona-color, var(--accent-gold));
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .persona-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .persona-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: var(--text-secondary);
+        }
+
+        .persona-tag-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ============================================
+           SENTIMENT DISTRIBUTION - Bar chart
+           ============================================ */
+        .sentiment-chart {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: var(--space-xl);
+        }
+
+        .sentiment-bars {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .sentiment-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .sentiment-label {
+            min-width: 100px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .sentiment-track {
+            flex: 1;
+            height: 32px;
+            background: var(--bg-deep);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sentiment-fill {
+            height: 100%;
+            background: var(--sentiment-color);
+            border-radius: 4px;
+            transition: width 0.6s ease-out;
+            position: relative;
+        }
+
+        .sentiment-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+        }
+
+        .sentiment-value {
+            min-width: 80px;
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           TAG STATISTICS - Tag cloud grid
+           ============================================ */
+        .tags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: var(--space-sm);
+        }
+
+        .tag-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .tag-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .tag-name {
+            font-size: 0.813rem;
+            color: var(--text-secondary);
+        }
+
+        .tag-count {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        /* Tag dimension headers */
+        .tag-dimension {
+            grid-column: 1 / -1;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-gold);
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-xs);
+        }
+
+        /* ============================================
+           GOLDEN SAMPLES - Review cards
+           ============================================ */
+        .samples-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .sample-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .sample-header {
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+        }
+
+        .sample-header:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sample-sentiment {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sample-sentiment.strong-positive { background: rgba(63, 185, 80, 0.15); color: var(--sentiment-strong-positive); }
+        .sample-sentiment.positive { background: rgba(126, 231, 135, 0.15); color: var(--sentiment-positive); }
+        .sample-sentiment.neutral { background: rgba(139, 148, 158, 0.15); color: var(--sentiment-neutral); }
+        .sample-sentiment.negative { background: rgba(255, 123, 114, 0.15); color: var(--sentiment-negative); }
+        .sample-sentiment.strong-negative { background: rgba(218, 54, 51, 0.15); color: var(--sentiment-strong-negative); }
+
+        .sample-rating {
+            display: flex;
+            gap: 2px;
+            color: var(--accent-gold);
+        }
+
+        .sample-body {
+            padding: 0 var(--space-lg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .sample-card.expanded .sample-body {
+            padding: var(--space-md) var(--space-lg) var(--space-lg);
+            max-height: 500px;
+        }
+
+        .sample-text {
+            font-size: 0.938rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+        }
+
+        .sample-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .sample-tag {
+            font-size: 0.688rem;
+            padding: 3px 8px;
+            background: rgba(121, 192, 255, 0.1);
+            border: 1px solid rgba(121, 192, 255, 0.2);
+            border-radius: 10px;
+            color: var(--accent-blue);
+        }
+
+        /* ============================================
+           INSIGHTS SECTION - Markdown content
+           ============================================ */
+        .insights-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: var(--space-xl);
+        }
+
+        .insights-content {
+            font-family: var(--font-body);
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .insights-content h1 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .insights-content h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+
+        .insights-content h3 {
+            font-size: 1.063rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+
+        .insights-content p {
+            margin-bottom: var(--space-md);
+        }
+
+        .insights-content ul, .insights-content ol {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+
+        .insights-content li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .insights-content blockquote {
+            border-left: 3px solid var(--accent-gold);
+            padding-left: var(--space-md);
+            margin: var(--space-md) 0;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        .insights-content code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            background: var(--bg-deep);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .insights-content strong {
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            margin-top: var(--space-2xl);
+            padding: var(--space-xl) 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.813rem;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            color: var(--accent-gold);
+            margin-bottom: var(--space-sm);
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary-card,
+        .persona-card,
+        .tag-item,
+        .sample-card {
+            animation: fadeSlideIn 0.5s ease-out backwards;
+        }
+
+        .summary-card:nth-child(1) { animation-delay: 0.05s; }
+        .summary-card:nth-child(2) { animation-delay: 0.1s; }
+        .summary-card:nth-child(3) { animation-delay: 0.15s; }
+        .summary-card:nth-child(4) { animation-delay: 0.2s; }
+
+        .persona-card:nth-child(1) { animation-delay: 0.1s; }
+        .persona-card:nth-child(2) { animation-delay: 0.15s; }
+        .persona-card:nth-child(3) { animation-delay: 0.2s; }
+        .persona-card:nth-child(4) { animation-delay: 0.25s; }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding: var(--space-lg) 0;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .section-number {
+                font-size: 2rem;
+            }
+
+            .personas-grid,
+            .tags-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sample-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+        .mb-sm { margin-bottom: var(--space-sm); }
+        .mb-md { margin-bottom: var(--space-md); }
+        .mb-lg { margin-bottom: var(--space-lg); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ============================================
+             HEADER
+             ============================================ -->
+        <header class="header">
+            <div class="header-meta">
+                <div class="header-meta-item">ASIN: {{ asin }}</div>
+                <div class="header-meta-item">{{ analysis_date }}</div>
+                <div class="header-meta-item">Amazon Review Analysis</div>
+            </div>
+            <h1 class="header-title">{{ product_name or 'Product Review Analysis' }}</h1>
+            <p class="header-subtitle">
+                基于 {{ summary.total_reviews }} 条评论的AI深度分析 · 22维度标签体系 · 用户画像洞察
+            </p>
+        </header>
+
+        <!-- ============================================
+             SUMMARY CARDS
+             ============================================ -->
+        <section class="summary-grid">
+            <div class="summary-card" style="--card-accent: var(--accent-blue);">
+                <div class="summary-card-label">Total Reviews</div>
+                <div class="summary-card-value">{{ summary.total_reviews }}<span class="summary-card-unit">条</span></div>
+            </div>
+            <div class="summary-card" style="--card-accent: var(--accent-teal);">
+                <div class="summary-card-label">Tagged</div>
+                <div class="summary-card-value">{{ summary.tagged_reviews }}<span class="summary-card-unit">条</span></div>
+            </div>
+            <div class="summary-card" style="--card-accent: var(--accent-purple);">
+                <div class="summary-card-label">User Personas</div>
+                <div class="summary-card-value">{{ summary.persona_count }}<span class="summary-card-unit">个</span></div>
+            </div>
+            <div class="summary-card" style="--card-accent: var(--accent-gold);">
+                <div class="summary-card-label">Avg Rating</div>
+                <div class="summary-card-value">{{ summary.avg_rating|round(1) }}<span class="summary-card-unit">/5</span></div>
+            </div>
+        </section>
+
+        {% if personas %}
+        <!-- ============================================
+             USER PERSONAS
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <div>
+                    <h2 class="section-title">核心用户画像</h2>
+                    <p class="section-subtitle">基于 {{ summary.tagged_reviews }} 条评论识别的典型用户群体</p>
+                </div>
+            </div>
+
+            <div class="personas-grid">
+                {% for persona in personas %}
+                <div class="persona-card" style="--persona-color: {{ persona.color or 'var(--accent-gold)' }};">
+                    <div class="persona-header">
+                        <div class="persona-name">{{ persona.name }}</div>
+                        <div class="persona-count">{{ persona.count }} 条</div>
+                    </div>
+                    <div class="persona-tags">
+                        {% for key, value in persona.tags.items() if value and value not in ['未提及', '不明', '无'] %}
+                        <div class="persona-tag">
+                            {{ key }}: <span class="persona-tag-value">{{ value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ============================================
+             SENTIMENT DISTRIBUTION
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <div>
+                    <h2 class="section-title">情感分布</h2>
+                    <p class="section-subtitle">评论情感倾向分析</p>
+                </div>
+            </div>
+
+            <div class="sentiment-chart">
+                <div class="sentiment-bars">
+                    {% set sentiment_order = [
+                        ('强烈推荐', 'var(--sentiment-strong-positive)'),
+                        ('推荐', 'var(--sentiment-positive)'),
+                        ('中立', 'var(--sentiment-neutral)'),
+                        ('不推荐', 'var(--sentiment-negative)'),
+                        ('强烈不推荐', 'var(--sentiment-strong-negative)')
+                    ] %}
+                    {% for label, color in sentiment_order %}
+                    {% set count = sentiment_distribution.get(label, 0) %}
+                    {% set percent = (count / summary.tagged_reviews * 100)|round(1) if summary.tagged_reviews > 0 else 0 %}
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">{{ label }}</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: {{ percent }}%; --sentiment-color: {{ color }};"></div>
+                        </div>
+                        <div class="sentiment-value">{{ count }} ({{ percent }}%)</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================
+             TAG STATISTICS
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <div>
+                    <h2 class="section-title">标签统计</h2>
+                    <p class="section-subtitle">22维度标签出现频次</p>
+                </div>
+            </div>
+
+            <div class="tags-grid">
+                {% set dimensions = {
+                    '人群维度': ['人群_性别', '人群_年龄段', '人群_职业', '人群_购买角色'],
+                    '场景维度': ['场景_使用场景'],
+                    '功能维度': ['功能_满意度', '功能_具体功能'],
+                    '质量维度': ['质量_材质', '质量_做工', '质量_耐用性'],
+                    '服务维度': ['服务_发货速度', '服务_包装质量', '服务_客服响应', '服务_退换货', '服务_保修'],
+                    '体验维度': ['体验_舒适度', '体验_易用性', '体验_外观设计', '体验_价格感知'],
+                    '市场维度': ['竞品_竞品对比', '复购_复购意愿'],
+                    '情感维度': ['情感_总体评价']
+                } %}
+
+                {% for dimension_name, tags in dimensions.items() %}
+                <div class="tag-dimension">{{ dimension_name }}</div>
+                {% for tag_name in tags %}
+                {% set tag_count = tag_statistics.get(tag_name, 0) %}
+                <div class="tag-item">
+                    <span class="tag-name">{{ tag_name }}</span>
+                    <span class="tag-count">{{ tag_count }}</span>
+                </div>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if golden_samples %}
+        <!-- ============================================
+             GOLDEN SAMPLES
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <div>
+                    <h2 class="section-title">精选评论样本</h2>
+                    <p class="section-subtitle">高信息密度评论深度解析</p>
+                </div>
+            </div>
+
+            <div class="samples-list">
+                {% for sample in golden_samples %}
+                <div class="sample-card" onclick="this.classList.toggle('expanded')">
+                    <div class="sample-header">
+                        <span class="sample-sentiment {{ sample.sentiment_class }}">{{ sample.sentiment }}</span>
+                        <div class="sample-rating">
+                            {% for i in range(sample.rating|int) %}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="sample-body">
+                        <p class="sample-text">{{ sample.body }}</p>
+                        <div class="sample-tags">
+                            {% for tag_key, tag_value in sample.tags.items() if tag_value and tag_value not in ['未提及', '不明', '无'] %}
+                            <span class="sample-tag">{{ tag_key }}: {{ tag_value }}</span>
+                            {% endfor %}
+                            {% if sample.info_score %}
+                            <span class="sample-tag" style="border-color: var(--accent-gold); color: var(--accent-gold);">信息密度: {{ sample.info_score }}/20</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if insights_md %}
+        <!-- ============================================
+             INSIGHTS REPORT
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <div>
+                    <h2 class="section-title">深度洞察分析</h2>
+                    <p class="section-subtitle">AI生成的综合分析报告</p>
+                </div>
+            </div>
+
+            <div class="insights-content">
+                {{ insights_md|safe }}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ============================================
+             FOOTER
+             ============================================ -->
+        <footer class="footer">
+            <div class="footer-logo">Amazon Review Analyzer</div>
+            <p>Generated by AI · {{ analysis_date }}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+                Powered by Claude AI · 22-Dimension Tag System · User Persona Analysis
+            </p>
+        </footer>
+    </div>
+
+    <!-- ============================================
+         INTERACTIVE SCRIPTS
+         ============================================ -->
+    <script>
+        // Auto-expand first sample card
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSample = document.querySelector('.sample-card');
+            if (firstSample) {
+                setTimeout(() => {
+                    firstSample.classList.add('expanded');
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

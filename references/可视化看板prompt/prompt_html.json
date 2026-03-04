@@ -1,0 +1,211 @@
+{
+    "meta": {
+        "product_name": "输入你的产品名称",
+        "report_title": "评论深度分析洞察",
+        "signature": "Created By 输入你的名字",
+        "retail_price": "输入你的产品价格",
+        "sample_size": "输入评论数量",
+        "status": "Strategic Review"
+    },
+    "kpis": [
+        {
+            "title": "Surpass Expectation",
+            "value": "55",
+            "label": "超出预期",
+            "desc": "极高的初始体验"
+        },
+        {
+            "title": "Strong Recommend",
+            "value": "60",
+            "label": "强烈推荐",
+            "desc": "品牌护城河稳固"
+        },
+        {
+            "title": "Material Failure",
+            "value": "15",
+            "label": "致命缺陷",
+            "desc": "关键组件易损",
+            "is_danger": true
+        },
+        {
+            "title": "Brand Churn",
+            "value": "10",
+            "label": "客户流失",
+            "desc": "明确拒绝复购"
+        }
+    ],
+    "market_insights": [
+        {
+            "icon": "fa-users-viewfinder",
+            "title": "核心受众画像",
+            "desc": "此处输入人群分析结论..."
+        },
+        {
+            "icon": "fa-wand-magic-sparkles",
+            "title": "易用性评估",
+            "desc": "此处输入易用性结论..."
+        },
+        {
+            "icon": "fa-gift",
+            "title": "购买场景特征",
+            "desc": "此处输入购买动机结论..."
+        },
+        {
+            "icon": "fa-chess-knight",
+            "title": "竞品威胁区隔",
+            "desc": "此处输入竞品分析结论..."
+        }
+    ],
+    "charts_data": {
+        "sentiment": {
+            "labels": [
+                "超出预期",
+                "符合预期",
+                "低于预期"
+            ],
+            "data": [
+                55,
+                30,
+                15
+            ]
+        },
+        "features": {
+            "labels": [
+                "卖点1",
+                "卖点2",
+                "卖点3",
+                "卖点4",
+                "卖点5"
+            ],
+            "data": [
+                30,
+                25,
+                20,
+                15,
+                10
+            ]
+        },
+        "scenarios": {
+            "labels": [
+                "场景1",
+                "场景2",
+                "场景3",
+                "场景4",
+                "场景5"
+            ],
+            "data": [
+                40,
+                20,
+                15,
+                15,
+                10
+            ]
+        },
+        "price_perception": {
+            "labels": [
+                "物超所值",
+                "偏贵",
+                "合理"
+            ],
+            "data": [
+                50,
+                30,
+                20
+            ]
+        },
+        "design_usability": {
+            "labels": [
+                "正面评价1",
+                "正面评价2",
+                "负面1",
+                "负面2"
+            ],
+            "data": [
+                40,
+                45,
+                10,
+                5
+            ]
+        },
+        "durability": {
+            "labels": [
+                "严重易损",
+                "质量稳定",
+                "一般"
+            ],
+            "data": [
+                15,
+                75,
+                10
+            ]
+        }
+    },
+    "strategy": {
+        "moat_pros": [
+            {
+                "title": "护城河/优势 1",
+                "desc": "深度解析..."
+            },
+            {
+                "title": "护城河/优势 2",
+                "desc": "深度解析..."
+            }
+        ],
+        "vulnerability_cons": [
+            {
+                "title": "致命弱点/风险 1",
+                "desc": "深度解析..."
+            },
+            {
+                "title": "致命弱点/风险 2",
+                "desc": "深度解析..."
+            }
+        ]
+    },
+    "execution_matrix": [
+        {
+            "urgency": "Immediate",
+            "directive": "高管指令1",
+            "details": "执行细节...",
+            "roi": "预期ROI..."
+        },
+        {
+            "urgency": "Short-Term",
+            "directive": "高管指令2",
+            "details": "执行细节...",
+            "roi": "预期ROI..."
+        },
+        {
+            "urgency": "Long-Term",
+            "directive": "高管指令3",
+            "details": "执行细节...",
+            "roi": "预期ROI..."
+        }
+    ],
+    "voc_quotes": [
+        {
+            "profile": "用户标签1 / Advocate",
+            "quote": "正面原声内容...",
+            "status": "High Satisfaction",
+            "is_danger": false
+        },
+        {
+            "profile": "用户标签2 / Detractor",
+            "quote": "负面原声内容...",
+            "status": "Severe Attrition",
+            "is_danger": true
+        },
+        {
+            "profile": "用户标签3 / Passive",
+            "quote": "中立原声内容...",
+            "status": "Premium Perception",
+            "is_danger": false
+        },
+        {
+            "profile": "用户标签4 / Detractor",
+            "quote": "负面原声内容...",
+            "status": "Trust Broken",
+            "is_danger": true
+        }
+    ]
+}

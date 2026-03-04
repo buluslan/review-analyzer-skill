@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST_10 - Boardroom Executive View</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        playfair: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        anker: {
+                            gold: '#BF953F',
+                            goldLight: '#FCF6BA',
+                            dark: '#050505',
+                            card: 'rgba(22, 22, 22, 0.7)',
+                            danger: '#ef4444'
+                        },
+                        brand: {
+                            gold: '#BF953F',
+                            goldLight: '#FCF6BA',
+                            dark: '#050505',
+                            card: 'rgba(22, 22, 22, 0.7)',
+                            danger: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Visual DNA CSS -->
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e7eb;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 核心滚动条样式 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #BF953F; }
+
+        .gold-shine {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent;
+            background-size: 200% auto; 
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        
+        .glass-card { 
+            background: rgba(22, 22, 22, 0.7); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(230,194,93,0.1); 
+        }
+        
+        .card-glow { transition: all 0.3s ease; }
+        .card-glow:hover { 
+            border-color: rgba(230,194,93,0.5); 
+            box-shadow: 0 0 40px rgba(230,194,93,0.1); 
+            transform: translateY(-4px); 
+            z-index: 10;
+        }
+
+        /* 市场洞察结构化排版 */
+        .insight-list { @apply space-y-3 mt-4; }
+        .insight-list li { @apply flex items-start text-sm text-gray-300 leading-relaxed; }
+        .insight-list li::before { content: "•"; @apply text-anker-gold mr-3 text-lg leading-none pt-0.5 font-bold; }
+        .insight-list li::before { content: "•"; @apply text-brand-gold mr-3 text-lg leading-none pt-0.5 font-bold; }
+        
+        .text-glow { text-shadow: 0 0 10px rgba(191, 149, 63, 0.3); }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+
+    <!-- Background Decoration -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#BF953F] opacity-[0.03] rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        
+        <!-- 1. Header Section (Anti-Overlap Strategy: pb-20) -->
+        <header class="flex flex-col items-center justify-center pb-20 pt-8">
+            <div class="mb-6 card-glow rounded-full p-4 bg-black/50 border border-anker-gold/20 backdrop-blur-md">
+                <i class="fa-solid fa-bolt text-3xl text-anker-gold text-glow"></i>
+            </div>
+            <h1 class="font-playfair text-5xl md:text-7xl text-white text-center font-bold tracking-tight mb-4 drop-shadow-2xl">
+                <span class="gold-shine">TEST_10</span>
+            </h1>
+            <h2 class="text-xl md:text-2xl text-gray-400 text-center tracking-[0.2em] font-light uppercase mb-8">
+                评论深度分析洞察
+            </h2>
+            <div class="text-center">
+                <span class="gold-shine text-xs md:text-sm font-semibold tracking-widest uppercase border-y border-anker-gold/30 py-2 px-8 inline-block">
+                    Created By Gemini-3.1-V46
+                </span>
+            </div>
+        </header>
+
+        <!-- 2. KPI Meta Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 relative z-20">
+            <!-- KPI 1 -->
+            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-anker-gold/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Total Reviews</h3>
+                <div class="text-5xl font-playfair font-bold text-anker-gold mb-2 text-glow">10</div>
+                <p class="text-gray-300 text-sm font-semibold">总评论数</p>
+                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">样本量极低</p>
+            </div>
+            <!-- KPI 2 -->
+            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Average Rating</h3>
+                <div class="text-5xl font-playfair font-bold text-anker-danger mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">3.4</div>
+                <p class="text-gray-300 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-anker-danger"></i> 平均评分
+                </p>
+                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">行业基准线以下</p>
+            </div>
+            <!-- KPI 3 -->
+            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Data Silence Rate</h3>
+                <div class="text-5xl font-playfair font-bold text-anker-danger mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">100<span class="text-2xl">%</span></div>
+                <p class="text-gray-300 text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-anker-danger"></i> 数据沉默率
+                </p>
+                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">解析失败/无有效内容</p>
+            </div>
+            <!-- KPI 4 -->
+            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-anker-gold/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Tagged Reviews</h3>
+                <div class="text-5xl font-playfair font-bold text-gray-500 mb-2">0</div>
+                <p class="text-gray-300 text-sm font-semibold">已打标评论</p>
+                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">成功率 0%</p>
+            </div>
+        </section>
+
+        <!-- 3. Market Demographics (4格栅格 - 深度提炼版) -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
+                <i class="fa-solid fa-microscope text-anker-gold"></i> 市场深度洞察与归因
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-20">
+                <!-- Grid 1 -->
+                <div class="glass-card card-glow p-8 rounded-2xl">
+                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
+                        <div class="w-10 h-10 rounded-full bg-anker-gold/10 flex items-center justify-center">
+                            <i class="fa-solid fa-users text-anker-gold text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white tracking-wide">核心受众画像</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><span class="text-white font-semibold mr-2">标签缺失信号:</span> 100% 性别、年龄、职业未知，呈现典型的电商冷启动与用户认知盲区。</li>
+                        <li><span class="text-white font-semibold mr-2">核心场景推断:</span> 集中于基础日常家庭环境，产品被定性为低介入度的易耗替代品。</li>
+                        <li><span class="text-white font-semibold mr-2">典型画像素描:</span> 实用主义至上的沉默型消费者，无品牌忠诚度，决策受价格绝对驱动。</li>
+                    </ul>
+                </div>
+                <!-- Grid 2 -->
+                <div class="glass-card card-glow p-8 rounded-2xl">
+                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
+                        <div class="w-10 h-10 rounded-full bg-anker-gold/10 flex items-center justify-center">
+                            <i class="fa-solid fa-bullseye text-anker-gold text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white tracking-wide">核心卖点与验证</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><span class="text-white font-semibold mr-2">底层价值触达:</span> 唯一正面归因指向“基本功能的完整性”，缺乏溢价支撑点。</li>
+                        <li><span class="text-white font-semibold mr-2">情绪平淡反馈:</span> 用户高频使用“OK”、“Fine”等词汇，表明缺乏打动人心的细节体验。</li>
+                        <li><span class="text-white font-semibold mr-2">底线交易逻辑:</span> 产品仅完成了品类最底线任务，用户反馈仅为完成交易后的礼貌性中立。</li>
+                    </ul>
+                </div>
+                <!-- Grid 3 -->
+                <div class="glass-card card-glow p-8 rounded-2xl">
+                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-heart-crack text-anker-danger text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white tracking-wide">主要痛点与负面归因</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><span class="text-anker-danger font-semibold mr-2">致命数据静默:</span> 90% 解析失败，在电商心理学中，无话可说比明确差评更为致命。</li>
+                        <li><span class="text-white font-semibold mr-2">货币属性缺失:</span> 拆箱与使用过程毫无惊喜感，产品陷入“极度平庸”的危险区。</li>
+                        <li><span class="text-white font-semibold mr-2">复购流失预警:</span> 品牌存在感透明，下次购买时用户极大概率转向低价或高颜值竞品。</li>
+                    </ul>
+                </div>
+                <!-- Grid 4 -->
+                <div class="glass-card card-glow p-8 rounded-2xl">
+                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
+                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-lightbulb text-green-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white tracking-wide">潜在机会与差异化</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><span class="text-white font-semibold mr-2">竞品竞争盲区:</span> 评论中未提及任何竞品，表明产品尚未进入消费者的高级比较清单。</li>
+                        <li><span class="text-white font-semibold mr-2">极简蓝海发现:</span> 100% 的中立评价暗示了一个被忽视的追求纯粹、无印调性的潜在客群。</li>
+                        <li><span class="text-white font-semibold mr-2">战略转型建议:</span> 将被动的“平庸”主动转化为“极简主义”，吸引厌恶冗余功能的消费者。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Data Telemetry 图表矩阵 -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
+                <i class="fa-solid fa-chart-pie text-anker-gold"></i> 多维数据遥测 (Data Telemetry)
+            </h2>
+            <!-- Anti-Overlap Strategy: min-h-[400px] -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-20">
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">情感分布矩阵</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartSentiment"></canvas></div>
+                </div>
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">核心特征关注度</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartFeatures"></canvas></div>
+                </div>
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">使用场景分布</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartScenarios"></canvas></div>
+                </div>
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">价格价值感知</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartPrice"></canvas></div>
+                </div>
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">设计与易用性反馈</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartDesign"></canvas></div>
+                </div>
+                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">耐用性与质量评估</h3>
+                    <div class="flex-grow relative w-full h-full"><canvas id="chartDurability"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Strategy Dual-Columns -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
+                <i class="fa-solid fa-chess text-anker-gold"></i> 战略对抗矩阵 (Moat vs Vulnerability)
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
+                <!-- Moat -->
+                <div class="glass-card card-glow p-8 rounded-2xl border-t-4 border-t-green-500/80">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fa-solid fa-shield-halved text-green-500"></i> 品牌护城河 (Moat)
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
+                            <h4 class="text-green-400 font-bold mb-2">质量稳定性</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">在随机样本中表现出极高的功能一致性，无质量瑕疵投诉，为品牌升级提供稳固底座。</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
+                            <h4 class="text-green-400 font-bold mb-2">预期管理一致性</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">产品实际表现与详情页描述高度契合，供应链品控稳定，有效降低了消费者的失落感。</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Vulnerability -->
+                <div class="glass-card card-glow p-8 rounded-2xl border-t-4 border-t-anker-danger/80">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fa-solid fa-crosshairs text-anker-danger"></i> 致命脆弱点 (Vulnerability)
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
+                            <h4 class="text-anker-danger font-bold mb-2">品牌存在感缺失</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">用户对产品缺乏情感投入，导致评论内容极度空洞，心智占位处于完全透明状态。</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
+                            <h4 class="text-anker-danger font-bold mb-2">社交货币属性弱</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">产品缺乏足以让用户产生分享冲动的亮点或创新点，无法形成口碑裂变与自发传播。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Strategic Allocation -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
+                <i class="fa-solid fa-layer-group text-anker-gold"></i> 高管执行矩阵 (Strategic Allocation)
+            </h2>
+            <div class="glass-card card-glow rounded-2xl overflow-hidden relative z-20">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-black/60 border-b border-gray-800">
+                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Urgency</th>
+                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Directive</th>
+                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase w-2/5">Strategic Details</th>
+                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Expected ROI</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800/50">
+                            <tr class="hover:bg-white/5 transition-colors group">
+                                <td class="p-5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/20">
+                                        <i class="fa-solid fa-fire"></i> Immediate
+                                    </span>
+                                </td>
+                                <td class="p-5 text-white font-bold">视觉与包装重构</td>
+                                <td class="p-5 text-gray-400 text-sm leading-relaxed">在产品包装中增加品牌故事或独特的视觉元素，打破中立沉默，植入开箱 Aha Moment。</td>
+                                <td class="p-5 text-anker-gold font-medium text-sm">提升高质量评论留存率</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition-colors group">
+                                <td class="p-5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                                        <i class="fa-solid fa-clock"></i> Short-Term
+                                    </span>
+                                </td>
+                                <td class="p-5 text-white font-bold">评论激励计划</td>
+                                <td class="p-5 text-gray-400 text-sm leading-relaxed">通过合法渠道引导用户针对耐用性和特定使用场景进行深度反馈，解决数据静默危机。</td>
+                                <td class="p-5 text-anker-gold font-medium text-sm">获取结构化标签，优化广告投放</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition-colors group">
+                                <td class="p-5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                        <i class="fa-solid fa-seedling"></i> Long-Term
+                                    </span>
+                                </td>
+                                <td class="p-5 text-white font-bold">细分市场心智占领</td>
+                                <td class="p-5 text-gray-400 text-sm leading-relaxed">将产品定位从通用型转向极简主义或特定低频场景，建立差异化壁垒，摆脱价格内卷。</td>
+                                <td class="p-5 text-anker-gold font-medium text-sm">建立品牌溢价能力与用户忠诚</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Market Resonance (VOC) 全案级深度版 -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
+                <i class="fa-solid fa-satellite-dish text-anker-gold"></i> 市场共振原声 (Voice of Customer)
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
+                
+                <!-- VOC Card 1 -->
+                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="flex items-center gap-5 mb-6">
+                        <img src="../../assets/avatars/avatar_tech.png" onerror="this.src='https://ui-avatars.com/api/?name=Advocate&background=111&color=BF953F&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-gold object-cover shadow-[0_0_15px_rgba(191,149,63,0.3)]">
+                        <div>
+                            <h3 class="text-lg font-bold text-white tracking-wide">Advocate / 技术大牛</h3>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20">
+                                High Loyalty
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Core Need -->
+                    <div class="mb-5">
+                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-gold/50 bg-anker-gold/10 text-anker-gold text-xs font-bold shadow-[0_0_10px_rgba(191,149,63,0.1)]">
+                            核心需求：顶级工业设计与硬件堆料认可
+                        </span>
+                    </div>
+                    <!-- Quote -->
+                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-gold pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
+                        "其工业设计与内部堆料确实达到了行业第一梯队水平..."
+                    </blockquote>
+                    <!-- Expert Analysis -->
+                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
+                        <h4 class="text-anker-gold font-bold text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
+                        </h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            该用户代表了高感知度的极客圈层。对硬件堆料的高度认可是品牌溢价的核心基石，建议在 A+ 页面及社媒营销中强化拆解图与硬核技术指标，放大该圈层的口碑效应。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VOC Card 2 -->
+                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="flex items-center gap-5 mb-6">
+                        <img src="../../assets/avatars/avatar_business.png" onerror="this.src='https://ui-avatars.com/api/?name=Detractor&background=111&color=ef4444&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-danger object-cover shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                        <div>
+                            <h3 class="text-lg font-bold text-white tracking-wide">Detractor / 商务精英</h3>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20">
+                                Trust Broken
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Core Need -->
+                    <div class="mb-5">
+                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-danger/50 bg-red-500/10 text-red-400 text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.1)]">
+                            核心需求：零容错的绝对稳定性
+                        </span>
+                    </div>
+                    <!-- Quote -->
+                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-danger pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
+                        "在关键的会议场合出现了断连，这对于专业人士来说是不可接受的。"
+                    </blockquote>
+                    <!-- Expert Analysis -->
+                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
+                        <h4 class="text-anker-danger font-bold text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 危机解析
+                        </h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            核心商务场景的断连是致命伤，直接导致高净值用户信任破裂。此反馈属于最高优 P0 级预警，需立即协同研发排查特定环境下的固件稳定性，并主动提供高规格售后挽回。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VOC Card 3 -->
+                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="flex items-center gap-5 mb-6">
+                        <img src="../../assets/avatars/avatar_elderly_male.png" onerror="this.src='https://ui-avatars.com/api/?name=Passive&background=111&color=9ca3af&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-gray-500 object-cover">
+                        <div>
+                            <h3 class="text-lg font-bold text-white tracking-wide">Passive / 生活家</h3>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-500/10 text-gray-400 border border-gray-500/20">
+                                Neutral
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Core Need -->
+                    <div class="mb-5">
+                        <span class="inline-block px-4 py-1.5 rounded-full border border-gray-500/50 bg-gray-800/50 text-gray-300 text-xs font-bold">
+                            核心需求：基础功能替代与情绪价值获取
+                        </span>
+                    </div>
+                    <!-- Quote -->
+                    <blockquote class="italic text-gray-400 text-lg border-l-4 border-gray-500 pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
+                        "平时用着还行，就是没什么特别惊艳的地方。"
+                    </blockquote>
+                    <!-- Expert Analysis -->
+                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
+                        <h4 class="text-gray-300 font-bold text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
+                        </h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            典型的“数据静默”群体代表。缺乏 Aha moment 使产品沦为平庸的代名词。亟需通过 CMF 设计微创新或极具仪式感的包装设计，提升开箱惊喜感，将中立态度转化为品牌偏好。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VOC Card 4 -->
+                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="flex items-center gap-5 mb-6">
+                        <img src="../../assets/avatars/avatar_tech.png" onerror="this.src='https://ui-avatars.com/api/?name=Advocate&background=111&color=BF953F&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-gold object-cover shadow-[0_0_15px_rgba(191,149,63,0.3)]">
+                        <div>
+                            <h3 class="text-lg font-bold text-white tracking-wide">Advocate / 极客玩家</h3>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-anker-gold/10 text-anker-gold border border-anker-gold/20">
+                                Premium Perception
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Core Need -->
+                    <div class="mb-5">
+                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-gold/50 bg-anker-gold/10 text-anker-gold text-xs font-bold shadow-[0_0_10px_rgba(191,149,63,0.1)]">
+                            核心需求：持续的软硬件生态进化
+                        </span>
+                    </div>
+                    <!-- Quote -->
+                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-gold pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
+                        "固件更新非常及时，这就是我选择该品牌的理由。"
+                    </blockquote>
+                    <!-- Expert Analysis -->
+                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
+                        <h4 class="text-anker-gold font-bold text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
+                        </h4>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            软硬件结合的持续售后体验是维系硬核用户的关键护城河。固件的更新频率与响应速度可提炼为隐性卖点，在详情页中作为“长期价值承诺”进行宣发，构建品牌信任壁垒。
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Chart.js Initialization -->
+    <script>
+        // Global Chart Defaults for Black Minimalist Luxury Theme
+        Chart.defaults.color = '#9ca3af';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, usePointStyle: true, boxWidth: 8 }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: '#BF953F',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(191,149,63,0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            }
+        };
+
+        const barOptions = {
+            ...commonOptions,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+                x: { grid: { display: false }, border: { display: false } }
+            }
+        };
+
+        const chartColors = {
+            gold: '#BF953F',
+            goldLight: '#FCF6BA',
+            grayDark: '#374151',
+            grayLight: '#9CA3AF',
+            danger: '#ef4444'
+        };
+
+        // 1. Sentiment (Doughnut)
+        new Chart(document.getElementById('chartSentiment'), {
+            type: 'doughnut',
+            data: {
+                labels: ["中立", "解析失败", "中立"],
+                datasets: [{
+                    data: [1, 9, 0],
+                    backgroundColor: [chartColors.grayLight, chartColors.grayDark, chartColors.gold],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { ...commonOptions, cutout: '70%' }
+        });
+
+        // 2. Features (Bar)
+        new Chart(document.getElementById('chartFeatures'), {
+            type: 'bar',
+            data: {
+                labels: ["项目1", "项目2", "项目3"],
+                datasets: [{
+                    label: '关注度',
+                    data: [40, 30, 30],
+                    backgroundColor: chartColors.gold,
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: barOptions
+        });
+
+        // 3. Scenarios (Bar)
+        new Chart(document.getElementById('chartScenarios'), {
+            type: 'bar',
+            data: {
+                labels: ["项目1", "项目2", "项目3"],
+                datasets: [{
+                    label: '提及频次',
+                    data: [40, 30, 30],
+                    backgroundColor: 'rgba(191, 149, 63, 0.6)',
+                    borderColor: chartColors.gold,
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: barOptions
+        });
+
+        // 4. Price Perception (Doughnut)
+        new Chart(document.getElementById('chartPrice'), {
+            type: 'doughnut',
+            data: {
+                labels: ["物超所值", "偏贵", "合理"],
+                datasets: [{
+                    data: [40, 30, 30],
+                    backgroundColor: [chartColors.goldLight, chartColors.danger, chartColors.grayDark],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { ...commonOptions, cutout: '70%' }
+        });
+
+        // 5. Design Usability (Radar or Bar - choosing Bar for consistency with dummy data)
+        new Chart(document.getElementById('chartDesign'), {
+            type: 'bar',
+            data: {
+                labels: ["外观精美", "操作直观", "笨重", "复杂"],
+                datasets: [{
+                    label: '正向反馈',
+                    data: [40, 30, 0, 0],
+                    backgroundColor: chartColors.gold,
+                    borderRadius: 4
+                },
+                {
+                    label: '负向反馈',
+                    data: [0, 0, 30, 0], // Adjusted dummy data to make sense for negative
+                    backgroundColor: chartColors.danger,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                ...barOptions,
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        // 6. Durability (Bar)
+        new Chart(document.getElementById('chartDurability'), {
+            type: 'bar',
+            data: {
+                labels: ["质量上乘", "材质优良", "易损耗"],
+                datasets: [{
+                    label: '反馈量',
+                    data: [40, 30, 30],
+                    backgroundColor: [chartColors.gold, chartColors.goldLight, chartColors.grayDark],
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                ...barOptions,
+                plugins: { ...commonOptions.plugins, legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>

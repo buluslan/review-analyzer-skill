@@ -1,0 +1,171 @@
+# 亚马逊商品评论标签体系配置
+# Amazon Product Review Tag System Configuration
+# 版本: V1
+# 来源: 基于 n8n 工作流适配
+
+# ==================== 标签维度定义 ====================
+tag_dimensions:
+  # 人群维度 (4个标签)
+  人群:
+    - name: 人群_性别
+      options: [男性, 女性, 不明]
+      description: 用户性别
+
+    - name: 人群_年龄段
+      options: [18-25, 26-35, 36-45, 46-55, 55+, 不明]
+      description: 用户年龄段
+
+    - name: 人群_职业
+      options:
+        - 医疗工作者
+        - 体力劳动者
+        - 办公室职员
+        - 学生
+        - 退休人员
+        - 教师
+        - 司机
+        - 其他
+        - 不明
+      description: 根据评论内容推断的职业身份
+
+    - name: 人群_购买角色
+      options: [自用, 礼物, 商用, 不明]
+      description: 购买目的
+
+  # 场景维度 (1个标签)
+  场景:
+    - name: 场景_使用场景
+      options:
+        - 家用
+        - 办公
+        - 户外
+        - 运动
+        - 开车
+        - 旅行
+        - 其他
+      description: 根据评论内容推断的使用场景
+
+  # 功能维度 (2个标签)
+  功能:
+    - name: 功能_满意度
+      options: [超出预期, 符合预期, 低于预期, 未提及]
+      description: 整体功能满意度
+
+    - name: 功能_具体功能
+      type: text
+      description: 简述用户提到的具体功能点，如：续航能力/防水功能/保暖效果/降噪功能等
+
+  # 质量维度 (3个标签)
+  质量:
+    - name: 质量_材质
+      options: [优秀, 良好, 一般, 差, 未提及]
+      description: 材质质量评价
+
+    - name: 质量_做工
+      options: [精细, 一般, 粗糙, 未提及]
+      description: 做工精细度
+
+    - name: 质量_耐用性
+      options: [耐用, 一般, 易坏, 未提及]
+      description: 产品耐用性
+
+  # 服务维度 (5个标签)
+  服务:
+    - name: 服务_发货速度
+      options: [快, 正常, 慢, 未提及]
+      description: 发货速度评价
+
+    - name: 服务_包装质量
+      options: [完好, 一般, 破损, 未提及]
+      description: 包装质量
+
+    - name: 服务_客服响应
+      options: [及时, 一般, 迟缓, 未提及]
+      description: 客服响应速度
+
+    - name: 服务_退换货
+      options: [顺畅, 一般, 困难, 未提及]
+      description: 退换货体验
+
+    - name: 服务_保修
+      options: [有保修, 无保修, 未提及]
+      description: 是否有保修
+
+  # 体验维度 (4个标签)
+  体验:
+    - name: 体验_舒适度
+      options: [舒适, 一般, 不适, 未提及]
+      description: 使用舒适度
+
+    - name: 体验_易用性
+      options: [简单, 适中, 困难, 未提及]
+      description: 易用性评价
+
+    - name: 体验_外观设计
+      options: [满意, 一般, 不满意, 未提及]
+      description: 外观设计满意度
+
+    - name: 体验_价格感知
+      options: [超值, 合理, 偏贵, 未提及]
+      description: 价格感知
+
+  # 市场维度 (2个标签)
+  市场:
+    - name: 竞品_竞品对比
+      type: text
+      description: 用户提及的竞品品牌名称，如：品牌A/品牌B/品牌C等，如无则填'无'
+      examples:
+        - 品牌A
+        - 品牌B
+        - 品牌C
+        - 无
+
+    - name: 复购_复购意愿
+      options: [会复购, 可能, 不会, 未提及]
+      description: 复购意愿
+
+  # 情感维度 (1个标签)
+  情感:
+    - name: 情感_总体评价
+      options: [强烈推荐, 推荐, 中立, 不推荐, 强烈不推荐]
+      description: 总体情感评价
+
+# ==================== 评分规则 ====================
+scoring:
+  info_score:
+    range: [1, 20]
+    rules:
+      - name: 基础分_字数
+        condition: "评论字数 > 50"
+        score: 1
+      - name: 基础分_长评
+        condition: "评论字数 > 200"
+        score: 2
+      - name: 标签分
+        condition: "每个有效标签（非'未提及'）"
+        score: 1
+      - name: 加分_竞品
+        condition: "提及竞品"
+        score: 5
+      - name: 加分_复购
+        condition: "明确复购意愿"
+        score: 3
+      - name: 加分_场景
+        condition: "描述使用场景"
+        score: 2
+
+# ==================== 输出格式 ====================
+output_format:
+  type: json
+  structure:
+    review_id: string
+    sentiment: enum[强烈推荐, 推荐, 中立, 不推荐, 强烈不推荐]
+    info_score: integer[1-20]
+    tags: object
+
+# ==================== 注意事项 ====================
+notes:
+  - 无依据的标签填"不明"或"未提及"
+  - 职业标签、使用场景均需从评论内容中推断
+  - info_score 反映评论的信息价值密度
+  - 只返回纯JSON，不要任何解释文字
