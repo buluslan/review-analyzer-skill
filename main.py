@@ -157,32 +157,45 @@ def main():
 
     parser = argparse.ArgumentParser(description="Amazon Review Analyzer V1.0")
     parser.add_argument("input_file", help="输入 CSV/Excel 文件路径")
-    parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=100)
+    parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
     # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
-    parser.add_argument("--mode", choices=["1", "2", "3"], default="1",
+    parser.add_argument("--mode", choices=["1", "2", "3"], default=None,
                         help="分析模式: 1=全程CLI(免费), 2=混动(打标CLI+看板Gemini), 3=全程Gemini")
-    parser.add_argument("--creator", help="报告署名/品牌", default="AI Assistant")
+    parser.add_argument("--creator", help="报告署名/品牌", default=None)
     parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
     args = parser.parse_args()
 
-    # 判断用户是否通过命令行显式提供了三个关键参数
-    # 如果用户一个都没提供（全走默认值），且在 TTY 环境，则启动向导
-    _explicitly_provided = any([
-        '--max-reviews' in sys.argv,
-        '--mode' in sys.argv,
-        '--creator' in sys.argv
-    ])
-    needs_interaction = not _explicitly_provided
+    # 判断是否缺少关键参数
+    _missing_params = []
+    if args.max_reviews is None:
+        _missing_params.append("--max-reviews")
+    if args.mode is None:
+        _missing_params.append("--mode")
+    if args.creator is None:
+        _missing_params.append("--creator")
+    needs_interaction = len(_missing_params) > 0
 
-    # 非交互环境 + 用户未显式提供参数 → 静默使用默认值，不阻塞执行
+    # 非交互环境 + 缺少参数 → 拒绝执行，报错退出
     if needs_interaction and not is_interactive_environment():
-        print(f"\n💡 检测到非交互式环境，将使用默认配置运行：")
-        print(f"   📊 分析数量: {args.max_reviews} 条")
-        print(f"   🤖 运行模式: Claude CLI 全程 (模式 {args.mode})")
-        print(f"   ✍️  报告署名: {args.creator}")
-        print(f"   (可通过 --max-reviews / --mode / --creator 参数自定义)\n")
+        print("=" * 70)
+        print("❌ 缺少必要参数，无法在非交互式环境中运行")
+        print("=" * 70)
+        print()
+        print("  缺少以下参数：")
+        for p in _missing_params:
+            print(f"    ⚠️  {p}")
+        print()
+        print("  请通过命令行提供完整参数：")
+        print(f"    python3 main.py '{args.input_file}' \\")
+        print("      --max-reviews 100 \\")
+        print("      --mode 1 \\")
+        print("      --creator '你的署名'")
+        print()
+        print("  💡 提示：如需使用交互式菜单，请直接在终端中运行此命令。")
+        print("=" * 70)
+        sys.exit(1)
 
     # 打印工具说明（向导第一步）
     print_intro()
@@ -199,23 +212,22 @@ def main():
     print(f"📄 成功加载表格：检测到 {total_available} 条有效评论记录")
 
     # 3. 配置合并 (优先级：命令行 > 向导 > 默认)
-    if not needs_interaction or not is_interactive_environment():
-        # 参数已就绪（显式提供或默认值），跳过向导
-        if _explicitly_provided:
-            print(f"\n✅ 检测到完整命令行参数，跳过交互式向导")
+    if not needs_interaction:
+        # 三个参数都已通过命令行提供，跳过向导
+        print(f"\n✅ 检测到完整命令行参数，跳过交互式向导")
         max_reviews = args.max_reviews
         mode = args.mode
         creator = args.creator
     else:
-        # 在 TTY 环境且未显式提供参数 → 启动交互式向导
+        # 在 TTY 环境且缺少参数 → 启动交互式向导
         wizard_max_reviews, wizard_mode, wizard_creator = config_wizard(
             total_available=total_available,
-            preset_max=args.max_reviews if '--max-reviews' in sys.argv else None,
-            preset_mode=args.mode if '--mode' in sys.argv else None,
-            preset_creator=args.creator if '--creator' in sys.argv else None
+            preset_max=args.max_reviews,
+            preset_mode=args.mode,
+            preset_creator=args.creator
         )
         print()  # 向导结束后添加空行
-        # 合并配置：向导结果优先
+        # 向导结果优先
         max_reviews = wizard_max_reviews
         mode = wizard_mode
         creator = wizard_creator
