@@ -12,6 +12,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Version](https://img.shields.io/badge/version-1.0.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
+[![English](https://img.shields.io/badge/lang-English-blue.svg)](README_EN.md)
+[![中文](https://img.shields.io/badge/lang-中文-red.svg)](README.md)
 
 **8大维度22个通用标签 | 深度洞察分析报告 | 动态可视化看板**
 
