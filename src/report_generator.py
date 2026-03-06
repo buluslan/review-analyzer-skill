@@ -134,15 +134,28 @@ def _build_json_data(
         "report_title": f"{product} 评论深度分析洞察",
         "signature": f"Created By {creator_name}",
         "retail_price": "待补充",
-        "sample_size": str(summary.get("total_reviews", 0)) if summary else "0",
+        "sample_size": str(summary.get("total", 0)) if summary else "0",
         "status": "Strategic Review"
     }
 
     # ========== KPI 指标 ==========
-    # 从统计数据中提取 KPI
-    total = summary.get("total_reviews", 0) if summary else 0
-    avg_rating = summary.get("avg_rating", 0) if summary else 0
-    tagged = summary.get("tagged_reviews", 0) if summary else 0
+    # 从统计数据中提取 KPI（修复键名不匹配问题）
+    total = summary.get("total", 0) if summary else 0
+    tagged = summary.get("tagged", 0) if summary else 0
+
+    # 计算平均评分（从 tag_statistics 中获取或使用默认值）
+    avg_rating = 0
+    if summary and "avg_rating" in summary:
+        avg_rating = summary.get("avg_rating", 0)
+    elif tag_statistics and "功能_满意度" in tag_statistics:
+        # 如果没有 avg_rating，从满意度数据估算
+        satisfaction = tag_statistics.get("功能_满意度", {})
+        total_count = sum(satisfaction.values())
+        if total_count > 0:
+            # 简单加权：超出预期=5, 符合预期=4, 低于预期=2, 其他=3
+            weights = {"超出预期": 5, "符合预期": 4, "低于预期": 2}
+            weighted_sum = sum(count * weights.get(label, 3) for label, count in satisfaction.items())
+            avg_rating = round(weighted_sum / total_count, 1)
 
     # 计算数据沉默率
     silence_rate = ((total - tagged) / total * 100) if total > 0 else 0
@@ -550,6 +563,18 @@ def _render_with_jinja2(
 
     # 准备模板数据
     total_reviews = int(json_data.get("meta", {}).get("sample_size", 0))
+
+    # 从KPI数据中提取平均评分
+    kpis = json_data.get("kpis", [])
+    avg_rating = 4.5  # 默认值
+    for kpi in kpis:
+        if kpi.get("title") == "Average Rating":
+            try:
+                avg_rating = float(kpi.get("value", 4.5))
+            except (ValueError, TypeError):
+                avg_rating = 4.5
+            break
+
     template_vars = {
         "asin": asin,
         "product_name": json_data.get("meta", {}).get("product_name", asin),
@@ -558,7 +583,7 @@ def _render_with_jinja2(
             "total_reviews": total_reviews,
             "tagged_reviews": total_reviews, # 本地模式默认全显示
             "persona_count": len(json_data.get("personas", [])),
-            "avg_rating": 4.5 # 默认值，后续可从 json_data 提取
+            "avg_rating": avg_rating  # 从KPI数据中提取
         },
         "personas": json_data.get("personas", []),
         "sentiment_distribution": json_data.get("sentiment_distribution", {}),

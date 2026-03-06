@@ -98,11 +98,16 @@ def calculate_stats_summary(tagged_reviews: List[Dict]) -> Dict:
     # 取 Top 30 标签
     top_tags = dict(tag_counter.most_common(30))
 
+    # 2. 计算平均评分
+    ratings = [r.get("rating", 0) for r in tagged_reviews if r.get("rating")]
+    avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else 0
+
     return {
         "total": total,
         "tagged": tagged_count,
         "sentiment": sentiment_dist,
-        "top_tags": top_tags
+        "top_tags": top_tags,
+        "avg_rating": avg_rating
     }
 
 
