@@ -75,19 +75,19 @@ def config_wizard(total_available: int,
     # Q2 (推理引擎选择)
     print("\n🤖 [向导 2/3] 请选择 AI 引擎组合：")
     print()
-    print("   [1] Claude CLI 本地模式")
-    print("       使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成")
+    print("   [1] Gemini增强模式（推荐）")
+    print("       调用Gemini API")
+    print("       使用【Gemini 3.1 flash】生成洞察报告")
+    print("       使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）")
     print()
     print("   [2] Claude CLI+Gemini混动模式")
     print("       文字报告使用Claude Code内置模型")
     print("       可视化看板使用【Gemini 3.1 pro】生成（需要API Key，产生费用）")
     print()
-    print("   [3] Gemini增强模式（推荐）")
-    print("       调用Gemini API")
-    print("       使用【Gemini 3.1 flash】生成洞察报告")
-    print("       使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）")
+    print("   [3] Claude CLI 本地模式")
+    print("       使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成")
     print()
-    mode_names = {"1": "Claude CLI 全程", "2": "CLI+Gemini混动", "3": "Gemini增强"}
+    mode_names = {"1": "Gemini增强", "2": "CLI+Gemini混动", "3": "Claude CLI 全程"}
     if preset_mode is not None:
         print(f"   [当前预设: {mode_names.get(preset_mode, preset_mode)} 模式]")
         mode_input = input(f"   输入编号 [直接回车使用预设值 {preset_mode}] >>> ").strip()
@@ -161,7 +161,7 @@ def main():
     # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
     parser.add_argument("--mode", choices=["1", "2", "3"], default=None,
-                        help="分析模式: 1=全程CLI(免费), 2=混动(打标CLI+看板Gemini), 3=全程Gemini")
+                        help="分析模式: 1=Gemini增强(需Key), 2=混动(CLI打标+Gemini看板), 3=CLI本地(免费)")
     parser.add_argument("--creator", help="报告署名/品牌", default=None)
     parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
@@ -244,22 +244,25 @@ def main():
     if gemini_key:
         config.GEMINI_API_KEY = gemini_key
 
-    # 模式分配
+    # 模式分配 (与SKILL.md中的选项顺序一致)
     if mode == "1":
-        config.INSIGHTS_PROVIDER = "cli"
-        config.HTML_GENERATION_SOURCE = "local"
-        print("💡 模式：全程 Claude CLI (全本地方案)")
+        # 模式1: Gemini增强模式 - 全程使用Gemini API
+        config.INSIGHTS_PROVIDER = "gemini"
+        config.GEMINI_MODEL = "gemini-3-flash-preview"  # 文字报告专用模型
+        config.HTML_GENERATION_SOURCE = "gemini"
+        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 可视化看板专用模型
+        print("💡 模式：Gemini 增强模式 (Flash报告 + 3.1 Pro看板)")
     elif mode == "2":
+        # 模式2: Claude CLI+Gemini混动模式 - 打标用CLI，看板用Gemini
         config.INSIGHTS_PROVIDER = "cli"
         config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 模式2可视化看板专用模型
+        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 可视化看板专用模型
         print("💡 模式：混动模式 (CLI 打标 + Gemini 3.1 Pro 看板)")
     elif mode == "3":
-        config.INSIGHTS_PROVIDER = "gemini"
-        config.GEMINI_MODEL = "gemini-3-flash-preview"  # 模式3文字报告专用模型
-        config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 模式3可视化看板专用模型
-        print("💡 模式：全程 Gemini 引擎 (Flash报告 + 3.1 Pro看板)")
+        # 模式3: Claude CLI 本地模式 - 全程使用本地模型
+        config.INSIGHTS_PROVIDER = "cli"
+        config.HTML_GENERATION_SOURCE = "local"
+        print("💡 模式：Claude CLI 本地模式 (全本地方案)")
 
     # 检查 Key 依赖
     if config.HTML_GENERATION_SOURCE == "gemini" and not config.GEMINI_API_KEY:
@@ -341,10 +344,12 @@ def main():
             print(f"   - 正在渲染本地模板...")
 
         summary = {
-            "total_reviews": len(tagged_reviews),
-            "tagged_reviews": stats["tagged"],
+            "total": len(tagged_reviews),
+            "tagged": stats["tagged"],
             "persona_count": len(personas),
-            "avg_rating": round(sum(r.get("rating", 0) for r in tagged_reviews) / len(tagged_reviews), 2) if tagged_reviews else 0
+            "avg_rating": stats.get("avg_rating", 0),
+            "sentiment": stats.get("sentiment", {}),
+            "top_tags": stats.get("top_tags", {})
         }
 
         html_path = generate_html_report(
