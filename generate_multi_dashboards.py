@@ -171,7 +171,7 @@ def main():
         # 配置生成模式
         config.HTML_GENERATION_SOURCE = version['source']
         config.HTML_GENERATION_MODEL = version['model']
-        config.HTML_CREATOR_NAME = "Buluu"
+        config.HTML_CREATOR_NAME = "AI Assistant"
 
         # 修改输出文件名
         original_get_html_path = config.get_html_path
@@ -190,7 +190,7 @@ def main():
                 personas=personas,
                 golden_samples=golden_samples,
                 insights_md=insights_md,
-                creator_name="Buluu"
+                creator_name="AI Assistant"
             )
 
             # 复制到输出目录根目录

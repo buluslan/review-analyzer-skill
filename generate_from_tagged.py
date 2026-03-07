@@ -117,7 +117,7 @@ def main():
 
     # 解析参数
     mode = "1"  # 默认Gemini增强模式
-    creator = "Buluu"
+    creator = "AI Assistant"
     output_dir = None  # 默认输出到CSV同目录
 
     for i in range(2, len(sys.argv)):

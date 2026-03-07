@@ -678,7 +678,7 @@ def generate_html_report(
             full_prompt,
             generation_config=genai.types.GenerationConfig(
                 temperature=config.HTML_GENERATION_TEMPERATURE,
-                max_output_tokens=16384,
+                max_output_tokens=65536,
             )
         )
 
