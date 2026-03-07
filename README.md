@@ -27,9 +27,9 @@
 
 Review Analyzer Skill 是一款AI驱动的多场景评论内容深度分析工具，为您提供灵活的分析模式选择：
 
-- **Claude CLI本地模式**：使用您的Claude Code中的内置模型进行打标，推理，报告和看板生成。
-- **Gemini增强模式（推荐）**：调用Gemini API，使用【Gemini 3.1 flash】生成洞察报告，使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）
-- **Claude CLI+Gemini混动模式**：文字报告使用Claude Code内置模型，可视化看板使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）
+- **模式1：Gemini增强模式（推荐）**：调用Gemini API，使用【Gemini 3.1 flash】生成洞察报告，使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）
+- **模式2：Claude CLI+Gemini混动模式**：文字报告使用Claude Code内置模型，可视化看板使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）
+- **模式3：Claude CLI本地模式**：使用您的Claude Code中的内置模型进行打标，推理，报告和看板生成。
 
 为提升token使用效率，在标签挖掘环节，默认使用您Claude Code中的内置模型。
 
@@ -140,11 +140,14 @@ cp .env.example .env
 ### 6. 运行分析
 
 ```bash
-# CLI本地模式（使用Claude CLI，消耗Claude配额）
-python main.py your_reviews.csv
+# Gemini增强模式（推荐，需要GEMINI_API_KEY，产生API费用）
+python main.py your_reviews.csv --mode 1
 
-# Gemini增强模式（需要GEMINI_API_KEY，产生API费用）
-python main.py your_reviews.csv --insights-mode 2
+# Claude CLI+Gemini混动模式（需要GEMINI_API_KEY）
+python main.py your_reviews.csv --mode 2
+
+# CLI本地模式（免费，使用Claude CLI，消耗Claude配额）
+python main.py your_reviews.csv --mode 3
 
 # 指定创作者署名
 python main.py your_reviews.csv --creator "Your Name"
@@ -240,11 +243,16 @@ review-analyzer-skill/
 ├── examples/                    # 示例数据
 │   ├── reviews_sample.csv       # 示例CSV
 │   └── output_sample/           # 示例输出
-├── main.py                      # 主入口
+├── main.py                      # 主入口 (新建单品分析)
+├── generate_from_tagged.py      # 独立工具：从已打标CSV生成报告
+├── generate_multi_dashboards.py # 独立工具：多版本HTML看板生成
+├── run_batch.py                 # 批量处理工具 (多ASIN分析)
+├── SKILL.md                     # Claude Code Skill 核心配置与防幻觉系统提示
 ├── requirements.txt             # Python依赖
 ├── .env.example                 # 环境变量模板
 ├── LICENSE                      # MIT许可证
-└── README.md                    # 项目说明
+├── README.md                    # 项目说明
+└── README_EN.md                 # 英文说明
 ```
 
 ---

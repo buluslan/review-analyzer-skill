@@ -26,9 +26,9 @@ For the latest AI industry insights, AI+ecommerce/advertising practices, and ref
 
 Review Analyzer Skill is an AI-driven multi-scenario review content deep analysis tool, providing flexible analysis mode options:
 
-- **Claude CLI Local Mode**: Use your built-in model in Claude Code for tagging, reasoning, report and dashboard generation.
-- **Gemini Enhanced Mode (Recommended)**: Call Gemini API, use [Gemini 3.1 flash] to generate insight reports, use [Gemini 3.1 pro] to generate visualization dashboards (requires API Key, incurs fees)
-- **Claude CLI + Gemini Hybrid Mode**: Text reports use Claude Code built-in model, visualization dashboards use [Gemini 3.1 pro] (requires API Key, incurs fees)
+- **Mode 1: Gemini Enhanced Mode (Recommended)**: Call Gemini API, use [Gemini 3.1 flash] to generate insight reports, use [Gemini 3.1 pro] to generate visualization dashboards (requires API Key, incurs fees)
+- **Mode 2: Claude CLI + Gemini Hybrid Mode**: Text reports use Claude Code built-in model, visualization dashboards use [Gemini 3.1 pro] (requires API Key, incurs fees)
+- **Mode 3: Claude CLI Local Mode**: Use your built-in model in Claude Code for tagging, reasoning, report and dashboard generation.
 
 To improve token usage efficiency, the default for tag mining is to use your built-in model in Claude Code.
 
@@ -139,11 +139,14 @@ cp .env.example .env
 ### 6. Run Analysis
 
 ```bash
-# CLI Local Mode (Uses Claude CLI, consumes Claude quota)
-python main.py your_reviews.csv
+# Gemini Enhanced Mode (Recommended, requires GEMINI_API_KEY, incurs API fees)
+python main.py your_reviews.csv --mode 1
 
-# Gemini Enhanced Mode (Requires GEMINI_API_KEY, incurs API fees)
-python main.py your_reviews.csv --insights-mode 2
+# Claude CLI + Gemini Hybrid Mode (requires GEMINI_API_KEY)
+python main.py your_reviews.csv --mode 2
+
+# CLI Local Mode (Free, uses Claude CLI, consumes Claude quota)
+python main.py your_reviews.csv --mode 3
 
 # Specify creator signature
 python main.py your_reviews.csv --creator "Your Name"
@@ -239,11 +242,16 @@ review-analyzer-skill/
 ├── examples/                    # Example data
 │   ├── reviews_sample.csv       # Sample CSV
 │   └── output_sample/           # Sample output
-├── main.py                      # Main entry point
+├── main.py                      # Main entry point (Single product analysis)
+├── generate_from_tagged.py      # Standalone tool: Generate report from tagged CSV
+├── generate_multi_dashboards.py # Standalone tool: Multi-version HTML dashboard generation
+├── run_batch.py                 # Batch processing tool (Multi-ASIN analysis)
+├── SKILL.md                     # Claude Code Skill core config and anti-hallucination prompt
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template
 ├── LICENSE                      # MIT License
-└── README.md                    # Project documentation
+├── README.md                    # Project documentation (Chinese)
+└── README_EN.md                 # Project documentation (English)
 ```
 
 ---
