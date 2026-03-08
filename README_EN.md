@@ -99,14 +99,33 @@ Multi-dimensional user profiling with enhanced social appeal:
 
 ## Quick Start
 
-### 1. Clone Repository
+### Method 1: Install via skills.sh Ecosystem (Recommended)
+
+```bash
+npx skills add buluslan/review-analyzer-skill
+```
+
+After installation, use natural language to invoke in Claude Code:
+
+```bash
+# Example 1: Analyze specific file
+Please analyze the reviews for this product: reviews.csv
+
+# Example 2: Describe requirements
+Help me do a deep analysis of competitor reviews
+
+# Example 3: Specify quantity
+Analyze the latest 100 review data
+```
+
+### Method 2: Manual Clone Repository
 
 ```bash
 git clone https://github.com/buluslan/review-analyzer-skill.git
 cd review-analyzer-skill
 ```
 
-### 2. Environment Check (Recommended)
+### 3. Environment Check (Recommended, Manual Installation Only)
 
 ```bash
 # Check Python version and dependencies
@@ -115,19 +134,19 @@ python scripts/check_environment.py
 
 If check fails, see [Python Upgrade Guide](docs/PYTHON_UPGRADE.md)
 
-### 3. Install Dependencies
+### 4. Install Dependencies (Manual Installation Only)
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Install Claude CLI (Required for CLI Mode)
+### 5. Install Claude CLI (Required for CLI Mode)
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-### 5. Configure Environment Variables (Optional)
+### 6. Configure Environment Variables (Optional)
 
 For Gemini Enhanced Mode:
 
@@ -136,7 +155,7 @@ cp .env.example .env
 # Edit .env file, add your GEMINI_API_KEY
 ```
 
-### 6. Run Analysis
+### 7. Run Analysis (Manual Installation Only)
 
 ```bash
 # Gemini Enhanced Mode (Recommended, requires GEMINI_API_KEY, incurs API fees)
