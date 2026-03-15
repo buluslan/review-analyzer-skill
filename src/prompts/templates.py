@@ -150,25 +150,37 @@ INSIGHTS_PROMPT_MD = """# Role
 ### 情感分布
 {sentiment_distribution}
 
+### 全维度标签分布（非常重要）
+{dimensional_distribution}
+
 ### 高频标签 Top 15
 {top_tags}
 
 ## 黄金样本（按用户画像筛选，共 {samples_count} 条）
 {golden_samples}
 
+# Core Principles / 核心原则
+1. **数据真实性第一**：报告中的每一项统计数据和结论都必须有原始数据支撑。
+2. **严禁过度外推（反幻觉红线）**：如果某个标签维度存在大量“不明”或“未提及”数据（如超过 50%），必须如实反映现状。**绝对禁止**利用极少数已知标签去推算、预测或代表整体分布。有多少算多少。
+3. **画像侧写诚实性（Persona Inference）**：在描述人口统计特征（年龄、职业）时，请向读者明确说明：这是**基于用户评论的语义线索和生活场景（如工作提及、家庭成员提及）进行的 AI 画像侧写推断**，而非精确的人口普查统计。
+4. **特征显著性要求**：如果某个人群属性或画像的样本量极小且不具特征性，必须诚实陈述其“特征不显著”，严禁强行描述。
+
 # Analysis Framework
 请严格按照以下 7 大章节进行深度洞察分析，生成完整的 Markdown 报告：
 
-## 0. 数据统计（新增）
-- 核心要求：对所有打标数据进行全盘的定量汇总与统计
-- 格式要求：[标签维度]：[类别A]（X人，X%），[类别B]（Y人，Y%），[类别C]（Z人，Z%）...
-- 语义归并原则：发挥AI的语义识别能力，将表达有差异但实际属于同个维度的标签进行合并统计（例如：将"医生"、"护士"统一合并为"医疗工作者"进行统计计算）
-- 长尾折叠原则：对于"职业"、"使用场景"、"具体功能"等分类可能极其繁杂的维度，仅详细列出占比最高的 Top 10 类别。Top 10 之外的所有长尾数据，请统一合并记录为"其他/未知"
-- 统计范围：必须涵盖性别、年龄段、职业、场景、功能满意度、质量维度、体验维度以及总体评价等核心标签
+## 0. 数据统计（Ground Truth 锁定区）
+- **核心要求**：必须 **100% 完整复刻** 下方【全维度标签分布】表格中的原始数据。
+- **严禁串扰**：绝对禁止将 A 维度的百分比写到 B 维度（例如：严禁因为性别有 98% 不明，就推断年龄也有 98% 属于某区间）。
+- **格式要求**：[标签维度]：[类别A]（X人，X%），[类别B]（Y人，Y%）...
+- 语义归并原则：发挥AI的语义识别能力，将表达有差异但实际属于同个维度的标签进行合并统计。
+- 长尾折叠原则：对于分类极其繁杂的维度，仅详细列出占比最高的 Top 10 类别。其余合并记录为"其他/未知"。
+- 统计范围：必须涵盖性别、年龄段、职业、场景、功能满意度、质量维度、体验维度以及总体评价等所有被打标的有效标签。
 
-## 1. 用户画像与主流场景
+## 1. 用户画像与主流场景 (Persona Inference)
 - 核心用户群体有哪些？（基于性别、年龄、职业的交叉分析）
 - 典型使用场景有哪些？
+- **【数据披露与定调】**：请在此章节开头开宗明义地说明：“以下受众画像基于具有可识别生活轨迹的样本（约占整体X%）进行的语义侧写推断，其余X%的客群特征不显著”。
+- 如果基础人口属性大部分为"不明"，请转而从"使用场景"、"核心痛点"等已被明确验证的标签来刻画，坚决避免进行无依据的人群外推预测。
 - **必须引用评论原话支撑**
 
 ## 2. 核心卖点与价值验证
@@ -197,7 +209,7 @@ INSIGHTS_PROMPT_MD = """# Role
 - 必须包含正面和负面评价，保持分布均匀
 - 严格按照以下格式输出本章节内容：
 
-**典型画像**：[年龄段] [性别] [职业] [核心需求]
+**典型画像**：[年龄段] [性别] [职业] [核心需求]（若前面三个维度大比例为"不明"，请直接用一笔带过，如："某年龄不明职业未知的用户"）
 
 **评价原文**："[保留评论核心内容，过长可适当截断]"
 
@@ -220,12 +232,16 @@ INSIGHTS_PROMPT_MD = """# Role
 
 ## 数据统计
 [结构化罗列人群、场景、满意度等核心分布数据]
+- **【数据真实性死命令】**：你必须以此处提供的【全维度标签分布】表格为**唯一真理**。
+- **禁止脑补**：严禁篡改或掩饰“不明/未提及”的数据比例！如果表格显示某维度不明比例为 69%，你的报告必须写“不明 (69%)”，**绝对禁止**将其归入任何具体的业务类别！
 - 对性别、年龄段、职业、场景、功能满意度、质量维度、体验维度以及总体评价等核心标签进行统计
 - 应用语义归并原则，合并同类型标签
 - 对职业、场景、具体功能等维度只显示 Top 10，其余合并为"其他/未知"
+- **【反幻觉红线】**：严禁篡改或掩饰“不明/未提及”的数据比例！例如，如果输入数据显示有 67% 的人群年龄段是“不明”，你的报告必须明确写出“不明（67%）”，**绝对禁止**将其归入任何具体的年龄段！有多少算多少！
 
 ## 一、核心用户画像与场景
-1. 定量统计与交叉洞察（基于性别、年龄、职业等维度的深度碰撞）
+- **【数据披露（必须原样输出）】**：请在本章节的开头第一行，**必须**写下这句声明：“**说明：以下受众画像基于具有可识别生活轨迹的样本（约占整体X%）进行的语义侧写推断（Persona Inference），其余的客群特征不显著。**”（请用实际已知特征的比例替换X%）。
+1. 定量统计与交叉洞察（基于性别、年龄、职业等维度的深度碰撞，基于那少部分能推断出画像的用户，描述其生活场景）
 2. 典型画像描述（刻画 2 个极其具象的真实使用场景。注意：严禁使用整段大篇幅文字，必须使用加粗标题+简短列表的结构化形式排版，确保移动端及大屏阅读体验）
 
 ## 二、核心卖点与价值验证
@@ -300,16 +316,18 @@ INSIGHTS_PROMPT_MD = """# Role
 </strategic_json>
 """
 
-INSIGHTS_PROMPT_TXT = """# Role / 角色设定
-你是一位拥有15年经验的"消费者行为学家"和"首席跨境电商数据分析师"。你擅长直接处理包含噪音的原始电商表格数据，具备强大的自然语言处理能力，能够从零散的用户评论中自主提取结构化信息，并挖掘市场真相。你的行文风格专业、客观、逻辑严密。
+INSIGHTS_PROMPT_TXT = """角色设定
+你是一位拥有15年经验的消费者行为学家和首席跨境电商数据分析师。你擅长直接处理包含噪音的原始电商表格数据，具备强大的自然语言处理能力，能够从零散的用户评论中自主提取结构化信息并挖掘市场真相。你的行文风格专业、客观、逻辑严密。
 
-# Context / 背景
-我将为你提供一份亚马逊商品评论数据，包含用户星级、评论标题、评论正文等信息，以及已完成AI打标的22维度标签数据。
+核心原则
+1. 数据真实性第一：报告内容必须严格基于下方提供的统计数据和样本。
+2. 严禁过度外推：遇到大量不明标签时必须如实反映。禁止利用极少数已知标签去强行代表全局。有多少就是多少。
+3. 画像侧写诚实性：在描述人口统计特征时，请向读者说明这是基于用户评论的语义线索进行的 AI 画像侧写推断。
 
-# Input Data
-- 评论总量：{total} 条
-- 有效打标：{tagged} 条
-- ASIN：{asin}
+输入数据
+评论总量：{total} 条
+有效打标：{tagged} 条
+ASIN：{asin}
 
 【用户画像分析】（{personas_count} 个）
 {personas_details}
@@ -318,110 +336,72 @@ INSIGHTS_PROMPT_TXT = """# Role / 角色设定
 情感分布：
 {sentiment_distribution}
 
+【全维度标签分布】（锁定数值使用，严格以此为准）
+{dimensional_distribution}
+
 高频标签 Top 15：
 {top_tags}
 
 【黄金样本】（{samples_count} 条）
 {golden_samples}
 
-# Processing Logic / 数据处理与提取逻辑
-数据已包含AI打标的22维度标签，你需要基于这些结构化标签和原始评论内容进行深度分析。
+任务目标
+综合定量估算和定性分析，生成一份结构化的《深度洞察分析报告》。
 
-# Task / 任务目标
-综合"定量估算"（基于标签频次和占比）和"定性分析"（基于原始评论的语义和情绪挖掘），生成一份结构化的《深度洞察分析报告》。
+严格格式约束（极其重要）
+1. 绝对禁止使用任何 Markdown 格式符号。不要井号 #，不要星号 *，不要下划线 _，不要代码块。
+2. 内部层级禁止使用 Markdown 标题，必须使用“【 】”符号。
+3. 列表项仅使用数字（1. 2. 3.）或简单的顿号。
+4. 引用用户原话时使用双引号。
+5. 这是一个纯文本报告，确保它能直接复制到 TXT 文档中且排版整齐。
 
-# Strict Formatting Rules / 严格格式约束
-为了保证报告的整洁性，请严格遵守以下格式要求：
-1. 禁止使用任何 Markdown 格式符号（如星号 *、井号 #、下划线 _ 等）
-2. 禁止使用无意义的斜杠 / 作为分隔符
-3. 标题使用【 】符号包裹来表示层级（例如：【一、用户画像分析】）
-4. 列表项使用数字（1. 2. 3.）或简单的连字符（-）
-5. 引用用户原话时，请使用双引号
-6. 输出内容必须纯净、文本化，便于直接阅读和复制
-
-# Analysis Framework / 分析框架
-请严格按照以下章节进行输出：
+分析框架（请严格按以下结构输出）
 
 【标题】
-常规命名格式：关于XX品牌XX产品的评论深度分析报告
-如果识别不到品牌，可以灵活调整进行删减
+关于XX品牌XX产品的评论深度分析报告
 
 【洞察总览】
-本次处理的数据范围（必须包括文档中的评论总数，以及有效提取到关键信息的评论数），用2-3句话总结本次评论分析的核心要点（特别是负反馈和产品可优化方向）
+本次分析的数据量，及 2-3 句话的全局要点总结（负反馈、改进方向）。
 
 【数据统计】
-核心要求：对所有打标数据进行全盘的定量汇总与统计
-格式要求：每个标签维度必须单独一行，格式为【标签维度】：类别（人数，占比）。多个类别用顿号、分隔。
-示例格式：
-【人群_性别】：男性（5人，50%）、女性（3人，30%）、未知（2人，20%）
-【人群_年龄段】：26-35岁（4人，40%）、36-45岁（3人，30%）、未知（3人，30%）
-语义归并原则：发挥AI的语义识别能力，将表达有差异但实际属于同个维度的标签进行合并统计（例如：将"医生"、"护士"统一合并为"医疗工作者"进行统计计算）
-长尾折叠原则：对于"职业"、"使用场景"、"具体功能"等分类可能极其繁杂的维度，仅详细列出占比最高的 Top 10 类别。Top 10 之外的所有长尾数据，请统一合并记录为"其他/未知"
-统计范围：必须涵盖性别、年龄段、职业、场景、功能满意度、质量维度、体验维度以及总体评价等核心标签
+100% 复刻上面的【全维度标签分布】内容。格式为：【维度】：标签1（人数，占比）、标签2（人数，占比）...
 
 【一、核心用户画像与场景】
-定量统计：分析人群性别、年龄段、职业标签的分布比例
-交叉洞察：通过数据关联，找出"职业"与"使用场景"的强相关性（例如：某种职业的人群是否集中在特定场景使用？）
-典型画像：基于数据，用文字描绘出该产品的核心典型用户形象（User Avatar）
+1. 定量统计分析
+2. 职业与场景的交叉洞察
+3. 典型用户描述
 
 【二、核心卖点与价值验证】
-满意度归因：在给出了4-5星或情感极佳的评论数据中，统计出现频率最高的体验或质量维度是什么
-语义挖掘（定性）：深入分析原始评论，用户是用什么具体的词汇来描述这些优点的？找出打动用户的具体细节
+1. 满意度归因分析
+2. 语义挖掘与优点细节
 
 【三、主要痛点与负面归因】
-问题分布：在1-3星的差评数据中，统计占比最高的负面维度（是质量问题多，还是服务问题多？）
-根源追溯（定性）：不要只说"耐用性差"，要根据原始评论指出具体是哪个部件坏了；不要只说"舒适度一般"，要指出具体是哪里造成了不适
-严重性评估：区分哪些是导致退货的致命伤，哪些是用户可以忍受的小瑕疵
+1. 问题分布情况
+2. 根源追溯与定性分析
+3. 严重性评估
 
 【四、改进建议与优先级】
-基于痛点分析，提出3条具体的改进建议
-请按照"问题出现的频率"和"对购买决策的影响程度"进行优先级排序（高/中/低）
+1. 硬件/功能迭代建议（优先级：高/中/低）
+2. 软件/服务建议
 
 【五、潜在机会与差异化】
-竞品情报：分析评论中用户提到了哪些对手品牌？用户认为我们好在哪里，差在哪里？
-蓝海发现：在提取到的"职业"或"场景"信息中，是否存在虽属小众但满意度极高的人群？这可能是一个未被充分服务的细分市场
+1. 竞品情报分析
+2. 蓝海细分场景发现
 
 【六、典型用户深度解析】
-请从高价值评论样本数据中提取 1-2 个占比最高或最具代表性的"核心用户画像"
-针对每个画像，抽取 1-2 条代表性原始评论（必须包含正面和负面评价，保持分布均匀）进行具体解析，最后总共输出不少于4个评论内容的解析
-请在分析时引用评论样本中的具体内容，严格按照以下格式输出本章节内容：
-
-典型画像：[年龄段] [性别] [职业] [核心需求]，如果识别不到以上维度信息，可以根据评论内容进行抽象总结，预测用户身份
-评价原文："[保留评论核心内容，过长可适当截断]"
-评论解析：[1-2句话简评。指出该用户的核心痛点、爽点或具体建议]
-
-（请重复上述格式以展示所有选取的评论）
+提取 4 个代表性样本（分布均匀），格式如下：
+典型画像：[职业/年龄等] [核心需求]
+评价原文："内容"
+评论解析：解析痛点或爽点。
 
 【七、关键洞察总结】
-请用一段精炼的文字（约150字左右）对整份报告进行总结
-核心聚焦：请基于你的专业判断，指出报告中最值得关注的"亮点"或"风险点"
+150字左右，指出最值得关注的亮点或风险。
 
 【战略数据输出（系统专用）】
-为了确保可视化看板的准确性，请在报告的最后，强制输出一个 <strategic_json> 块。
-该块必须是合法的 JSON，严禁包含任何 Markdown 格式或额外文字。
-格式如下：
+必须在最后以 <strategic_json> 块输出合法 JSON（不带任何 Markdown 标记）。格式：
 <strategic_json>
-{{
-  "moat": [
-    {{"title": "护城河1", "desc": "简短描述..."}},
-    {{"title": "护城河2", "desc": "..."}}
-  ],
-  "vulnerability": [
-    {{"title": "软肋1", "desc": "..."}},
-    {{"title": "软肋2", "desc": "..."}}
-  ],
-  "execution_matrix": [
-    {{"urgency": "Immediate", "directive": "指令1", "details": "动作...", "roi": "预期..."}},
-    {{"urgency": "Short-Term", "directive": "指令2", "details": "...", "roi": "..."}},
-    {{"urgency": "Long-Term", "directive": "指令3", "details": "...", "roi": "..."}}
-  ]
-}}
+{{"moat": [], "vulnerability": [], "execution_matrix": []}}
 </strategic_json>
-
-# 字数要求
-- 总字数：1000-3000 字
-- 每个章节必须有具体数据支撑
-- 每个论点必须引用至少 1 条用户原话
 """
 
 # ==================== 辅助函数 ====================
@@ -514,7 +494,7 @@ def get_insights_prompt_md(
     for i, p in enumerate(personas):
         tags = normalize_tags(p.get('tags', {}))
         detail = f"### 画像 {i+1}: {p['name']} ({p['count']} 条)\n"
-        detail += f"标签特征: {', '.join(f'{k}:{v}' for k,v in tags.items() if v and v not in ('不明', '未提及'))}"
+        detail += f"标签特征: {', '.join(f'{k}:{v}' for k,v in tags.items() if v)}"
         personas_details.append(detail)
     personas_details = "\n\n".join(personas_details)
 
@@ -530,6 +510,21 @@ def get_insights_prompt_md(
         for i, (t, c) in enumerate(list(stats.get("top_tags", {}).items())[:15])
     )
 
+    # 格式化全维度数据（改用表格以锁定 AI 数值感知，防止串扰）
+    dimensional_stats = stats.get("dimensional_stats", {})
+    if not dimensional_stats:
+        dimensional_distribution = "无具体维度分布数据"
+    else:
+        dim_lines = []
+        for dim, count_dict in dimensional_stats.items():
+            total_dim_count = sum(count_dict.values())
+            # 构建该维度的子表格
+            table = f"| {dim} 类别 | 人数 | 占比 |\n| :--- | :--- | :--- |\n"
+            for val, count in count_dict.items():
+                table += f"| {val} | {count} | {count/total_dim_count*100:.1f}% |\n"
+            dim_lines.append(table)
+        dimensional_distribution = "\n".join(dim_lines)
+
     # 格式化黄金样本
     samples_details = []
     for i, s in enumerate(samples):
@@ -537,7 +532,7 @@ def get_insights_prompt_md(
         sample = f"### 样本 {i+1}\n"
         sample += f"**情感**: {s.get('sentiment', '不明')}\n"
         sample += f"**内容**: {s.get('body', '')[:300]}...\n"
-        sample += f"**标签**: {', '.join(f'{k}:{v}' for k,v in tags.items() if v and v not in ('不明', '未提及'))}"
+        sample += f"**标签**: {', '.join(f'{k}:{v}' for k,v in tags.items() if v)}"
         samples_details.append(sample)
     golden_samples = "\n\n".join(samples_details)
 
@@ -548,6 +543,7 @@ def get_insights_prompt_md(
         personas_count=len(personas),
         personas_details=personas_details,
         sentiment_distribution=sentiment_dist,
+        dimensional_distribution=dimensional_distribution,
         top_tags=top_tags,
         samples_count=len(samples),
         golden_samples=golden_samples,
@@ -594,7 +590,7 @@ def get_insights_prompt_txt(
     for i, p in enumerate(personas):
         tags = normalize_tags(p.get('tags', {}))
         detail = f"画像 {i+1}: {p['name']} ({p['count']} 条)\n"
-        detail += f"标签特征: {', '.join(f'{k}:{v}' for k,v in tags.items() if v and v not in ('不明', '未提及'))}"
+        detail += f"标签特征: {', '.join(f'{k}:{v}' for k,v in tags.items() if v)}"
         personas_details.append(detail)
     personas_details = "\n\n".join(personas_details)
 
@@ -610,6 +606,21 @@ def get_insights_prompt_txt(
         for i, (t, c) in enumerate(list(stats.get("top_tags", {}).items())[:15])
     )
 
+    # 格式化全维度数据（改用表格以锁定 AI 数值感知，防止串扰）
+    dimensional_stats = stats.get("dimensional_stats", {})
+    if not dimensional_stats:
+        dimensional_distribution = "无具体维度分布数据"
+    else:
+        dim_lines = []
+        for dim, count_dict in dimensional_stats.items():
+            total_dim_count = sum(count_dict.values())
+            # 构建该维度的子表格
+            table = f"| {dim} 类别 | 人数 | 占比 |\n| :--- | :--- | :--- |\n"
+            for val, count in count_dict.items():
+                table += f"| {val} | {count} | {count/total_dim_count*100:.1f}% |\n"
+            dim_lines.append(table)
+        dimensional_distribution = "\n".join(dim_lines)
+
     # 格式化黄金样本（纯文本格式）
     samples_details = []
     for i, s in enumerate(samples):
@@ -617,7 +628,7 @@ def get_insights_prompt_txt(
         sample = f"样本 {i+1}\n"
         sample += f"情感: {s.get('sentiment', '不明')}\n"
         sample += f"内容: {s.get('body', '')[:300]}...\n"
-        sample += f"标签: {', '.join(f'{k}:{v}' for k,v in tags.items() if v and v not in ('不明', '未提及'))}"
+        sample += f"标签: {', '.join(f'{k}:{v}' for k,v in tags.items() if v)}"
         samples_details.append(sample)
     golden_samples = "\n\n".join(samples_details)
 
@@ -628,6 +639,7 @@ def get_insights_prompt_txt(
         personas_count=len(personas),
         personas_details=personas_details,
         sentiment_distribution=sentiment_dist,
+        dimensional_distribution=dimensional_distribution,
         top_tags=top_tags,
         samples_count=len(samples),
         golden_samples=golden_samples

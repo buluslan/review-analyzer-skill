@@ -159,19 +159,19 @@ cp .env.example .env
 
 ```bash
 # Gemini Enhanced Mode (Recommended, requires GEMINI_API_KEY, incurs API fees)
-python main.py your_reviews.csv --mode 1
+python3 main.py your_reviews.csv --mode 1
 
 # Claude CLI + Gemini Hybrid Mode (requires GEMINI_API_KEY)
-python main.py your_reviews.csv --mode 2
+python3 main.py your_reviews.csv --mode 2
 
 # CLI Local Mode (Free, uses Claude CLI, consumes Claude quota)
-python main.py your_reviews.csv --mode 3
+python3 main.py your_reviews.csv --mode 3
 
 # Specify creator signature
-python main.py your_reviews.csv --creator "Your Name"
+python3 main.py your_reviews.csv --creator "Your Name"
 
 # Custom product title
-python main.py your_reviews.csv --product-title "Amazing Product"
+python3 main.py your_reviews.csv --product-title "Amazing Product"
 ```
 
 ---
@@ -261,10 +261,12 @@ review-analyzer-skill/
 ├── examples/                    # Example data
 │   ├── reviews_sample.csv       # Sample CSV
 │   └── output_sample/           # Sample output
+├── tools/                       # Independent Utility Chain (Advanced)
+│   ├── generate_from_tagged.py  # Standalone tool: Generate report from tagged CSV
+│   ├── generate_multi_dashboards.py # Standalone tool: Multi-version HTML dashboard generation
+│   ├── regenerate_insights.py   # Standalone tool: One-click refresh insight report content/style
+│   └── run_batch.py             # Batch processing tool (Multi-ASIN analysis)
 ├── main.py                      # Main entry point (Single product analysis)
-├── generate_from_tagged.py      # Standalone tool: Generate report from tagged CSV
-├── generate_multi_dashboards.py # Standalone tool: Multi-version HTML dashboard generation
-├── run_batch.py                 # Batch processing tool (Multi-ASIN analysis)
 ├── SKILL.md                     # Claude Code Skill core config and anti-hallucination prompt
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template

@@ -136,6 +136,7 @@ python3 ~/.claude/skills/review-analyzer-skill/main.py "<目标CSV文件路径>"
 - 性能对比: [references/performance.md](references/performance.md)
 - 高级用法: [references/ADVANCED_USAGE.md](references/ADVANCED_USAGE.md)
 - 故障排除: [references/TROUBLESHOOTING.md](references/TROUBLESHOOTING.md)
+- 进阶工具链: [tools/README.md（待补充）](tools/)
 - 技术架构: [references/ARCHITECTURE.md](references/ARCHITECTURE.md)
 
 ## 作者

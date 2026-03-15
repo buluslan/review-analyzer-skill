@@ -124,7 +124,7 @@ def _identify_personas(reviews: List[Dict]) -> Tuple[List[Dict], str]:
             if p_name not in persona_tag_stats:
                 persona_tag_stats[p_name] = {}
             for t_key, t_val in tags.items():
-                if t_val not in ["不明", "未提及", "nan"]:
+                if t_val:
                     if t_key not in persona_tag_stats[p_name]:
                         persona_tag_stats[p_name][t_key] = Counter()
                     persona_tag_stats[p_name][t_key][t_val] += 1
@@ -140,7 +140,9 @@ def _identify_personas(reviews: List[Dict]) -> Tuple[List[Dict], str]:
             for idx, (name, count) in enumerate(valid[:config.MAX_PERSONAS]):
                 typical_tags = {}
                 for t_key, counter in persona_tag_stats.get(name, {}).items():
-                    typical_tags[t_key] = counter.most_common(1)[0][0]
+                    top_val, top_count = counter.most_common(1)[0]
+                    # Append the actual exact count of people who had this known tag
+                    typical_tags[t_key] = f"{top_val}(仅{top_count}人有此特征)"
                 
                 final_personas_raw.append({
                     "name": name,

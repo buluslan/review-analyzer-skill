@@ -81,24 +81,34 @@ def calculate_stats_summary(tagged_reviews: List[Dict]) -> Dict:
 
     sentiment_dist = dict(sentiment_counter)
 
-    # 2. 统计高频标签
+    # 2. 统计高频标签和全维度分布
     # 格式: "维度_标签名:值" 如 "人群_性别:男性"
     tag_counter = Counter()
-    exclude_values = {"未提及", "不明", "无"}
-
+    dimensional_stats = {}
+    
+    # 保持数据完整性：不再过滤"不明"或"未提及"，让大模型看到真实的分布（特别是缺失率）
+    # 大模型会根据 Prompt 中的"长尾折叠"和"反幻觉"原则自主处理这些标签
     for review in tagged_reviews:
         tags = review.get("tags", {})
         for tag_key, tag_value in tags.items():
-            # 过滤掉无效值
-            if tag_value and tag_value not in exclude_values:
-                # 使用 "维度_标签名:值" 作为key
+            if tag_value:
+                # 扁平化的高频标签
                 combined_key = f"{tag_key}:{tag_value}"
                 tag_counter[combined_key] += 1
+                
+                # 结构化的维度打标
+                if tag_key not in dimensional_stats:
+                    dimensional_stats[tag_key] = Counter()
+                dimensional_stats[tag_key][tag_value] += 1
 
-    # 取 Top 30 标签
+    # 取 Top 30 标签 (供本地和旧看板逻辑使用)
     top_tags = dict(tag_counter.most_common(30))
+    
+    # 将 Counter 转换为普通 dict (供 Gemini 使用全面数据)
+    for dim in dimensional_stats:
+        dimensional_stats[dim] = dict(dimensional_stats[dim].most_common(50)) # 取每个维度前50防止过大
 
-    # 2. 计算平均评分
+    # 3. 计算平均评分
     ratings = [r.get("rating", 0) for r in tagged_reviews if r.get("rating")]
     avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else 0
 
@@ -107,6 +117,7 @@ def calculate_stats_summary(tagged_reviews: List[Dict]) -> Dict:
         "tagged": tagged_count,
         "sentiment": sentiment_dist,
         "top_tags": top_tags,
+        "dimensional_stats": dimensional_stats,
         "avg_rating": avg_rating
     }
 
@@ -141,14 +152,23 @@ def generate_insights(
         >>> "评论深度洞察报告" in report
         True
     """
-    # 获取格式化的提示词
-    prompt = get_insights_prompt_txt(
-        stats=stats,
-        personas=personas,
-        samples=golden_samples,
-        asin=asin,
-        product_name=product_name
-    )
+    # 获取格式化的提示词（根据配置选择样式：md 或 txt）
+    if config.INSIGHTS_FORMAT == "md":
+        prompt = get_insights_prompt_md(
+            stats=stats,
+            personas=personas,
+            samples=golden_samples,
+            asin=asin,
+            product_name=product_name
+        )
+    else:
+        prompt = get_insights_prompt_txt(
+            stats=stats,
+            personas=personas,
+            samples=golden_samples,
+            asin=asin,
+            product_name=product_name
+        )
 
     # 根据配置选择生成方式
     if config.INSIGHTS_PROVIDER == "gemini":

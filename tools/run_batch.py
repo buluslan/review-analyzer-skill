@@ -13,6 +13,10 @@ from dotenv import load_dotenv
 # 加载 .env 环境变量
 load_dotenv()
 
+# 添加项目根目录到路径
+import os
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 # 导入所有核心模块
 from src.data_loader import load_reviews_from_file
 from src.review_analyzer import analyze_all

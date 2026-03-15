@@ -31,7 +31,7 @@ class Config:
     # 通过 subprocess.run(["claude", "-p", ...]) 调用
     CLAUDE_CLI_CMD: str = "claude"
     # CLI 调用超时时间（秒）- 从环境变量读取，默认 180 秒
-    CLI_TIMEOUT: int = int(os.getenv("CLI_TIMEOUT", "180"))
+    CLI_TIMEOUT: int = int(os.getenv("CLI_TIMEOUT", "600"))
 
     # ==================== 分析配置 ====================
     MAX_REVIEWS: int = 500           # 最大获取评论数
@@ -57,6 +57,7 @@ class Config:
 
     # ==================== 洞察报告生成配置 ====================
     INSIGHTS_PROVIDER: str = "cli"  # 可选: cli / gemini
+    INSIGHTS_FORMAT: str = "txt"  # 可选: md / txt
     GEMINI_API_KEY: str = ""  # 从环境变量读取或用户输入
     GEMINI_MODEL: str = "gemini-3-flash-preview"  # 使用 Gemini 3 Flash Preview
     GEMINI_TEMPERATURE: float = 0.7

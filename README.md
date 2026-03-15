@@ -160,19 +160,19 @@ cp .env.example .env
 
 ```bash
 # Gemini增强模式（推荐，需要GEMINI_API_KEY，产生API费用）
-python main.py your_reviews.csv --mode 1
+python3 main.py your_reviews.csv --mode 1
 
 # Claude CLI+Gemini混动模式（需要GEMINI_API_KEY）
-python main.py your_reviews.csv --mode 2
+python3 main.py your_reviews.csv --mode 2
 
 # CLI本地模式（免费，使用Claude CLI，消耗Claude配额）
-python main.py your_reviews.csv --mode 3
+python3 main.py your_reviews.csv --mode 3
 
 # 指定创作者署名
-python main.py your_reviews.csv --creator "Your Name"
+python3 main.py your_reviews.csv --creator "Your Name"
 
 # 自定义产品标题
-python main.py your_reviews.csv --product-title "Amazing Product"
+python3 main.py your_reviews.csv --product-title "Amazing Product"
 ```
 
 ---
@@ -262,10 +262,12 @@ review-analyzer-skill/
 ├── examples/                    # 示例数据
 │   ├── reviews_sample.csv       # 示例CSV
 │   └── output_sample/           # 示例输出
+├── tools/                       # 独立工具链 (进阶玩法)
+│   ├── generate_from_tagged.py  # 独立工具：从已打标CSV生成报告
+│   ├── generate_multi_dashboards.py # 独立工具：多版本HTML看板生成
+│   ├── regenerate_insights.py   # 独立工具：一键重刷洞察报告内容/样式
+│   └── run_batch.py             # 批量处理工具 (多ASIN分析)
 ├── main.py                      # 主入口 (新建单品分析)
-├── generate_from_tagged.py      # 独立工具：从已打标CSV生成报告
-├── generate_multi_dashboards.py # 独立工具：多版本HTML看板生成
-├── run_batch.py                 # 批量处理工具 (多ASIN分析)
 ├── SKILL.md                     # Claude Code Skill 核心配置与防幻觉系统提示
 ├── requirements.txt             # Python依赖
 ├── .env.example                 # 环境变量模板

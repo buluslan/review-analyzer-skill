@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 # 加载 .env 环境变量
 load_dotenv()
 
-# 添加src到路径
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# 添加项目根目录到路径
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.config import config
 from src.user_persona_analyzer import analyze_user_personas
