@@ -1,7 +1,90 @@
 import os
 import uuid
+import tempfile
+import urllib.request
+import urllib.parse
+import urllib.error
+import atexit
 import pandas as pd
+from pathlib import Path
 from typing import List, Dict, Tuple
+
+
+def download_if_url(input_path: str) -> str:
+    """如果 input_path 是 URL 则下载到临时文件并返回本地路径，否则原样返回
+
+    采用流式写入避免大文件 OOM，使用 atexit 确保临时文件清理。
+
+    Args:
+        input_path: 本地文件路径或 HTTP/HTTPS URL
+
+    Returns:
+        本地文件路径（URL 会被下载为临时文件）
+
+    Raises:
+        ValueError: 当 URL 不可访问或下载失败时
+    """
+    if not (input_path.startswith("http://") or input_path.startswith("https://")):
+        return input_path
+
+    # 从 URL 推断文件扩展名
+    parsed = urllib.parse.urlparse(input_path)
+    ext = Path(parsed.path).suffix.lower()
+    if ext not in (".csv", ".xls", ".xlsx"):
+        ext = ".csv"
+
+    print(f"🌐 检测到 URL，正在下载: {input_path}")
+
+    # 创建临时文件
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="review_")
+    os.close(tmp_fd)
+
+    # 注册进程退出时清理临时文件
+    atexit.register(os.unlink, tmp_path)
+
+    # 下载文件（带异常捕获和流式写入）
+    try:
+        req = urllib.request.Request(input_path, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            # 检查 Content-Length 防止下载超大文件
+            content_length = resp.headers.get("Content-Length")
+            if content_length and int(content_length) > 100 * 1024 * 1024:  # 100MB 上限
+                os.unlink(tmp_path)
+                raise ValueError(
+                    f"文件过大（{int(content_length) / 1024 / 1024:.1f}MB），"
+                    f"超过 100MB 上限限制"
+                )
+
+            # 流式写入，避免 OOM
+            with open(tmp_path, "wb") as f:
+                import shutil as _shutil
+                _shutil.copyfileobj(resp, f)
+
+        file_size = os.path.getsize(tmp_path)
+        print(f"✅ 下载完成，文件大小: {file_size / 1024:.1f}KB")
+        return tmp_path
+
+    except urllib.error.HTTPError as e:
+        os.unlink(tmp_path)
+        raise ValueError(
+            f"下载失败 - HTTP {e.code} {e.reason}: {input_path}\n"
+            f"请检查 URL 是否正确，或目标服务器是否可访问"
+        )
+    except urllib.error.URLError as e:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise ValueError(
+            f"下载失败 - 网络错误: {e.reason}\n"
+            f"请检查网络连接和 URL 是否正确"
+        )
+    except Exception as e:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise ValueError(f"下载失败: {str(e)}")
+
 
 def load_reviews_from_file(file_path: str) -> Tuple[List[Dict], pd.DataFrame]:
     """

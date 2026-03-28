@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 导入所有核心模块
-from src.data_loader import load_reviews_from_file
+from src.data_loader import load_reviews_from_file, download_if_url
 from src.review_analyzer import analyze_all
 from src.user_persona_analyzer import analyze_user_personas
 from src.insights_generator import calculate_stats_summary, generate_insights
@@ -33,8 +33,8 @@ def print_intro():
 核心功能: 针对您提供的原始评论数据，逐条进行22个维度标签挖掘、生成深度洞察分析文字报告、高品质的可视化看板。
 
 支持模式:
-[Claude CLI 模式] 调用系统原生指令，使用您Claude Code中的内置模型，
-                消耗您的 Claude 月度配额（非 API 额度）
+[CLI 模式] 调用系统原生指令，使用您 Claude Code 或 OpenCode 中的内置模型，
+                消耗您的月度配额（非 API 额度）
 [Gemini API 模式] 调用 Google 官方接口，推理质量极大增强，
                 但需配置 API Key
 [默认配置] 为提升token使用效率，在标签挖掘环节，
@@ -156,7 +156,9 @@ def main():
     """主函数"""
 
     parser = argparse.ArgumentParser(description="Amazon Review Analyzer V1.0")
-    parser.add_argument("input_file", help="输入 CSV/Excel 文件路径")
+    parser.add_argument("input_file", help="输入 CSV/Excel 文件路径或 URL（http/https）")
+    parser.add_argument("--engine", choices=["claude", "opencode"], default=None,
+                        help="CLI 引擎: claude (默认) 或 opencode")
     parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
     # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
@@ -200,14 +202,20 @@ def main():
     # 打印工具说明（向导第一步）
     print_intro()
 
-    # 1. 验证输入
-    input_path = Path(args.input_file)
+    # 处理 --engine 参数
+    if args.engine:
+        config.CLI_ENGINE = args.engine
+        print(f"🔧 CLI 引擎: {config.CLI_ENGINE}")
+
+    # 1. 解析输入（支持 URL 自动下载）
+    resolved_file = download_if_url(args.input_file)
+    input_path = Path(resolved_file)
     if not input_path.exists():
         print(f"❌ 错误：找不到文件: {input_path}")
         sys.exit(1)
 
     # 2. 加载初始数据以获取评论总数
-    reviews, original_df = load_reviews_from_file(args.input_file)
+    reviews, original_df = load_reviews_from_file(resolved_file)
     total_available = len(reviews)
     print(f"📄 成功加载表格：检测到 {total_available} 条有效评论记录")
 
@@ -262,7 +270,8 @@ def main():
         # 模式3: Claude CLI 本地模式 - 全程使用本地模型
         config.INSIGHTS_PROVIDER = "cli"
         config.HTML_GENERATION_SOURCE = "local"
-        print("💡 模式：Claude CLI 本地模式 (全本地方案)")
+        engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
+        print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
 
     # 检查 Key 依赖
     if config.HTML_GENERATION_SOURCE == "gemini" and not config.GEMINI_API_KEY:
@@ -280,7 +289,7 @@ def main():
         config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         print(f"📁 自定义输出目录: {config.OUTPUT_DIR}")
 
-    asin = extract_asin_from_file(args.input_file)
+    asin = extract_asin_from_file(resolved_file)
 
     # 截断评论
     if len(reviews) > config.MAX_REVIEWS:

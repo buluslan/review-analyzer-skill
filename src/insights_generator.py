@@ -225,8 +225,8 @@ def _generate_via_gemini(
 
 
 def _generate_via_cli(prompt: str, asin: str) -> str:
-    """使用 Claude Code CLI 生成洞察报告"""
-    cmd = [config.CLAUDE_CLI_CMD, "-p", prompt]
+    """使用 CLI 引擎生成洞察报告（支持 claude / opencode）"""
+    cmd = config.build_cli_cmd(prompt)
 
     result = subprocess.run(
         cmd,
@@ -238,15 +238,15 @@ def _generate_via_cli(prompt: str, asin: str) -> str:
 
     if result.returncode != 0:
         error_msg = result.stderr or result.stdout or "未知错误"
-        logger.error(f"Claude CLI 返回非零状态码: {error_msg}")
+        logger.error(f"CLI 返回非零状态码: {error_msg}")
         return ""
 
     report_text = result.stdout.strip()
     if not report_text:
-        logger.error("Claude CLI 返回空内容")
+        logger.error("CLI 返回空内容")
         return ""
 
-    logger.info(f"成功生成洞察报告(CLI): ASIN={asin}, 字数={len(report_text)}")
+    logger.info(f"成功生成洞察报告({config.CLI_ENGINE.upper()}): ASIN={asin}, 字数={len(report_text)}")
     return report_text
 
 

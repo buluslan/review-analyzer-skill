@@ -67,7 +67,7 @@ def analyze_all(reviews: List[Dict], batch_size: int = 30) -> List[Dict]:
 
     total_reviews = len(reviews)
     logger.info(f"开始分析 {total_reviews} 条评论，批次大小: {batch_size}")
-    logger.info(f"使用引擎: Claude Code CLI ({config.CLAUDE_CLI_CMD})")
+    logger.info(f"使用引擎: {config.CLI_ENGINE.upper()} CLI ({config.cli_cmd})")
 
     # 分批处理
     batches = _chunk_reviews(reviews, batch_size)
@@ -303,10 +303,9 @@ def analyze_batch(batch: List[Dict], batch_idx: int = -1) -> List[Dict]:
 # ==================== 私有辅助函数 ====================
 
 def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
-    """调用 Claude Code CLI 进行 AI 推理
+    """调用 CLI 引擎进行 AI 推理
 
-    这是 V1.0 的核心函数，通过 subprocess 调用宿主系统的 claude -p 命令。
-    V1.0 热修复: 使用绝对路径避免 shell alias 干扰
+    通过 config.build_cli_cmd() 统一构建命令，支持 claude / opencode 双引擎。
 
     Args:
         prompt: 提示词
@@ -318,29 +317,15 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
     Raises:
         subprocess.TimeoutExpired: 超时
         subprocess.SubprocessError: 子进程错误
-        json.JSONDecodeError: JSON 解析失败
     """
-    # 🔥 热修复: 使用绝对路径，避免 shell alias 干扰
-    claude_path = shutil.which(config.CLAUDE_CLI_CMD)
-    if not claude_path:
-        raise RuntimeError(
-            f"❌ 找不到 Claude CLI: {config.CLAUDE_CLI_CMD}\n"
-            f"请确保已安装 Claude Code 并正确配置 PATH"
-        )
-
-    logger.info(f"🔧 使用 Claude CLI 绝对路径: {claude_path}")
+    logger.info(f"🔧 使用 {config.CLI_ENGINE.upper()} CLI 引擎")
 
     for attempt in range(max_retries):
         try:
-            # 构造命令：使用绝对路径和长格式参数
-            cmd = [
-                claude_path,  # 使用绝对路径而不是 "claude" 字符串
-                "--print",  # 使用长格式 --print 而不是 -p
-                "--dangerously-skip-permissions",
-                prompt
-            ]
+            # 通过统一入口构建命令（已包含绝对路径解析和引擎适配）
+            cmd = config.build_cli_cmd(prompt)
 
-            logger.debug(f"调用 CLI: {claude_path} --print <prompt长度={len(prompt)}>")
+            logger.debug(f"调用 CLI: {cmd[0]} <prompt长度={len(prompt)}>")
 
             # 执行命令，设置超时，传递环境变量
             result = subprocess.run(
@@ -349,17 +334,16 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
                 text=True,
                 timeout=config.CLI_TIMEOUT,
                 check=True,
-                env={**os.environ, 'PATH': os.environ.get('PATH', '')}  # 传递环境变量
+                env={**os.environ, 'PATH': os.environ.get('PATH', '')}
             )
 
             # 检查返回码
             if result.returncode != 0:
                 error_msg = result.stderr or result.stdout or "未知错误"
-                logger.error(f"🔴 Claude CLI 失败 (返回码 {result.returncode})")
+                logger.error(f"🔴 CLI 失败 (返回码 {result.returncode})")
                 logger.error(f"🔴 错误信息: {error_msg}")
-                logger.error(f"🔴 命令: {' '.join(cmd)}")
                 raise subprocess.SubprocessError(
-                    f"Claude CLI 返回非零状态码 ({result.returncode}): {error_msg}"
+                    f"CLI 返回非零状态码 ({result.returncode}): {error_msg}"
                 )
 
             # 返回 stdout
@@ -367,7 +351,7 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
             logger.debug(f"CLI 返回内容长度: {len(response_text)}")
 
             if not response_text:
-                raise subprocess.SubprocessError("Claude CLI 返回空内容")
+                raise subprocess.SubprocessError("CLI 返回空内容")
 
             return response_text
 
@@ -382,7 +366,7 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
             logger.warning(f"   2. 网络延迟或 API 响应慢")
             logger.warning(f"   3. CLI 进程卡住或崩溃")
             logger.warning(f"💡 建议:")
-            logger.warning(f"   - 检查 CLI 是否可用: claude --version")
+            logger.warning(f"   - 检查 CLI 是否可用: {config.cli_cmd} --version")
             logger.warning(f"   - 增加超时时间: 修改 config.CLI_TIMEOUT")
             logger.warning(f"   - 减少批次大小: 降低单批次评论数")
             if attempt == max_retries - 1:
@@ -391,7 +375,7 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
         except subprocess.CalledProcessError as e:
             logger.warning(f"❌ CLI 调用失败 (尝试 {attempt + 1}/{max_retries}): {e.stderr}")
             if attempt == max_retries - 1:
-                raise subprocess.SubprocessError(f"Claude CLI 执行失败: {e.stderr}")
+                raise subprocess.SubprocessError(f"CLI 执行失败: {e.stderr}")
 
         except Exception as e:
             logger.warning(f"⚠️  未知错误 (尝试 {attempt + 1}/{max_retries}): {str(e)}")

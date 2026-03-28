@@ -28,7 +28,7 @@ Review Analyzer Skill is an AI-driven multi-scenario review content deep analysi
 
 - **Mode 1: Gemini Enhanced Mode (Recommended)**: Call Gemini API, use [Gemini 3.1 flash] to generate insight reports, use [Gemini 3.1 pro] to generate visualization dashboards (requires API Key, incurs fees)
 - **Mode 2: Claude CLI + Gemini Hybrid Mode**: Text reports use Claude Code built-in model, visualization dashboards use [Gemini 3.1 pro] (requires API Key, incurs fees)
-- **Mode 3: Claude CLI Local Mode**: Use your built-in model in Claude Code for tagging, reasoning, report and dashboard generation.
+- **Mode 3: CLI Local Mode**: Use your built-in model in Claude Code or OpenCode for tagging, reasoning, report and dashboard generation. (Free)
 
 To improve token usage efficiency, the default for tag mining is to use your built-in model in Claude Code.
 
@@ -400,6 +400,16 @@ This project is licensed under the [MIT License](LICENSE).
 - Thanks to Anthropic for providing Claude AI
 - Thanks to Google for providing Gemini API
 - Inspired by the wisdom contributions of the open source community
+
+### Contributors
+
+Thanks to the following community contributors:
+
+| Contributor | Contribution |
+|-------------|-------------|
+| [@zeropool](https://github.com/zeropool) | OpenCode CLI engine support, URL remote input, avatar asset compression ([PR#1](https://github.com/buluslan/review-analyzer-skill/pull/1)) |
+
+> After community contributors submit PRs, the maintenance team reviews the code. To ensure code quality and stability, some PRs may be merged as improved versions rather than direct merges of the original submission.
 
 ---
 
