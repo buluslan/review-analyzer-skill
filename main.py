@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 导入所有核心模块
-from src.data_loader import load_reviews_from_file
+from src.data_loader import load_reviews_from_file, download_if_url
 from src.review_analyzer import analyze_all
 from src.user_persona_analyzer import analyze_user_personas
 from src.insights_generator import calculate_stats_summary, generate_insights
@@ -27,18 +27,20 @@ from src.config import config, mask_api_key
 
 def print_intro():
     """打印工具详细说明（向导第一步）"""
-    print("""
+    engine_name = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude Code"
+    print(f"""
 🚀 欢迎使用  多场景评论内容 AI 深度分析工具 V1.0 Created By Buluu@新西楼
 ============================================================
 核心功能: 针对您提供的原始评论数据，逐条进行22个维度标签挖掘、生成深度洞察分析文字报告、高品质的可视化看板。
 
 支持模式:
-[Claude CLI 模式] 调用系统原生指令，使用您Claude Code中的内置模型，
-                消耗您的 Claude 月度配额（非 API 额度）
+[CLI 本地模式] 调用系统原生指令，使用您{engine_name}中的内置模型
 [Gemini API 模式] 调用 Google 官方接口，推理质量极大增强，
                 但需配置 API Key
 [默认配置] 为提升token使用效率，在标签挖掘环节，
-                默认使用您Claude Code中的内置模型
+                默认使用您{engine_name}中的内置模型
+
+当前 CLI 引擎: {config.CLI_ENGINE}
 ============================================================
     """)
 
@@ -84,10 +86,11 @@ def config_wizard(total_available: int,
     print("       文字报告使用Claude Code内置模型")
     print("       可视化看板使用【Gemini 3.1 pro】生成（需要API Key，产生费用）")
     print()
-    print("   [3] Claude CLI 本地模式")
-    print("       使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成")
+    engine_name = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude Code"
+    print(f"   [3] CLI 本地模式")
+    print(f"       使用您的{engine_name}中的内置模型进行打标、推理、报告和看板生成")
     print()
-    mode_names = {"1": "Gemini增强", "2": "CLI+Gemini混动", "3": "Claude CLI 全程"}
+    mode_names = {"1": "Gemini增强", "2": "CLI+Gemini混动", "3": "CLI 本地全程"}
     if preset_mode is not None:
         print(f"   [当前预设: {mode_names.get(preset_mode, preset_mode)} 模式]")
         mode_input = input(f"   输入编号 [直接回车使用预设值 {preset_mode}] >>> ").strip()
@@ -156,7 +159,7 @@ def main():
     """主函数"""
 
     parser = argparse.ArgumentParser(description="Amazon Review Analyzer V1.0")
-    parser.add_argument("input_file", help="输入 CSV/Excel 文件路径")
+    parser.add_argument("input_file", help="输入 CSV/Excel 文件路径或 URL（http/https）")
     parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
     # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
@@ -165,6 +168,8 @@ def main():
     parser.add_argument("--creator", help="报告署名/品牌", default=None)
     parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
+    parser.add_argument("--engine", choices=["claude", "opencode"], default=None,
+                        help="CLI 引擎: claude (默认) 或 opencode")
     args = parser.parse_args()
 
     # 判断是否缺少关键参数
@@ -200,14 +205,15 @@ def main():
     # 打印工具说明（向导第一步）
     print_intro()
 
-    # 1. 验证输入
-    input_path = Path(args.input_file)
+    # 1. 验证输入（支持 URL 和本地路径）
+    resolved_file = download_if_url(args.input_file)
+    input_path = Path(resolved_file)
     if not input_path.exists():
         print(f"❌ 错误：找不到文件: {input_path}")
         sys.exit(1)
 
     # 2. 加载初始数据以获取评论总数
-    reviews, original_df = load_reviews_from_file(args.input_file)
+    reviews, original_df = load_reviews_from_file(resolved_file)
     total_available = len(reviews)
     print(f"📄 成功加载表格：检测到 {total_available} 条有效评论记录")
 
@@ -239,6 +245,11 @@ def main():
     if creator:
         config.HTML_CREATOR_NAME = creator
 
+    # CLI 引擎处理
+    if args.engine:
+        config.CLI_ENGINE = args.engine
+        print(f"🔧 CLI 引擎: {config.CLI_ENGINE}")
+
     # Key 处理
     gemini_key = args.gemini_key or os.environ.get("GEMINI_API_KEY") or config.GEMINI_API_KEY
     if gemini_key:
@@ -262,7 +273,8 @@ def main():
         # 模式3: Claude CLI 本地模式 - 全程使用本地模型
         config.INSIGHTS_PROVIDER = "cli"
         config.HTML_GENERATION_SOURCE = "local"
-        print("💡 模式：Claude CLI 本地模式 (全本地方案)")
+        engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
+        print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
 
     # 检查 Key 依赖
     if config.HTML_GENERATION_SOURCE == "gemini" and not config.GEMINI_API_KEY:
@@ -280,7 +292,7 @@ def main():
         config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         print(f"📁 自定义输出目录: {config.OUTPUT_DIR}")
 
-    asin = extract_asin_from_file(args.input_file)
+    asin = extract_asin_from_file(resolved_file)
 
     # 截断评论
     if len(reviews) > config.MAX_REVIEWS:

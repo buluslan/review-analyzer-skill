@@ -1,7 +1,43 @@
 import os
 import uuid
+import tempfile
+import urllib.request
+import urllib.parse
 import pandas as pd
 from typing import List, Dict, Tuple
+from pathlib import Path
+
+
+def download_if_url(input_path: str) -> str:
+    """如果 input_path 是 URL 则下载到临时文件并返回本地路径，否则原样返回"""
+    if not (input_path.startswith("http://") or input_path.startswith("https://")):
+        return input_path
+
+    # 从 URL 推断文件扩展名
+    parsed = urllib.parse.urlparse(input_path)
+    url_path = parsed.path
+    ext = Path(url_path).suffix.lower()
+    if ext not in (".csv", ".xls", ".xlsx"):
+        ext = ".csv"  # 默认当作 csv
+
+    print(f"🌐 检测到 URL，正在下载: {input_path}")
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="review_")
+    os.close(tmp_fd)
+
+    try:
+        req = urllib.request.Request(input_path, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        })
+        with urllib.request.urlopen(req) as resp, open(tmp_path, "wb") as f:
+            f.write(resp.read())
+    except Exception as e:
+        os.unlink(tmp_path)
+        raise RuntimeError(f"❌ 下载失败: {e}")
+
+    file_size = os.path.getsize(tmp_path)
+    print(f"✅ 下载完成: {file_size / 1024:.1f} KB -> {tmp_path}")
+    return tmp_path
+
 
 def load_reviews_from_file(file_path: str) -> Tuple[List[Dict], pd.DataFrame]:
     """

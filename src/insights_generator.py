@@ -225,8 +225,11 @@ def _generate_via_gemini(
 
 
 def _generate_via_cli(prompt: str, asin: str) -> str:
-    """使用 Claude Code CLI 生成洞察报告"""
-    cmd = [config.CLAUDE_CLI_CMD, "-p", prompt]
+    """使用 CLI 引擎生成洞察报告（支持 claude / opencode）"""
+    if config.CLI_ENGINE == "opencode":
+        cmd = [config.cli_cmd, "run", prompt]
+    else:
+        cmd = [config.cli_cmd, "-p", prompt]
 
     result = subprocess.run(
         cmd,

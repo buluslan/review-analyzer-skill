@@ -67,7 +67,7 @@ def analyze_all(reviews: List[Dict], batch_size: int = 30) -> List[Dict]:
 
     total_reviews = len(reviews)
     logger.info(f"开始分析 {total_reviews} 条评论，批次大小: {batch_size}")
-    logger.info(f"使用引擎: Claude Code CLI ({config.CLAUDE_CLI_CMD})")
+    logger.info(f"使用引擎: {config.CLI_ENGINE.upper()} CLI ({config.cli_cmd})")
 
     # 分批处理
     batches = _chunk_reviews(reviews, batch_size)
@@ -320,27 +320,25 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
         subprocess.SubprocessError: 子进程错误
         json.JSONDecodeError: JSON 解析失败
     """
-    # 🔥 热修复: 使用绝对路径，避免 shell alias 干扰
-    claude_path = shutil.which(config.CLAUDE_CLI_CMD)
-    if not claude_path:
+    # 使用绝对路径，避免 shell alias 干扰
+    cli_path = shutil.which(config.cli_cmd)
+    if not cli_path:
         raise RuntimeError(
-            f"❌ 找不到 Claude CLI: {config.CLAUDE_CLI_CMD}\n"
-            f"请确保已安装 Claude Code 并正确配置 PATH"
+            f"❌ 找不到 CLI: {config.cli_cmd}\n"
+            f"请确保已安装 {config.CLI_ENGINE} 并正确配置 PATH"
         )
 
-    logger.info(f"🔧 使用 Claude CLI 绝对路径: {claude_path}")
+    logger.info(f"🔧 使用 {config.CLI_ENGINE.upper()} CLI 绝对路径: {cli_path}")
 
     for attempt in range(max_retries):
         try:
-            # 构造命令：使用绝对路径和长格式参数
-            cmd = [
-                claude_path,  # 使用绝对路径而不是 "claude" 字符串
-                "--print",  # 使用长格式 --print 而不是 -p
-                "--dangerously-skip-permissions",
-                prompt
-            ]
+            # 根据引擎类型构造命令
+            if config.CLI_ENGINE == "opencode":
+                cmd = [cli_path, "run", prompt]
+            else:
+                cmd = [cli_path, "--print", "--dangerously-skip-permissions", prompt]
 
-            logger.debug(f"调用 CLI: {claude_path} --print <prompt长度={len(prompt)}>")
+            logger.debug(f"调用 CLI: {cli_path} <prompt长度={len(prompt)}>")
 
             # 执行命令，设置超时，传递环境变量
             result = subprocess.run(
@@ -382,7 +380,7 @@ def _call_claude_cli(prompt: str, max_retries: int = 3) -> str:
             logger.warning(f"   2. 网络延迟或 API 响应慢")
             logger.warning(f"   3. CLI 进程卡住或崩溃")
             logger.warning(f"💡 建议:")
-            logger.warning(f"   - 检查 CLI 是否可用: claude --version")
+            logger.warning(f"   - 检查 CLI 是否可用: {config.cli_cmd} --version")
             logger.warning(f"   - 增加超时时间: 修改 config.CLI_TIMEOUT")
             logger.warning(f"   - 减少批次大小: 降低单批次评论数")
             if attempt == max_retries - 1:

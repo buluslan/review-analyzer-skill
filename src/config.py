@@ -26,11 +26,15 @@ class Config:
     ASSETS_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent / "assets")
     DATA_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent / "data")
 
-    # ==================== Claude Code CLI 配置 ====================
-    # 使用宿主系统的 Claude Code CLI 进行 AI 推理
-    # 通过 subprocess.run(["claude", "-p", ...]) 调用
+    # ==================== CLI 引擎配置 ====================
+    # 支持 claude / opencode 两种 CLI 引擎
+    # claude  → subprocess: claude --print --dangerously-skip-permissions <prompt>
+    # opencode → subprocess: opencode run <prompt>
+    # 未指定时自动探测: 优先 claude，其次 opencode
+    CLI_ENGINE: str = ""  # 可选: claude / opencode / 留空自动探测
     CLAUDE_CLI_CMD: str = "claude"
-    # CLI 调用超时时间（秒）- 从环境变量读取，默认 180 秒
+    OPENCODE_CLI_CMD: str = "opencode"
+    # CLI 调用超时时间（秒）- 从环境变量读取，默认 600 秒
     CLI_TIMEOUT: int = int(os.getenv("CLI_TIMEOUT", "600"))
 
     # ==================== 分析配置 ====================
@@ -76,12 +80,33 @@ class Config:
         self.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-        # 验证 Claude CLI 是否可用
+        # 自动探测或验证 CLI 引擎
         import shutil
-        if not shutil.which(self.CLAUDE_CLI_CMD):
-            raise RuntimeError(
-                f"❌ 找不到 Claude Code CLI！请确保已安装 Claude Code 并将 '{self.CLAUDE_CLI_CMD}' 加入 PATH"
-            )
+        env_engine = os.getenv("CLI_ENGINE", "")
+        explicit = env_engine or self.CLI_ENGINE  # 环境变量或命令行指定
+
+        if explicit:
+            # 用户显式指定了引擎，直接验证
+            self.CLI_ENGINE = explicit
+            if not shutil.which(self.cli_cmd):
+                raise RuntimeError(
+                    f"❌ 找不到 {self.CLI_ENGINE} CLI！请确保已安装并加入 PATH"
+                )
+        else:
+            # 自动探测: 优先 claude，其次 opencode
+            if shutil.which(self.CLAUDE_CLI_CMD):
+                self.CLI_ENGINE = "claude"
+            elif shutil.which(self.OPENCODE_CLI_CMD):
+                self.CLI_ENGINE = "opencode"
+            else:
+                raise RuntimeError(
+                    "❌ 未找到可用的 CLI 引擎！请安装 Claude Code 或 OpenCode 并加入 PATH"
+                )
+
+    @property
+    def cli_cmd(self) -> str:
+        """获取当前 CLI 引擎的命令名"""
+        return self.OPENCODE_CLI_CMD if self.CLI_ENGINE == "opencode" else self.CLAUDE_CLI_CMD
 
     def _get_project_dir(self, asin: str) -> Path:
         """获取项目输出目录: {ASIN}-{PROJECT_NAME}-{月.日}"""
