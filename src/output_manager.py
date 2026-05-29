@@ -255,7 +255,8 @@ def generate_outputs(
         "feishu_result": {
             "success": False,
             "doc_url": "",
-            "whiteboard_url": "",
+            "whiteboard_urls": [],
+            "whiteboard_count": 0,
             "error": "未执行飞书同步",
         },
         "charts": [],
@@ -322,7 +323,8 @@ def generate_outputs(
             result["feishu_result"] = {
                 "success": False,
                 "doc_url": "",
-                "whiteboard_url": "",
+                "whiteboard_urls": [],
+                "whiteboard_count": 0,
                 "error": f"飞书同步异常: {exc}",
             }
 

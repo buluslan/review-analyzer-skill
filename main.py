@@ -416,7 +416,6 @@ def main():
 
         # 选择模板
         template_name = args.template
-        available_templates = [t["name"] for t in list_templates() if isinstance(list_templates(), list)]
         # 如果模板不存在，使用默认
         try:
             from src.template_engine import list_templates as _lt
@@ -461,6 +460,9 @@ def main():
                 print(f"   ✅ 飞书同步成功！")
                 if feishu_result.get("doc_url"):
                     print(f"   📄 文档: {feishu_result['doc_url']}")
+                wb_count = feishu_result.get("whiteboard_count", 0)
+                if wb_count > 0:
+                    print(f"   📊 白板图表: {wb_count} 个已渲染")
             else:
                 error = feishu_result.get("error", "未知错误") if feishu_result else "同步失败"
                 print(f"   ⚠️ 飞书同步失败: {error}")
@@ -477,6 +479,9 @@ def main():
         print(f"  - 可视化看板: {Path(final_html).name} (模板: {template_name})")
         if args.feishu_sync and feishu_result and feishu_result.get("doc_url"):
             print(f"  - 飞书文档: {feishu_result['doc_url']}")
+            wb_count = feishu_result.get("whiteboard_count", 0)
+            if wb_count > 0:
+                print(f"  - 白板图表: {wb_count} 个")
         print("✨" * 30 + "\n")
 
     except Exception as e:
