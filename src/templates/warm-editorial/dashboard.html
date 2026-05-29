@@ -1,55 +1,689 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Review Analysis - Warm Editorial</title>
-<link href="https://fonts.googleapis.com/css2?family=Charter:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-body{background:#f5f4ed;color:#2c3e50;font-family:'Inter',system-ui,sans-serif;margin:0;line-height:1.7}
-.paper-card{background:#fff;border:1px solid #e8e4d9;border-radius:8px;padding:28px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-h1{font-family:'Charter','Georgia',serif;font-size:32px;font-weight:700;color:#1B365D;margin:0 0 6px;line-height:1.3}
-h2{font-family:'Charter','Georgia',serif;font-size:20px;font-weight:600;color:#1B365D;margin:0 0 16px;padding-bottom:8px;border-bottom:2px solid #B5652A}
-.ink{color:#1B365D}.copper{color:#B5652A}
-.kpi-box{text-align:center;padding:20px;background:#faf8f3;border:1px solid #e8e4d9;border-radius:8px}
-.kpi-box .value{font-family:'Charter','Georgia',serif;font-size:36px;font-weight:700;color:#B5652A}
-.kpi-box .desc{font-size:13px;color:#7c7268;margin-top:4px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
-.pull-quote{border-left:4px solid #B5652A;padding:16px 20px;background:#faf8f3;margin:16px 0;font-style:italic;font-family:'Charter','Georgia',serif;font-size:16px;color:#4a4039;border-radius:0 6px 6px 0}
-canvas{max-height:280px!important}
-.tag{display:inline-block;padding:3px 10px;background:#f0ebe1;border-radius:4px;font-size:12px;color:#5a4f43;margin:2px}
-@media(max-width:768px){.grid-4,.grid-3{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Analysis — Editorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+        :root {
+            --we-parchment: #f5f4ed;
+            --we-parchment-light: #faf9f4;
+            --we-card: #fffef9;
+            --we-border: #e2dfd6;
+            --we-ink: #1B365D;
+            --we-ink-light: #2d4a72;
+            --we-copper: #B5652A;
+            --we-copper-light: #d4894a;
+            --we-copper-bg: rgba(181, 101, 42, 0.06);
+            --we-text: #2c2c2c;
+            --we-text-secondary: #5a5a5a;
+            --we-text-muted: #8a8a8a;
+            --we-serif: 'Source Serif 4', 'Charter', 'Georgia', 'Times New Roman', serif;
+            --we-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--we-sans);
+            background: var(--we-parchment);
+            color: var(--we-text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Editorial Masthead */
+        .masthead {
+            padding: 4rem 0 3rem;
+            border-bottom: 2px solid var(--we-ink);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .masthead-rule {
+            width: 60px;
+            height: 3px;
+            background: var(--we-copper);
+            margin-bottom: 1.5rem;
+        }
+
+        .masthead-eyebrow {
+            font-family: var(--we-sans);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--we-copper);
+            margin-bottom: 1rem;
+        }
+
+        .masthead h1 {
+            font-family: var(--we-serif);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--we-ink);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+
+        .masthead-subtitle {
+            font-family: var(--we-serif);
+            font-size: 1.125rem;
+            font-style: italic;
+            color: var(--we-text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .masthead-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            font-size: 0.813rem;
+            color: var(--we-text-muted);
+        }
+
+        .masthead-meta span { display: flex; align-items: center; gap: 0.375rem; }
+        .masthead-meta .ink { color: var(--we-ink); font-weight: 500; }
+
+        /* Stat Cards */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            padding: 1.75rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--we-copper);
+        }
+
+        .stat-label {
+            font-family: var(--we-sans);
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--we-text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-value {
+            font-family: var(--we-serif);
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--we-ink);
+            line-height: 1;
+        }
+
+        .stat-value.copper { color: var(--we-copper); }
+        .stat-value.danger { color: #b91c1c; }
+
+        .stat-desc {
+            font-size: 0.813rem;
+            color: var(--we-text-secondary);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-heading {
+            font-family: var(--we-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--we-ink);
+            margin-bottom: 0.375rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--we-border);
+        }
+
+        .section-heading::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--we-copper);
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Chart Panel */
+        .chart-panel {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-panel-title {
+            font-family: var(--we-serif);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--we-ink);
+            margin-bottom: 1.25rem;
+            font-style: italic;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 300px;
+        }
+
+        /* Strategy */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .strategy-column {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            padding: 1.75rem;
+        }
+
+        .strategy-column-title {
+            font-family: var(--we-serif);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--we-border);
+        }
+
+        .strategy-entry {
+            padding: 1rem 0;
+            border-bottom: 1px dotted var(--we-border);
+        }
+
+        .strategy-entry:last-child { border-bottom: none; }
+
+        .strategy-entry-title {
+            font-family: var(--we-serif);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--we-ink);
+        }
+
+        .strategy-entry-desc {
+            font-size: 0.875rem;
+            color: var(--we-text-secondary);
+            margin-top: 0.25rem;
+            line-height: 1.6;
+        }
+
+        /* Execution Matrix */
+        .matrix-wrapper {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .matrix-table th {
+            font-family: var(--we-sans);
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--we-text-muted);
+            padding: 0.875rem 1.25rem;
+            border-bottom: 1px solid var(--we-border);
+            text-align: left;
+            background: var(--we-parchment-light);
+        }
+
+        .matrix-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--we-border);
+            color: var(--we-text-secondary);
+        }
+
+        .urgency-pill {
+            font-family: var(--we-sans);
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .urgency-pill.immediate { background: rgba(185, 28, 28, 0.06); color: #b91c1c; }
+        .urgency-pill.short-term { background: var(--we-copper-bg); color: var(--we-copper); }
+        .urgency-pill.long-term { background: rgba(27, 54, 93, 0.06); color: var(--we-ink); }
+
+        /* Pull Quote (VOC) */
+        .pull-quotes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .pull-quote {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .pull-quote::before {
+            content: '\201C';
+            font-family: var(--we-serif);
+            font-size: 4rem;
+            line-height: 1;
+            color: var(--we-copper);
+            opacity: 0.3;
+            position: absolute;
+            top: 0.25rem;
+            left: 1rem;
+        }
+
+        .pull-quote.danger { border-left: 3px solid #b91c1c; }
+        .pull-quote.safe { border-left: 3px solid var(--we-ink); }
+
+        .pull-quote-attribution {
+            font-family: var(--we-sans);
+            font-size: 0.813rem;
+            font-weight: 600;
+            color: var(--we-ink);
+            margin-bottom: 0.25rem;
+        }
+
+        .pull-quote-status {
+            font-size: 0.688rem;
+            font-weight: 500;
+            color: var(--we-copper);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .pull-quote-text {
+            font-family: var(--we-serif);
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--we-text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Chapter / Article */
+        .article-block {
+            background: var(--we-card);
+            border: 1px solid var(--we-border);
+            border-radius: 4px;
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .article-block-title {
+            font-family: var(--we-serif);
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--we-ink);
+            margin-bottom: 1.25rem;
+            line-height: 1.3;
+        }
+
+        .article-block-body {
+            font-family: var(--we-serif);
+            font-size: 1rem;
+            color: var(--we-text-secondary);
+            line-height: 1.9;
+        }
+
+        .article-block-body h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--we-ink);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .article-block-body h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--we-ink);
+            margin: 1.25rem 0 0.5rem;
+        }
+
+        .article-block-body p { margin-bottom: 1rem; }
+        .article-block-body ul, .article-block-body ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .article-block-body li { margin-bottom: 0.375rem; }
+        .article-block-body blockquote {
+            border-left: 3px solid var(--we-copper);
+            padding-left: 1.25rem;
+            margin: 1.25rem 0;
+            font-style: italic;
+            color: var(--we-ink);
+        }
+
+        .article-block-body strong { color: var(--we-ink); font-weight: 600; }
+
+        /* Footer - Editorial colophon */
+        .colophon {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 2px solid var(--we-ink);
+            text-align: center;
+        }
+
+        .colophon-rule {
+            width: 40px;
+            height: 2px;
+            background: var(--we-copper);
+            margin: 0 auto 1rem;
+        }
+
+        .colophon-text {
+            font-family: var(--we-sans);
+            font-size: 0.75rem;
+            color: var(--we-text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .masthead { padding: 2.5rem 0 2rem; }
+            .masthead h1 { font-size: 1.75rem; }
+            .stat-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .strategy-grid { grid-template-columns: 1fr; }
+            .pull-quotes { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-<div style="max-width:960px;margin:0 auto;padding:32px 24px">
-<div style="margin-bottom:36px;border-bottom:3px solid #B5652A;padding-bottom:20px">
-<h1 id="title">Review Analysis</h1>
-<p style="color:#7c7268;margin:4px 0 0;font-size:15px">A thoughtful analysis · Review Analyzer Skill V2.0</p>
-</div>
-<div class="grid-4" id="kpi-area"></div>
-<div class="grid-2" id="charts-main"></div>
-<div class="grid-3" id="charts-secondary"></div>
-<div class="paper-card" id="strategy-section"></div>
-<div class="paper-card" id="voc-section"></div>
-</div>
-<script>
-const D=window.__ANALYSIS_DATA__||{title:"Analysis",total_reviews:0,avg_rating:0,statistics:{},charts:[]};
-document.getElementById("title").textContent=D.title||"Review Analysis";
-const kpiArea=document.getElementById("kpi-area");
-[{v:D.total_reviews||0,l:"Total Reviews"},{v:D.avg_rating||0,l:"Avg Rating"},{v:D.statistics?Object.keys(D.statistics).length:0,l:"Dimensions"},{v:D.personas?D.personas.length:0,l:"Personas"}].forEach(k=>{
-const d=document.createElement("div");d.className="kpi-box";d.innerHTML=`<div class="value">${k.v}</div><div class="desc">${k.l}</div>`;kpiArea.appendChild(d)});
-function makeChart(cid,cfg){const el=document.createElement("div");el.className="paper-card";const cv=document.createElement("canvas");el.appendChild(cv);document.getElementById(cid).appendChild(el);
-const colors=['#B5652A','#1B365D','#8B7355','#5F6B7D','#A67C52','#2E4057','#D4A574','#6B4226'];
-new Chart(cv,{type:cfg.type,data:{labels:cfg.data?.labels||[],datasets:[{data:cfg.data?.values||[],backgroundColor:cfg.colors||colors,borderColor:'#e8e4d9',borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:cfg.type==='pie'||cfg.type==='doughnut',labels:{color:'#5a4f43',font:{family:'Inter'}}},title:{display:true,text:cfg.title,color:'#1B365D',font:{size:14,family:'Charter,Georgia,serif'}}},scales:cfg.type==='bar'||cfg.type==='line'?{x:{ticks:{color:'#7c7268'},grid:{color:'#e8e4d9'}},y:{ticks:{color:'#7c7268'},grid:{color:'#e8e4d9'}}}:undefined}})}
-const charts=D.charts||[];charts.slice(0,2).forEach(c=>makeChart('charts-main',c));charts.slice(2,5).forEach(c=>makeChart('charts-secondary',c));
-const ss=document.getElementById("strategy-section");ss.innerHTML=`<h2>Strategy Insights</h2><p style="color:#5a4f43">Full strategic analysis is available in the complete report.</p>`;
-const vs=document.getElementById("voc-section");vs.innerHTML=`<h2>Customer Voices</h2>`;
-if(D.personas&&D.personas.length){D.personas.forEach(p=>{const q=document.createElement("div");q.className="pull-quote";q.innerHTML=`<strong class="copper">${p.name||'Customer'}</strong><p style="margin:8px 0 0;color:#5a4f43">${p.tags?Object.entries(p.tags).filter(([k,v])=>v&&v!=='未提及').slice(0,3).map(([k,v])=>v).join(' · '):'Insights available in full report'}</p>`;vs.appendChild(q)})}
-</script>
+    <div class="container">
+        <header class="masthead" id="masthead"></header>
+        <section class="stat-row" id="stat-row"></section>
+
+        <section class="section">
+            <h2 class="section-heading">Data Visualizations</h2>
+            <div class="charts-grid" id="charts-grid"></div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-heading">Strategic Outlook</h2>
+            <div class="strategy-grid" id="strategy-grid"></div>
+        </section>
+
+        <section class="section" id="matrix-section" style="display:none;">
+            <h2 class="section-heading">Action Plan</h2>
+            <div class="matrix-wrapper">
+                <table class="matrix-table">
+                    <thead><tr><th>Priority</th><th>Directive</th><th>Details</th><th>Expected Return</th></tr></thead>
+                    <tbody id="matrix-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-heading">Customer Voices</h2>
+            <div class="pull-quotes" id="pull-quotes"></div>
+        </section>
+
+        <section class="section" id="chapters-section" style="display:none;">
+            <h2 class="section-heading">In-Depth Reporting</h2>
+            <div id="chapters-list"></div>
+        </section>
+
+        <footer class="colophon">
+            <div class="colophon-rule"></div>
+            <p class="colophon-text">Review Analyzer &middot; Warm Editorial Template &middot; Generated by AI</p>
+        </footer>
+    </div>
+
+    <script>
+    // Analysis data is injected here by the template engine
+    window.__ANALYSIS_DATA__ = {
+        "title": "Product ASIN Review Analysis",
+        "asin": "B001OAXE0S",
+        "total_reviews": 20,
+        "avg_rating": 3.4,
+        "statistics": {},
+        "chapters": [],
+        "charts": []
+    };
+
+    (function() {
+        const D = window.__ANALYSIS_DATA__;
+        const meta = D.meta || {};
+        const kpis = D.kpis || [];
+        const chartsData = D.charts_data || {};
+        const strategy = D.strategy || {};
+        const executionMatrix = D.execution_matrix || [];
+        const vocQuotes = D.voc_quotes || [];
+        const marketInsights = D.market_insights || [];
+        const chapters = D.chapters || [];
+
+        const INK = '#1B365D';
+        const COPPER = '#B5652A';
+        const PALETTE = ['#1B365D', '#B5652A', '#d4894a', '#5a5a5a', '#8a8a8a', '#2d4a72'];
+
+        // ---- Masthead ----
+        document.getElementById('masthead').innerHTML = `
+            <div class="masthead-rule"></div>
+            <div class="masthead-eyebrow">Review Intelligence Report</div>
+            <h1>${meta.product_name || meta.report_title || D.title || 'Review Analysis'}</h1>
+            <p class="masthead-subtitle">A comprehensive analysis of ${D.total_reviews || 0} customer reviews, revealing patterns in sentiment, satisfaction, and market positioning.</p>
+            <div class="masthead-meta">
+                <span>ASIN <span class="ink">${D.asin || 'N/A'}</span></span>
+                <span>${new Date().toISOString().split('T')[0]}</span>
+                <span>${D.total_reviews || 0} reviews analyzed</span>
+                <span>Average rating <span class="ink">${D.avg_rating || 'N/A'}</span></span>
+            </div>
+        `;
+
+        // ---- Stat Cards ----
+        document.getElementById('stat-row').innerHTML = kpis.map((kpi, i) => {
+            const cls = kpi.is_danger ? 'danger' : (i === 0 ? 'copper' : '');
+            return `
+                <div class="stat-card">
+                    <div class="stat-label">${kpi.label || kpi.title}</div>
+                    <div class="stat-value ${cls}">${kpi.value}</div>
+                    <div class="stat-desc">${kpi.desc || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        // ---- Charts ----
+        const chartsGrid = document.getElementById('charts-grid');
+        const defs = [
+            { key: 'sentiment', title: 'Sentiment Distribution', type: 'doughnut' },
+            { key: 'features', title: 'Feature Satisfaction', type: 'bar', horizontal: true },
+            { key: 'scenarios', title: 'Usage Scenarios', type: 'pie' },
+            { key: 'price_perception', title: 'Price Perception', type: 'bar' }
+        ];
+
+        defs.forEach(def => {
+            const cd = chartsData[def.key];
+            if (!cd || !cd.labels || cd.labels.length === 0) return;
+
+            const cId = 'ed-' + def.key;
+            chartsGrid.innerHTML += `
+                <div class="chart-panel">
+                    <div class="chart-panel-title">${def.title}</div>
+                    <div class="chart-container"><canvas id="${cId}"></canvas></div>
+                </div>
+            `;
+
+            const isPie = def.type === 'doughnut' || def.type === 'pie';
+            const bg = isPie
+                ? cd.labels.map((_, i) => PALETTE[i % PALETTE.length])
+                : cd.labels.map(() => INK);
+
+            setTimeout(() => {
+                const canvas = document.getElementById(cId);
+                if (!canvas) return;
+                new Chart(canvas.getContext('2d'), {
+                    type: def.type,
+                    data: {
+                        labels: cd.labels,
+                        datasets: [{
+                            data: cd.data,
+                            backgroundColor: bg,
+                            borderColor: isPie ? '#fffef9' : bg,
+                            borderWidth: isPie ? 2 : 0,
+                            borderRadius: def.type === 'bar' ? 4 : 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: def.horizontal ? 'y' : 'x',
+                        plugins: {
+                            legend: {
+                                display: isPie,
+                                position: 'bottom',
+                                labels: {
+                                    font: { family: 'Source Serif 4', size: 12 },
+                                    color: '#5a5a5a',
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        },
+                        scales: def.type === 'bar' ? {
+                            x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#8a8a8a' } },
+                            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#8a8a8a' }, beginAtZero: true }
+                        } : undefined
+                    }
+                });
+            }, 100);
+        });
+
+        // ---- Strategy ----
+        const moatPros = strategy.moat_pros || [];
+        const vulnCons = strategy.vulnerability_cons || [];
+        let stratHtml = '';
+
+        if (moatPros.length > 0) {
+            stratHtml += `<div class="strategy-column">
+                <div class="strategy-column-title" style="color:var(--we-ink);">Competitive Advantages</div>
+                ${moatPros.map(item => `
+                    <div class="strategy-entry">
+                        <div class="strategy-entry-title">${item.title}</div>
+                        <div class="strategy-entry-desc">${item.desc || ''}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        if (vulnCons.length > 0) {
+            stratHtml += `<div class="strategy-column">
+                <div class="strategy-column-title" style="color:#b91c1c;">Areas of Concern</div>
+                ${vulnCons.map(item => `
+                    <div class="strategy-entry">
+                        <div class="strategy-entry-title">${item.title}</div>
+                        <div class="strategy-entry-desc">${item.desc || ''}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        document.getElementById('strategy-grid').innerHTML = stratHtml || '<div></div><div></div>';
+
+        // ---- Matrix ----
+        if (executionMatrix.length > 0) {
+            document.getElementById('matrix-section').style.display = '';
+            document.getElementById('matrix-tbody').innerHTML = executionMatrix.map(row => {
+                const uc = (row.urgency || '').toLowerCase().includes('immediate') ? 'immediate'
+                    : (row.urgency || '').toLowerCase().includes('short') ? 'short-term' : 'long-term';
+                return `<tr>
+                    <td><span class="urgency-pill ${uc}">${row.urgency || '—'}</span></td>
+                    <td style="font-weight:600;color:var(--we-ink);">${row.directive || ''}</td>
+                    <td>${row.details || ''}</td>
+                    <td style="color:var(--we-copper);font-style:italic;">${row.roi || ''}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ---- VOC as Pull Quotes ----
+        document.getElementById('pull-quotes').innerHTML = vocQuotes.map(voc => {
+            const isDanger = voc.is_danger || false;
+            const cls = isDanger ? 'danger' : 'safe';
+            return `
+                <div class="pull-quote ${cls}">
+                    <div class="pull-quote-attribution">${voc.profile || 'A Customer'}</div>
+                    <div class="pull-quote-status">${voc.status || 'Neutral'}</div>
+                    <div class="pull-quote-text">${voc.quote || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        // ---- Chapters ----
+        if (chapters.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-list').innerHTML = chapters.map(ch => `
+                <div class="article-block">
+                    <div class="article-block-title">${ch.title || ''}</div>
+                    <div class="article-block-body">${ch.content || ''}</div>
+                </div>
+            `).join('');
+        } else if (marketInsights.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-list').innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;">
+                    ${marketInsights.map(mi => `
+                        <div class="chart-panel">
+                            <div class="strategy-entry-title">${mi.title || ''}</div>
+                            <div class="strategy-entry-desc">${mi.desc || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    })();
+    </script>
 </body>
 </html>
