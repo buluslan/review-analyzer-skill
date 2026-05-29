@@ -52,3 +52,6 @@ htmlcov/
 
 # 日志
 *.log
+
+# 图表产物（测试/运行时生成）
+diagrams/
