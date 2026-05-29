@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --lm-indigo: #5e6ad2;
+            --lm-indigo-light: rgba(94, 106, 210, 0.08);
+            --lm-dark: #1a1a2e;
+            --lm-bg: #fafafa;
+            --lm-card: #ffffff;
+            --lm-border: #eeeef0;
+            --lm-text: #1a1a2e;
+            --lm-text-secondary: #6b6f80;
+            --lm-text-muted: #9ca0b0;
+            --lm-mono: 'JetBrains Mono', 'SF Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--lm-bg);
+            color: var(--lm-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Minimal Header */
+        .header {
+            padding: 3rem 0 2rem;
+            border-bottom: 1px solid var(--lm-border);
+            margin-bottom: 2.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-label {
+            font-family: var(--lm-mono);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--lm-indigo);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--lm-text);
+            line-height: 1.2;
+        }
+
+        .header-desc {
+            font-size: 0.938rem;
+            color: var(--lm-text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .header-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-stat-value {
+            font-family: var(--lm-mono);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--lm-text);
+        }
+
+        .header-stat-label {
+            font-size: 0.6875rem;
+            color: var(--lm-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--lm-border);
+            margin: 2rem 0;
+        }
+
+        /* KPI Row - Minimal inline */
+        .kpi-row {
+            display: flex;
+            gap: 1px;
+            background: var(--lm-border);
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+        }
+
+        .kpi-item {
+            flex: 1;
+            background: var(--lm-card);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-item-label {
+            font-family: var(--lm-mono);
+            font-size: 0.625rem;
+            font-weight: 500;
+            color: var(--lm-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.375rem;
+        }
+
+        .kpi-item-value {
+            font-family: var(--lm-mono);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--lm-text);
+        }
+
+        .kpi-item-value.danger { color: #e03e3e; }
+        .kpi-item-value.accent { color: var(--lm-indigo); }
+
+        .kpi-item-desc {
+            font-size: 0.75rem;
+            color: var(--lm-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-family: var(--lm-mono);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--lm-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 1px;
+            background: var(--lm-indigo);
+        }
+
+        /* Card - ultra minimal */
+        .card {
+            background: var(--lm-card);
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--lm-text);
+            margin-bottom: 1rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1px;
+            background: var(--lm-border);
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chart-cell {
+            background: var(--lm-card);
+            padding: 1.5rem;
+        }
+
+        .chart-cell-title {
+            font-family: var(--lm-mono);
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: var(--lm-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 280px;
+        }
+
+        /* Strategy */
+        .strategy-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--lm-border);
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .strategy-col {
+            background: var(--lm-card);
+            padding: 1.5rem;
+        }
+
+        .strategy-col-title {
+            font-family: var(--lm-mono);
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .strategy-entry {
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--lm-border);
+        }
+
+        .strategy-entry:last-child { border-bottom: none; }
+
+        .strategy-entry-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--lm-text);
+        }
+
+        .strategy-entry-desc {
+            font-size: 0.813rem;
+            color: var(--lm-text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Matrix */
+        .matrix-rows {
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .matrix-header {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr 1fr;
+            background: #f7f7f9;
+            border-bottom: 1px solid var(--lm-border);
+        }
+
+        .matrix-header-cell {
+            padding: 0.75rem 1rem;
+            font-family: var(--lm-mono);
+            font-size: 0.5625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--lm-text-muted);
+        }
+
+        .matrix-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr 1fr;
+            border-bottom: 1px solid var(--lm-border);
+            background: var(--lm-card);
+        }
+
+        .matrix-row:last-child { border-bottom: none; }
+
+        .matrix-cell {
+            padding: 0.875rem 1rem;
+            font-size: 0.813rem;
+            color: var(--lm-text-secondary);
+        }
+
+        .matrix-cell:first-child {
+            display: flex;
+            align-items: center;
+        }
+
+        .urgency-tag {
+            font-family: var(--lm-mono);
+            font-size: 0.5625rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .urgency-tag.immediate { background: rgba(224, 62, 62, 0.08); color: #e03e3e; }
+        .urgency-tag.short-term { background: var(--lm-indigo-light); color: var(--lm-indigo); }
+        .urgency-tag.long-term { background: rgba(46, 160, 67, 0.08); color: #2ea043; }
+
+        /* VOC - Minimal list */
+        .voc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1px;
+            background: var(--lm-border);
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .voc-item {
+            background: var(--lm-card);
+            padding: 1.5rem;
+        }
+
+        .voc-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .voc-profile {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--lm-text);
+        }
+
+        .voc-badge {
+            font-family: var(--lm-mono);
+            font-size: 0.5625rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .voc-badge.positive { background: rgba(46, 160, 67, 0.08); color: #2ea043; }
+        .voc-badge.negative { background: rgba(224, 62, 62, 0.08); color: #e03e3e; }
+        .voc-badge.neutral-badge { background: var(--lm-indigo-light); color: var(--lm-indigo); }
+
+        .voc-text {
+            font-size: 0.875rem;
+            color: var(--lm-text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Chapter */
+        .chapter-card {
+            border: 1px solid var(--lm-border);
+            border-radius: 10px;
+            padding: 1.75rem;
+            margin-bottom: 1rem;
+            background: var(--lm-card);
+        }
+
+        .chapter-card-title {
+            font-size: 1.063rem;
+            font-weight: 600;
+            color: var(--lm-text);
+            margin-bottom: 0.875rem;
+            font-family: var(--lm-mono);
+        }
+
+        .chapter-card-body {
+            font-size: 0.938rem;
+            color: var(--lm-text-secondary);
+            line-height: 1.8;
+        }
+
+        .chapter-card-body h2 { font-size: 1rem; font-weight: 600; color: var(--lm-text); margin: 1rem 0 0.5rem; }
+        .chapter-card-body h3 { font-size: 0.938rem; font-weight: 600; color: var(--lm-text); margin: 0.75rem 0 0.375rem; }
+        .chapter-card-body p { margin-bottom: 0.625rem; }
+        .chapter-card-body ul, .chapter-card-body ol { margin-left: 1.25rem; margin-bottom: 0.625rem; }
+        .chapter-card-body li { margin-bottom: 0.25rem; }
+        .chapter-card-body blockquote { border-left: 2px solid var(--lm-indigo); padding-left: 1rem; margin: 0.75rem 0; font-style: italic; color: var(--lm-text); }
+        .chapter-card-body strong { color: var(--lm-text); font-weight: 600; }
+
+        /* Footer */
+        .footer {
+            padding: 2rem 0;
+            border-top: 1px solid var(--lm-border);
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-family: var(--lm-mono);
+            font-size: 0.6875rem;
+            color: var(--lm-text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .header h1 { font-size: 1.5rem; }
+            .header-top { flex-direction: column; gap: 0.5rem; }
+            .header-stats { flex-wrap: wrap; gap: 1.5rem; }
+            .kpi-row { flex-direction: column; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .strategy-columns { grid-template-columns: 1fr; }
+            .matrix-header, .matrix-row { grid-template-columns: 1fr; }
+            .matrix-header-cell:first-child, .matrix-cell:first-child { padding-bottom: 0.25rem; }
+            .voc-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header" id="header"></header>
+        <div class="kpi-row" id="kpi-row"></div>
+
+        <section class="section">
+            <div class="section-title">Charts</div>
+            <div class="charts-grid" id="charts-grid"></div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Strategy</div>
+            <div class="strategy-columns" id="strategy-columns"></div>
+        </section>
+
+        <section class="section" id="matrix-section" style="display:none;">
+            <div class="section-title">Execution Matrix</div>
+            <div class="matrix-rows">
+                <div class="matrix-header">
+                    <div class="matrix-header-cell">Priority</div>
+                    <div class="matrix-header-cell">Directive</div>
+                    <div class="matrix-header-cell">Details</div>
+                    <div class="matrix-header-cell">ROI</div>
+                </div>
+                <div id="matrix-body"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">VOC</div>
+            <div class="voc-list" id="voc-list"></div>
+        </section>
+
+        <section class="section" id="chapters-section" style="display:none;">
+            <div class="section-title">Insights</div>
+            <div id="chapters-list"></div>
+        </section>
+
+        <footer class="footer">
+            <span class="footer-text">review-analyzer v2.0</span>
+            <span class="footer-text">linear-minimal template</span>
+        </footer>
+    </div>
+
+    <script>
+    // Analysis data is injected here by the template engine
+    window.__ANALYSIS_DATA__ = {
+        "title": "Product ASIN Review Analysis",
+        "asin": "B001OAXE0S",
+        "total_reviews": 20,
+        "avg_rating": 3.4,
+        "statistics": {},
+        "chapters": [],
+        "charts": []
+    };
+
+    (function() {
+        const D = window.__ANALYSIS_DATA__;
+        const meta = D.meta || {};
+        const kpis = D.kpis || [];
+        const chartsData = D.charts_data || {};
+        const strategy = D.strategy || {};
+        const executionMatrix = D.execution_matrix || [];
+        const vocQuotes = D.voc_quotes || [];
+        const marketInsights = D.market_insights || [];
+        const chapters = D.chapters || [];
+
+        const INDIGO = '#5e6ad2';
+        const PALETTE = ['#5e6ad2', '#8b8ec4', '#1a1a2e', '#2ea043', '#9ca0b0'];
+
+        // ---- Header ----
+        document.getElementById('header').innerHTML = `
+            <div class="header-top">
+                <div>
+                    <div class="header-label">// review.analysis</div>
+                    <h1>${meta.product_name || meta.report_title || D.title || 'Review Analysis'}</h1>
+                    <div class="header-desc">ASIN: ${D.asin || 'N/A'} &middot; ${new Date().toISOString().split('T')[0]}</div>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">${D.total_reviews || 0}</div>
+                    <div class="header-stat-label">Total Reviews</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">${D.avg_rating || 'N/A'}</div>
+                    <div class="header-stat-label">Avg Rating</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">${meta.sample_size || 'N/A'}</div>
+                    <div class="header-stat-label">Sample Size</div>
+                </div>
+            </div>
+        `;
+
+        // ---- KPI Row ----
+        document.getElementById('kpi-row').innerHTML = kpis.map(kpi => {
+            const cls = kpi.is_danger ? 'danger' : '';
+            return `
+                <div class="kpi-item">
+                    <div class="kpi-item-label">${kpi.label || kpi.title}</div>
+                    <div class="kpi-item-value ${cls}">${kpi.value}</div>
+                    <div class="kpi-item-desc">${kpi.desc || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        // ---- Charts ----
+        const chartsGrid = document.getElementById('charts-grid');
+        const defs = [
+            { key: 'sentiment', title: 'sentiment_distribution', type: 'doughnut' },
+            { key: 'features', title: 'feature_satisfaction', type: 'bar', horizontal: true },
+            { key: 'scenarios', title: 'usage_scenarios', type: 'pie' },
+            { key: 'price_perception', title: 'price_perception', type: 'bar' }
+        ];
+
+        defs.forEach(def => {
+            const cd = chartsData[def.key];
+            if (!cd || !cd.labels || cd.labels.length === 0) return;
+
+            const cId = 'c-' + def.key;
+            chartsGrid.innerHTML += `
+                <div class="chart-cell">
+                    <div class="chart-cell-title">${def.title}</div>
+                    <div class="chart-container"><canvas id="${cId}"></canvas></div>
+                </div>
+            `;
+
+            const isPie = def.type === 'doughnut' || def.type === 'pie';
+            const bg = isPie ? cd.labels.map((_, i) => PALETTE[i % PALETTE.length]) : cd.labels.map(() => INDIGO);
+
+            setTimeout(() => {
+                const canvas = document.getElementById(cId);
+                if (!canvas) return;
+                new Chart(canvas.getContext('2d'), {
+                    type: def.type,
+                    data: {
+                        labels: cd.labels,
+                        datasets: [{
+                            data: cd.data,
+                            backgroundColor: bg,
+                            borderColor: isPie ? '#fff' : bg,
+                            borderWidth: isPie ? 2 : 0,
+                            borderRadius: def.type === 'bar' ? 4 : 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: def.horizontal ? 'y' : 'x',
+                        plugins: {
+                            legend: {
+                                display: isPie,
+                                position: 'bottom',
+                                labels: { font: { family: 'JetBrains Mono', size: 11 }, color: '#9ca0b0', padding: 16, boxWidth: 8, boxHeight: 8 }
+                            }
+                        },
+                        scales: def.type === 'bar' ? {
+                            x: { grid: { color: '#f0f0f2' }, ticks: { font: { family: 'JetBrains Mono', size: 11 }, color: '#9ca0b0' } },
+                            y: { grid: { color: '#f0f0f2' }, ticks: { font: { family: 'JetBrains Mono', size: 11 }, color: '#9ca0b0' }, beginAtZero: true }
+                        } : undefined
+                    }
+                });
+            }, 100);
+        });
+
+        // ---- Strategy ----
+        const moatPros = strategy.moat_pros || [];
+        const vulnCons = strategy.vulnerability_cons || [];
+        let stratHtml = '';
+
+        if (moatPros.length > 0) {
+            stratHtml += `<div class="strategy-col">
+                <div class="strategy-col-title" style="color:#2ea043;">Moat</div>
+                ${moatPros.map(item => `
+                    <div class="strategy-entry">
+                        <div class="strategy-entry-title">${item.title}</div>
+                        <div class="strategy-entry-desc">${item.desc || ''}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        if (vulnCons.length > 0) {
+            stratHtml += `<div class="strategy-col">
+                <div class="strategy-col-title" style="color:#e03e3e;">Risk</div>
+                ${vulnCons.map(item => `
+                    <div class="strategy-entry">
+                        <div class="strategy-entry-title">${item.title}</div>
+                        <div class="strategy-entry-desc">${item.desc || ''}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        if (stratHtml) {
+            document.getElementById('strategy-columns').innerHTML = stratHtml;
+        } else {
+            document.getElementById('strategy-columns').style.display = 'none';
+        }
+
+        // ---- Execution Matrix ----
+        if (executionMatrix.length > 0) {
+            document.getElementById('matrix-section').style.display = '';
+            document.getElementById('matrix-body').innerHTML = executionMatrix.map(row => {
+                const uc = (row.urgency || '').toLowerCase().includes('immediate') ? 'immediate'
+                    : (row.urgency || '').toLowerCase().includes('short') ? 'short-term' : 'long-term';
+                return `
+                    <div class="matrix-row">
+                        <div class="matrix-cell"><span class="urgency-tag ${uc}">${row.urgency || '—'}</span></div>
+                        <div class="matrix-cell" style="font-weight:500;color:var(--lm-text);">${row.directive || ''}</div>
+                        <div class="matrix-cell">${row.details || ''}</div>
+                        <div class="matrix-cell">${row.roi || ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ---- VOC ----
+        document.getElementById('voc-list').innerHTML = vocQuotes.map(voc => {
+            const isDanger = voc.is_danger || false;
+            const badgeCls = isDanger ? 'negative' : 'positive';
+            return `
+                <div class="voc-item">
+                    <div class="voc-item-header">
+                        <span class="voc-profile">${voc.profile || 'User'}</span>
+                        <span class="voc-badge ${badgeCls}">${voc.status || 'neutral'}</span>
+                    </div>
+                    <div class="voc-text">${voc.quote || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        // ---- Chapters ----
+        if (chapters.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-list').innerHTML = chapters.map(ch => `
+                <div class="chapter-card">
+                    <div class="chapter-card-title">${ch.title || ''}</div>
+                    <div class="chapter-card-body">${ch.content || ''}</div>
+                </div>
+            `).join('');
+        } else if (marketInsights.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-list').innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--lm-border);border:1px solid var(--lm-border);border-radius:10px;overflow:hidden;">
+                    ${marketInsights.map(mi => `
+                        <div style="background:var(--lm-card);padding:1.25rem;">
+                            <div class="strategy-entry-title">${mi.title || ''}</div>
+                            <div class="strategy-entry-desc">${mi.desc || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    })();
+    </script>
+</body>
+</html>

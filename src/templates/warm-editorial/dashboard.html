@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Analysis - Warm Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Charter:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#f5f4ed;color:#2c3e50;font-family:'Inter',system-ui,sans-serif;margin:0;line-height:1.7}
+.paper-card{background:#fff;border:1px solid #e8e4d9;border-radius:8px;padding:28px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+h1{font-family:'Charter','Georgia',serif;font-size:32px;font-weight:700;color:#1B365D;margin:0 0 6px;line-height:1.3}
+h2{font-family:'Charter','Georgia',serif;font-size:20px;font-weight:600;color:#1B365D;margin:0 0 16px;padding-bottom:8px;border-bottom:2px solid #B5652A}
+.ink{color:#1B365D}.copper{color:#B5652A}
+.kpi-box{text-align:center;padding:20px;background:#faf8f3;border:1px solid #e8e4d9;border-radius:8px}
+.kpi-box .value{font-family:'Charter','Georgia',serif;font-size:36px;font-weight:700;color:#B5652A}
+.kpi-box .desc{font-size:13px;color:#7c7268;margin-top:4px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.pull-quote{border-left:4px solid #B5652A;padding:16px 20px;background:#faf8f3;margin:16px 0;font-style:italic;font-family:'Charter','Georgia',serif;font-size:16px;color:#4a4039;border-radius:0 6px 6px 0}
+canvas{max-height:280px!important}
+.tag{display:inline-block;padding:3px 10px;background:#f0ebe1;border-radius:4px;font-size:12px;color:#5a4f43;margin:2px}
+@media(max-width:768px){.grid-4,.grid-3{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div style="max-width:960px;margin:0 auto;padding:32px 24px">
+<div style="margin-bottom:36px;border-bottom:3px solid #B5652A;padding-bottom:20px">
+<h1 id="title">Review Analysis</h1>
+<p style="color:#7c7268;margin:4px 0 0;font-size:15px">A thoughtful analysis · Review Analyzer Skill V2.0</p>
+</div>
+<div class="grid-4" id="kpi-area"></div>
+<div class="grid-2" id="charts-main"></div>
+<div class="grid-3" id="charts-secondary"></div>
+<div class="paper-card" id="strategy-section"></div>
+<div class="paper-card" id="voc-section"></div>
+</div>
+<script>
+const D=window.__ANALYSIS_DATA__||{title:"Analysis",total_reviews:0,avg_rating:0,statistics:{},charts:[]};
+document.getElementById("title").textContent=D.title||"Review Analysis";
+const kpiArea=document.getElementById("kpi-area");
+[{v:D.total_reviews||0,l:"Total Reviews"},{v:D.avg_rating||0,l:"Avg Rating"},{v:D.statistics?Object.keys(D.statistics).length:0,l:"Dimensions"},{v:D.personas?D.personas.length:0,l:"Personas"}].forEach(k=>{
+const d=document.createElement("div");d.className="kpi-box";d.innerHTML=`<div class="value">${k.v}</div><div class="desc">${k.l}</div>`;kpiArea.appendChild(d)});
+function makeChart(cid,cfg){const el=document.createElement("div");el.className="paper-card";const cv=document.createElement("canvas");el.appendChild(cv);document.getElementById(cid).appendChild(el);
+const colors=['#B5652A','#1B365D','#8B7355','#5F6B7D','#A67C52','#2E4057','#D4A574','#6B4226'];
+new Chart(cv,{type:cfg.type,data:{labels:cfg.data?.labels||[],datasets:[{data:cfg.data?.values||[],backgroundColor:cfg.colors||colors,borderColor:'#e8e4d9',borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:cfg.type==='pie'||cfg.type==='doughnut',labels:{color:'#5a4f43',font:{family:'Inter'}}},title:{display:true,text:cfg.title,color:'#1B365D',font:{size:14,family:'Charter,Georgia,serif'}}},scales:cfg.type==='bar'||cfg.type==='line'?{x:{ticks:{color:'#7c7268'},grid:{color:'#e8e4d9'}},y:{ticks:{color:'#7c7268'},grid:{color:'#e8e4d9'}}}:undefined}})}
+const charts=D.charts||[];charts.slice(0,2).forEach(c=>makeChart('charts-main',c));charts.slice(2,5).forEach(c=>makeChart('charts-secondary',c));
+const ss=document.getElementById("strategy-section");ss.innerHTML=`<h2>Strategy Insights</h2><p style="color:#5a4f43">Full strategic analysis is available in the complete report.</p>`;
+const vs=document.getElementById("voc-section");vs.innerHTML=`<h2>Customer Voices</h2>`;
+if(D.personas&&D.personas.length){D.personas.forEach(p=>{const q=document.createElement("div");q.className="pull-quote";q.innerHTML=`<strong class="copper">${p.name||'Customer'}</strong><p style="margin:8px 0 0;color:#5a4f43">${p.tags?Object.entries(p.tags).filter(([k,v])=>v&&v!=='未提及').slice(0,3).map(([k,v])=>v).join(' · '):'Insights available in full report'}</p>`;vs.appendChild(q)})}
+</script>
+</body>
+</html>

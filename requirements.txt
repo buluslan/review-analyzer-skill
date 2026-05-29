@@ -1,9 +1,6 @@
 # ==================== 核心依赖 ====================
 
-# Apify 爬虫客户端
-apify-client==1.8.1
-
-# ScraperAPI HTTP 客户端
+# HTTP 客户端（数据获取 + API 调用）
 requests==2.32.3
 
 # HTML 解析库
@@ -29,8 +26,12 @@ python-dotenv==1.0.1
 
 # ==================== 可选依赖 ====================
 
-# 如果需要更快的 JSON 处理
-# orjson==3.10.7
-
-# 如果需要进度条显示
+# 进度条显示
 tqdm==4.66.4
+
+# ==================== V2.0 新增依赖 ====================
+# 以上依赖已足够，无需新增额外包
+# - chart_engine: 纯 Python 实现
+# - template_engine: 基于 Jinja2
+# - feishu_sync: 通过 subprocess 调用 lark-cli
+# - sorftime_fetcher: 通过 requests 调用 API

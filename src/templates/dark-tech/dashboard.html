@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Analysis - Dark Tech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#0a0e17;color:#c9d1d9;font-family:'Inter',system-ui,sans-serif;margin:0}
+.cyber-card{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:24px;margin-bottom:20px}
+.cyber-glow{box-shadow:0 0 20px rgba(0,229,200,0.1)}
+.accent{color:#00e5c8}.accent2{color:#38bdf8}
+h1{font-size:28px;font-weight:700;color:#fff;margin:0 0 8px}
+h2{font-size:20px;font-weight:600;color:#00e5c8;margin:0 0 16px;text-transform:uppercase;letter-spacing:0.05em}
+.kpi{background:linear-gradient(135deg,#111827,#1e293b);border:1px solid #00e5c8;padding:20px;border-radius:12px;text-align:center}
+.kpi .num{font-size:36px;font-weight:700;color:#00e5c8;font-family:'JetBrains Mono',monospace}
+.kpi .label{font-size:13px;color:#8b949e;margin-top:4px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.quote{border-left:3px solid #00e5c8;padding:12px 16px;background:#0d1117;margin:12px 0;border-radius:0 8px 8px 0}
+canvas{max-height:300px!important}
+@media(max-width:768px){.grid-4,.grid-3{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div style="max-width:1200px;margin:0 auto;padding:24px">
+<div style="margin-bottom:32px">
+<h1 id="title">Review Analysis</h1>
+<p style="color:#8b949e;margin:0">Powered by Review Analyzer Skill V2.0</p>
+</div>
+<div class="grid-4" id="kpi-area"></div>
+<div class="grid-2" id="charts-row1"></div>
+<div class="grid-3" id="charts-row2"></div>
+<div class="cyber-card cyber-glow" id="strategy-area"></div>
+<div class="cyber-card" id="voc-area"></div>
+</div>
+<script>
+const D=window.__ANALYSIS_DATA__||{title:"Analysis",total_reviews:0,avg_rating:0,statistics:{},charts:[]};
+document.getElementById("title").textContent=D.title||"Review Analysis";
+const kpiArea=document.getElementById("kpi-area");
+const kpis=[
+{num:D.total_reviews||0,label:"Total Reviews"},
+{num:D.avg_rating||0,label:"Avg Rating"},
+{num:D.statistics&&Object.keys(D.statistics).length||0,label:"Dimensions"},
+{num:D.personas&&D.personas.length||0,label:"User Personas"}
+];
+kpis.forEach(k=>{const d=document.createElement("div");d.className="kpi";d.innerHTML=`<div class="num">${k.num}</div><div class="label">${k.label}</div>`;kpiArea.appendChild(d)});
+function makeChart(containerId,config){const c=document.createElement("div");c.className="cyber-card";const canvas=document.createElement("canvas");c.appendChild(canvas);document.getElementById(containerId).appendChild(c);new Chart(canvas,{type:config.type,data:{labels:config.data?.labels||[],datasets:[{data:config.data?.values||[],backgroundColor:config.colors||['#00e5c8','#38bdf8','#a78bfa','#f472b6','#fbbf24','#34d399','#f87171','#818cf8'],borderColor:'#1e293b',borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:config.type==='pie'||config.type==='doughnut',labels:{color:'#8b949e'}},title:{display:true,text:config.title,color:'#00e5c8',font:{size:14}}},scales:config.type==='bar'||config.type==='line'?{x:{ticks:{color:'#8b949e'},grid:{color:'#1e293b'}},y:{ticks:{color:'#8b949e'},grid:{color:'#1e293b'}}}:undefined}})}
+const charts=D.charts||[];
+charts.slice(0,2).forEach(c=>makeChart('charts-row1',c));
+charts.slice(2,5).forEach(c=>makeChart('charts-row2',c));
+const stratArea=document.getElementById("strategy-area");
+stratArea.innerHTML="<h2>Strategy Analysis</h2><p style='color:#8b949e'>Detailed strategy analysis available in the full report.</p>";
+const vocArea=document.getElementById("voc-area");
+vocArea.innerHTML="<h2>Customer Voices</h2>";
+if(D.personas&&D.personas.length){D.personas.forEach(p=>{const q=document.createElement("div");q.className="quote";q.innerHTML=`<strong class="accent">${p.name||'User'}</strong><p style="color:#8b949e;margin:8px 0 0">${p.tags?Object.values(p.tags).slice(0,3).join(' · '):'No data'}</p>`;vocArea.appendChild(q)})}
+</script>
+</body>
+</html>

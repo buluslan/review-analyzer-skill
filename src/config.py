@@ -1,11 +1,13 @@
 """
-配置管理模块 V1.0
+配置管理模块 V2.0 — Agent 原生版
 
-重大变更：双模洞察系统
-- 支持双模式生成洞察报告：CLI 原生版 / Gemini API
-- CLI 模式：使用 subprocess 调用宿主系统的 Claude Code CLI (claude -p)
-- Gemini 模式：使用 Google Gemini API 生成高质量洞察报告
-- 打标阶段固定使用 CLI（config.CLAUDE_CLI_CMD），不能用 API
+重大变更：
+- 打标阶段改为 Prompt Router，宿主 Agent 直接执行，不再依赖 subprocess CLI
+- 新增数据接入层配置（Sorftime 平台）
+- 新增可视化模板系统配置
+- 新增飞书同步配置
+- 新增图表引擎配置
+- 保留 Gemini 模式用于洞察报告和 HTML 看板生成
 """
 
 import os
@@ -16,7 +18,7 @@ from datetime import datetime
 
 @dataclass
 class Config:
-    """全局配置类 V1.0 - CLI 原生版"""
+    """全局配置类 V2.0 - Agent 原生版"""
 
     # ==================== 项目路径配置 ====================
     PROJECT_ROOT: Path = field(default_factory=lambda: Path(__file__).parent.parent)
@@ -31,11 +33,36 @@ class Config:
     # claude  → subprocess: claude --print --dangerously-skip-permissions <prompt>
     # opencode → subprocess: opencode run <prompt>
     # 未指定时自动探测: 优先 claude，其次 opencode
+    # V2.0 备注：打标阶段不再使用 CLI，由宿主 Agent 直接执行
+    #            CLI 引擎仅用于洞察报告和 HTML 看板的生成
     CLI_ENGINE: str = ""  # 可选: claude / opencode / 留空自动探测
     CLAUDE_CLI_CMD: str = "claude"
     OPENCODE_CLI_CMD: str = "opencode"
     # CLI 调用超时时间（秒）- 从环境变量读取，默认 600 秒
     CLI_TIMEOUT: int = int(os.getenv("CLI_TIMEOUT", "600"))
+
+    # ==================== V2.0: 数据接入配置 ====================
+    DATA_SOURCE: str = "csv"  # 可选: csv / sorftime
+    SORFTIME_API_KEY: str = os.getenv("SORFTIME_API_KEY", "")
+    SORFTIME_MODE: str = "mcp"  # 可选: mcp / api / cli
+    SORFTIME_BASE_URL: str = "https://mcp.sorftime.com"
+    SORFTIME_MAX_REVIEWS: int = 100  # Sorftime 单次最多返回 100 条
+
+    # ==================== V2.0: 可视化模板配置 ====================
+    TEMPLATE_DIR: Path = field(default_factory=lambda: Path(__file__).parent / "templates")
+    DEFAULT_TEMPLATE: str = "premium-gold"  # 默认模板名称
+
+    # ==================== V2.0: 飞书同步配置 ====================
+    FEISHU_SYNC: bool = False  # 是否同步到飞书（用户选择）
+    LARK_CLI_CMD: str = "lark-cli"  # 飞书 CLI 命令名
+
+    # ==================== V2.0: 图表引擎配置 ====================
+    CHART_ENGINE: str = "chartjs"  # 可选: chartjs / echarts
+    CHART_COLOR_PALETTE: str = "premium-gold"  # 颜色主题
+
+    # ==================== V2.0: Prompt 模板配置 ====================
+    PROMPTS_DIR: Path = field(default_factory=lambda: Path(__file__).parent / "prompts")
+    INSIGHTS_CHAPTERS: str = "all"  # 可选: all / 自定义章节编号列表（如 "1,2,3,9,10"）
 
     # ==================== 分析配置 ====================
     MAX_REVIEWS: int = 500           # 最大获取评论数
@@ -80,30 +107,22 @@ class Config:
         self.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-        # CLI 引擎探测与验证
+        # V2.0: CLI 引擎不再是必须的（打标由宿主 Agent 执行）
+        # 仅在洞察报告和 HTML 看板生成时才需要 CLI
         import shutil
         env_engine = os.getenv("CLI_ENGINE", "").lower()
         if env_engine in ("claude", "opencode"):
             self.CLI_ENGINE = env_engine
 
         if not self.CLI_ENGINE:
-            # 自动探测: 优先 claude，其次 opencode
+            # 自动探测: 优先 claude，其次 opencode，找不到也不报错
             if shutil.which(self.CLAUDE_CLI_CMD):
                 self.CLI_ENGINE = "claude"
             elif shutil.which(self.OPENCODE_CLI_CMD):
                 self.CLI_ENGINE = "opencode"
             else:
-                raise RuntimeError(
-                    "❌ 找不到可用的 CLI 引擎！请安装 Claude Code 或 OpenCode 并加入 PATH"
-                )
-
-        # 验证指定引擎的 CLI 是否可用
-        cli_cmd = self.OPENCODE_CLI_CMD if self.CLI_ENGINE == "opencode" else self.CLAUDE_CLI_CMD
-        if not shutil.which(cli_cmd):
-            raise RuntimeError(
-                f"❌ 指定的 CLI 引擎 '{self.CLI_ENGINE}' 不可用！"
-                f"请确保已安装并加入 PATH: {cli_cmd}"
-            )
+                # V2.0: 不再强制要求 CLI，但记录警告
+                self.CLI_ENGINE = "none"
 
     @property
     def cli_cmd(self) -> str:
@@ -114,6 +133,7 @@ class Config:
         """构建 CLI 调用命令（统一入口）
 
         自动解析绝对路径并根据当前引擎类型构建正确的命令参数。
+        V2.0: 当引擎为 "none" 时抛出 RuntimeError（仅洞察报告/看板生成需要 CLI）
 
         Args:
             prompt: 要传递给 CLI 的提示词
@@ -125,6 +145,13 @@ class Config:
             RuntimeError: 当 CLI 不可用时
         """
         import shutil
+
+        if self.CLI_ENGINE == "none":
+            raise RuntimeError(
+                "❌ 当前无可用的 CLI 引擎。洞察报告和 HTML 看板生成需要 CLI。\n"
+                "请安装 Claude Code 或 OpenCode 并加入 PATH"
+            )
+
         cli_path = shutil.which(self.cli_cmd)
         if not cli_path:
             raise RuntimeError(
@@ -136,6 +163,30 @@ class Config:
             return [cli_path, "run", prompt]
         else:
             return [cli_path, "--print", "--dangerously-skip-permissions", prompt]
+
+    # ==================== V2.0: 新增方法 ====================
+
+    def check_lark_cli(self) -> bool:
+        """检查飞书 CLI 是否可用"""
+        import shutil
+        return shutil.which(self.LARK_CLI_CMD) is not None
+
+    def check_sorftime_config(self) -> bool:
+        """检查 Sorftime 配置是否可用"""
+        return bool(self.SORFTIME_API_KEY)
+
+    def list_templates(self) -> list:
+        """列出可用的可视化模板"""
+        if not self.TEMPLATE_DIR.exists():
+            return []
+        templates = []
+        for d in sorted(self.TEMPLATE_DIR.iterdir()):
+            if d.is_dir() and (d / "dashboard.html").exists():
+                templates.append({
+                    "name": d.name,
+                    "path": str(d / "dashboard.html")
+                })
+        return templates
 
     def _get_project_dir(self, asin: str) -> Path:
         """获取项目输出目录: {ASIN}-{PROJECT_NAME}-{月.日}"""

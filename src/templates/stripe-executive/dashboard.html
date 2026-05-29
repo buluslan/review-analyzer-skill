@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Review Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --stripe-purple: #533afd;
+            --stripe-purple-light: #7a73ff;
+            --stripe-purple-bg: rgba(83, 58, 253, 0.06);
+            --stripe-navy: #061b31;
+            --stripe-navy-light: #0d2948;
+            --stripe-white: #FFFFFF;
+            --stripe-bg: #F6F9FC;
+            --stripe-card: #FFFFFF;
+            --stripe-border: #E3E8EE;
+            --stripe-text: #1a1f36;
+            --stripe-text-secondary: #697386;
+            --stripe-text-muted: #8792a2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--stripe-bg);
+            color: var(--stripe-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        /* Premium Header */
+        .header {
+            background: linear-gradient(135deg, var(--stripe-navy) 0%, #1a1f5e 50%, var(--stripe-purple) 100%);
+            color: #fff;
+            padding: 3rem 0;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(83, 58, 253, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(122, 115, 255, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        .header-eyebrow {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #fff 60%, rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.65);
+        }
+
+        .header-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* KPI Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+            margin-top: -2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .kpi-card {
+            background: var(--stripe-card);
+            border: 1px solid var(--stripe-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 12px rgba(6, 27, 49, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(6, 27, 49, 0.1);
+        }
+
+        .kpi-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--stripe-text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--stripe-text);
+        }
+
+        .kpi-value.purple { color: var(--stripe-purple); }
+        .kpi-value.danger { color: #d63031; }
+
+        .kpi-desc {
+            font-size: 0.813rem;
+            color: var(--stripe-text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .kpi-bar {
+            margin-top: 0.75rem;
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .kpi-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--stripe-purple), var(--stripe-purple-light));
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--stripe-purple);
+        }
+
+        .section-title {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--stripe-navy);
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--stripe-card);
+            border: 1px solid var(--stripe-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 1px 6px rgba(6, 27, 49, 0.04);
+        }
+
+        .panel-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--stripe-navy);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 300px;
+        }
+
+        /* Strategy Grid */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .strategy-list-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--stripe-border);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .strategy-list-item:last-child { border-bottom: none; }
+
+        .strategy-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .strategy-item-title {
+            font-size: 0.938rem;
+            font-weight: 600;
+            color: var(--stripe-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .strategy-item-desc {
+            font-size: 0.813rem;
+            color: var(--stripe-text-secondary);
+        }
+
+        /* Execution Matrix */
+        .exec-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+        }
+
+        .exec-table thead th {
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--stripe-text-muted);
+            padding: 0.75rem 1.25rem;
+            background: #f7f9fc;
+            border-bottom: 2px solid var(--stripe-border);
+        }
+
+        .exec-table thead th:first-child { border-radius: 12px 0 0 0; }
+        .exec-table thead th:last-child { border-radius: 0 12px 0 0; }
+
+        .exec-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--stripe-border);
+            color: var(--stripe-text-secondary);
+        }
+
+        .urgency-pill {
+            display: inline-block;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .urgency-pill.immediate { background: rgba(214, 48, 49, 0.08); color: #d63031; }
+        .urgency-pill.short-term { background: var(--stripe-purple-bg); color: var(--stripe-purple); }
+        .urgency-pill.long-term { background: rgba(0, 184, 148, 0.08); color: #00b894; }
+
+        /* VOC */
+        .voc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .voc-card {
+            background: var(--stripe-card);
+            border: 1px solid var(--stripe-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            position: relative;
+            box-shadow: 0 1px 6px rgba(6, 27, 49, 0.04);
+        }
+
+        .voc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .voc-card.positive::before { background: linear-gradient(90deg, #00b894, #55efc4); }
+        .voc-card.negative::before { background: linear-gradient(90deg, #d63031, #ff7675); }
+        .voc-card.neutral-card::before { background: linear-gradient(90deg, var(--stripe-purple), var(--stripe-purple-light)); }
+
+        .voc-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .voc-card.positive .voc-avatar { background: rgba(0,184,148,0.1); }
+        .voc-card.negative .voc-avatar { background: rgba(214,48,49,0.1); }
+        .voc-card.neutral-card .voc-avatar { background: var(--stripe-purple-bg); }
+
+        .voc-profile-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--stripe-text);
+        }
+
+        .voc-status-badge {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .voc-card.positive .voc-status-badge { background: rgba(0,184,148,0.1); color: #00b894; }
+        .voc-card.negative .voc-status-badge { background: rgba(214,48,49,0.1); color: #d63031; }
+        .voc-card.neutral-card .voc-status-badge { background: var(--stripe-purple-bg); color: var(--stripe-purple); }
+
+        .voc-quote-text {
+            font-size: 0.938rem;
+            color: var(--stripe-text-secondary);
+            line-height: 1.7;
+            margin-top: 1rem;
+            font-style: italic;
+            padding-left: 1rem;
+            border-left: 2px solid var(--stripe-border);
+        }
+
+        /* Chapters */
+        .chapter-block {
+            background: var(--stripe-card);
+            border: 1px solid var(--stripe-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 1px 6px rgba(6, 27, 49, 0.04);
+        }
+
+        .chapter-block h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--stripe-navy);
+            margin-bottom: 1rem;
+        }
+
+        .chapter-body {
+            font-size: 0.938rem;
+            color: var(--stripe-text-secondary);
+            line-height: 1.8;
+        }
+
+        .chapter-body h2 { font-size: 1.125rem; font-weight: 600; color: var(--stripe-text); margin: 1.25rem 0 0.5rem; }
+        .chapter-body h3 { font-size: 1rem; font-weight: 600; color: var(--stripe-text); margin: 1rem 0 0.375rem; }
+        .chapter-body p { margin-bottom: 0.75rem; }
+        .chapter-body ul, .chapter-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
+        .chapter-body li { margin-bottom: 0.375rem; }
+        .chapter-body blockquote { border-left: 3px solid var(--stripe-purple); padding-left: 1rem; margin: 1rem 0; color: var(--stripe-text); font-style: italic; }
+        .chapter-body strong { color: var(--stripe-text); font-weight: 600; }
+
+        /* Footer */
+        .footer {
+            padding: 2.5rem 0;
+            border-top: 1px solid var(--stripe-border);
+            text-align: center;
+            color: var(--stripe-text-muted);
+            font-size: 0.813rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .header-inner { padding: 0 1rem; }
+            .header h1 { font-size: 1.75rem; }
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .strategy-grid { grid-template-columns: 1fr; }
+            .voc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header" id="header"></header>
+
+    <div class="container">
+        <section class="kpi-row" id="kpi-row"></section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-dot"></div>
+                <h2 class="section-title">Analytics Overview</h2>
+            </div>
+            <div class="charts-grid" id="charts-grid"></div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-dot"></div>
+                <h2 class="section-title">Strategic Assessment</h2>
+            </div>
+            <div class="strategy-grid" id="strategy-grid"></div>
+        </section>
+
+        <section class="section" id="matrix-section" style="display:none;">
+            <div class="section-header">
+                <div class="section-dot"></div>
+                <h2 class="section-title">Execution Roadmap</h2>
+            </div>
+            <div class="panel">
+                <table class="exec-table">
+                    <thead>
+                        <tr><th>Priority</th><th>Action Item</th><th>Implementation</th><th>Expected ROI</th></tr>
+                    </thead>
+                    <tbody id="matrix-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-dot"></div>
+                <h2 class="section-title">Customer Voice</h2>
+            </div>
+            <div class="voc-grid" id="voc-grid"></div>
+        </section>
+
+        <section class="section" id="chapters-section" style="display:none;">
+            <div class="section-header">
+                <div class="section-dot"></div>
+                <h2 class="section-title">In-Depth Analysis</h2>
+            </div>
+            <div id="chapters-list"></div>
+        </section>
+
+        <footer class="footer">
+            <p style="font-weight:600;color:var(--stripe-navy);">Review Analyzer &middot; Executive Report</p>
+            <p style="margin-top:0.375rem;">Stripe-inspired financial-grade presentation</p>
+        </footer>
+    </div>
+
+    <script>
+    // Analysis data is injected here by the template engine
+    window.__ANALYSIS_DATA__ = {
+        "title": "Product ASIN Review Analysis",
+        "asin": "B001OAXE0S",
+        "total_reviews": 20,
+        "avg_rating": 3.4,
+        "statistics": {},
+        "chapters": [],
+        "charts": []
+    };
+
+    (function() {
+        const D = window.__ANALYSIS_DATA__;
+        const meta = D.meta || {};
+        const kpis = D.kpis || [];
+        const chartsData = D.charts_data || {};
+        const strategy = D.strategy || {};
+        const executionMatrix = D.execution_matrix || [];
+        const vocQuotes = D.voc_quotes || [];
+        const marketInsights = D.market_insights || [];
+        const chapters = D.chapters || [];
+
+        const PURPLE = '#533afd';
+        const PALETTE = ['#533afd', '#7a73ff', '#061b31', '#00b894', '#fdcb6e'];
+
+        // ---- Header ----
+        document.getElementById('header').innerHTML = `
+            <div class="header-inner">
+                <div class="header-eyebrow">Executive Review Report &middot; Confidential</div>
+                <h1>${meta.product_name || meta.report_title || D.title || 'Review Analysis'}</h1>
+                <div class="header-meta">
+                    <span>ASIN ${D.asin || 'N/A'}</span>
+                    <span>${new Date().toISOString().split('T')[0]}</span>
+                    <span>${D.total_reviews || 0} Reviews</span>
+                    <span>Avg ${D.avg_rating || 'N/A'} / 5</span>
+                </div>
+            </div>
+        `;
+
+        // ---- KPI Cards ----
+        document.getElementById('kpi-row').innerHTML = kpis.map((kpi, i) => {
+            const valueClass = kpi.is_danger ? 'danger' : (i === 0 ? 'purple' : '');
+            const barWidth = kpi.value ? Math.min(parseFloat(kpi.value) / 5 * 100, 100) : 50;
+            return `
+                <div class="kpi-card">
+                    <div class="kpi-label">${kpi.label || kpi.title}</div>
+                    <div class="kpi-value ${valueClass}">${kpi.value}</div>
+                    <div class="kpi-desc">${kpi.desc || ''}</div>
+                    ${i === 1 ? `<div class="kpi-bar"><div class="kpi-bar-fill" style="width:${barWidth}%"></div></div>` : ''}
+                </div>
+            `;
+        }).join('');
+
+        // ---- Charts ----
+        function createChart(canvasId, type, data, options) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            new Chart(canvas.getContext('2d'), { type, data, options });
+        }
+
+        const chartsGrid = document.getElementById('charts-grid');
+        const chartDefs = [
+            { key: 'sentiment', title: 'Sentiment Distribution', type: 'doughnut' },
+            { key: 'features', title: 'Feature Satisfaction', type: 'bar', horizontal: true },
+            { key: 'scenarios', title: 'Usage Scenarios', type: 'pie' },
+            { key: 'price_perception', title: 'Price Perception', type: 'bar' },
+            { key: 'design_usability', title: 'Design & Usability', type: 'bar' },
+            { key: 'durability', title: 'Durability Assessment', type: 'bar', horizontal: true }
+        ];
+
+        chartDefs.forEach(def => {
+            const cd = chartsData[def.key];
+            if (!cd || !cd.labels || cd.labels.length === 0) return;
+
+            const cId = 'chart-' + def.key;
+            chartsGrid.innerHTML += `
+                <div class="panel">
+                    <div class="panel-title">${def.title}</div>
+                    <div class="chart-container"><canvas id="${cId}"></canvas></div>
+                </div>
+            `;
+
+            const bgColors = def.type === 'doughnut' || def.type === 'pie'
+                ? cd.labels.map((_, i) => PALETTE[i % PALETTE.length])
+                : cd.labels.map(() => PURPLE);
+
+            setTimeout(() => {
+                createChart(cId, def.type, {
+                    labels: cd.labels,
+                    datasets: [{
+                        label: def.title,
+                        data: cd.data,
+                        backgroundColor: bgColors,
+                        borderColor: def.type === 'doughnut' || def.type === 'pie' ? '#fff' : bgColors,
+                        borderWidth: def.type === 'doughnut' || def.type === 'pie' ? 3 : 0,
+                        borderRadius: def.type === 'bar' ? 8 : 0
+                    }]
+                }, {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: def.horizontal ? 'y' : 'x',
+                    plugins: {
+                        legend: {
+                            display: def.type !== 'bar',
+                            position: 'bottom',
+                            labels: { font: { family: 'Inter', size: 12, weight: '500' }, color: '#697386', padding: 20, usePointStyle: true }
+                        }
+                    },
+                    scales: def.type === 'bar' ? {
+                        x: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { family: 'Inter' }, color: '#8792a2' } },
+                        y: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { family: 'Inter' }, color: '#8792a2' }, beginAtZero: true }
+                    } : undefined
+                });
+            }, 100);
+        });
+
+        // ---- Strategy ----
+        const moatPros = strategy.moat_pros || [];
+        const vulnCons = strategy.vulnerability_cons || [];
+        let stratHtml = '';
+
+        if (moatPros.length > 0) {
+            stratHtml += `<div class="panel">
+                <div class="panel-title" style="color:#00b894;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00b894;margin-right:0.5rem;"></span>Competitive Moat</div>
+                ${moatPros.map((item, i) => `
+                    <div class="strategy-list-item">
+                        <div class="strategy-number" style="background:rgba(0,184,148,0.1);color:#00b894;">${i + 1}</div>
+                        <div>
+                            <div class="strategy-item-title">${item.title}</div>
+                            <div class="strategy-item-desc">${item.desc || ''}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        if (vulnCons.length > 0) {
+            stratHtml += `<div class="panel">
+                <div class="panel-title" style="color:#d63031;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d63031;margin-right:0.5rem;"></span>Vulnerability Assessment</div>
+                ${vulnCons.map((item, i) => `
+                    <div class="strategy-list-item">
+                        <div class="strategy-number" style="background:rgba(214,48,49,0.1);color:#d63031;">${i + 1}</div>
+                        <div>
+                            <div class="strategy-item-title">${item.title}</div>
+                            <div class="strategy-item-desc">${item.desc || ''}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        document.getElementById('strategy-grid').innerHTML = stratHtml;
+
+        // ---- Execution Matrix ----
+        if (executionMatrix.length > 0) {
+            document.getElementById('matrix-section').style.display = '';
+            document.getElementById('matrix-tbody').innerHTML = executionMatrix.map(row => {
+                const uc = (row.urgency || '').toLowerCase().includes('immediate') ? 'immediate'
+                    : (row.urgency || '').toLowerCase().includes('short') ? 'short-term' : 'long-term';
+                return `<tr>
+                    <td><span class="urgency-pill ${uc}">${row.urgency || 'N/A'}</span></td>
+                    <td style="font-weight:600;color:var(--stripe-text);">${row.directive || ''}</td>
+                    <td>${row.details || ''}</td>
+                    <td style="color:var(--stripe-purple);font-weight:500;">${row.roi || ''}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ---- VOC ----
+        document.getElementById('voc-grid').innerHTML = vocQuotes.map(voc => {
+            const isDanger = voc.is_danger || false;
+            const cardClass = isDanger ? 'negative' : 'positive';
+            const avatar = isDanger ? '&#x26A0;' : '&#x2714;';
+            return `
+                <div class="voc-card ${cardClass}">
+                    <div class="voc-avatar">${avatar}</div>
+                    <div class="voc-profile-name">${voc.profile || 'Customer'}</div>
+                    <span class="voc-status-badge">${voc.status || 'Neutral'}</span>
+                    <div class="voc-quote-text">${voc.quote || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        // ---- Chapters ----
+        if (chapters.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-list').innerHTML = chapters.map(ch => `
+                <div class="chapter-block">
+                    <h3>${ch.title || ''}</h3>
+                    <div class="chapter-body">${ch.content || ''}</div>
+                </div>
+            `).join('');
+        } else if (marketInsights.length > 0) {
+            document.getElementById('chapters-section').style.display = '';
+            document.getElementById('chapters-section').querySelector('.section-title').textContent = 'Market Intelligence';
+            document.getElementById('chapters-list').innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;">
+                    ${marketInsights.map(mi => `
+                        <div class="panel">
+                            <div class="strategy-item-title" style="margin-bottom:0.5rem;">${mi.title || ''}</div>
+                            <div class="strategy-item-desc">${mi.desc || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    })();
+    </script>
+</body>
+</html>

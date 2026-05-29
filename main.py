@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Amazon 商品评论 AI 深度分析工具 - 主入口 V1.0 (向导增强版)
-功能：支持交互式向导 + 全参数驱动，完美兼容人工与 AI Agent 自动化调用。
+Amazon 商品评论 AI 深度分析工具 - 主入口 V2.0 (Agent 原生版)
+功能：支持交互式向导 + 全参数驱动 + Sorftime数据对接 + 多模板看板 + 飞书同步
 """
 
 import sys
@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 # 加载 .env 环境变量
 load_dotenv()
 
-# 导入所有核心模块
+# 导入核心模块
 from src.data_loader import load_reviews_from_file, download_if_url
 from src.review_analyzer import analyze_all
 from src.user_persona_analyzer import analyze_user_personas
@@ -24,22 +24,21 @@ from src.insights_generator import calculate_stats_summary, generate_insights
 from src.report_generator import generate_html_report
 from src.config import config, mask_api_key
 
+# V2.0 新模块
+from src.data_fetchers import get_fetcher, list_fetchers
+from src.output_manager import OutputManager
+from src.prompts.manager import list_chapters
+
 
 def print_intro():
-    """打印工具详细说明（向导第一步）"""
+    """打印工具详细说明"""
     print("""
-🚀 欢迎使用  多场景评论内容 AI 深度分析工具 V1.0 Created By Buluu@新西楼
-============================================================
-核心功能: 针对您提供的原始评论数据，逐条进行22个维度标签挖掘、生成深度洞察分析文字报告、高品质的可视化看板。
-
-支持模式:
-[CLI 模式] 调用系统原生指令，使用您 Claude Code 或 OpenCode 中的内置模型，
-                消耗您的月度配额（非 API 额度）
-[Gemini API 模式] 调用 Google 官方接口，推理质量极大增强，
-                但需配置 API Key
-[默认配置] 为提升token使用效率，在标签挖掘环节，
-                默认使用您Claude Code中的内置模型
-============================================================
+🚀 多场景评论内容 AI 深度分析工具 V2.0 — Agent 原生版 Created By Buluu@新西楼
+======================================================================
+核心功能: 22维度智能标签 · 13章深度洞察报告 · 多风格可视化看板
+数据来源: 本地CSV / Sorftime平台
+输出方式: MD报告 + HTML看板(多模板) + 飞书同步(可选)
+======================================================================
     """)
 
 
@@ -155,12 +154,24 @@ def is_interactive_environment():
 def main():
     """主函数"""
 
-    parser = argparse.ArgumentParser(description="Amazon Review Analyzer V1.0")
-    parser.add_argument("input_file", help="输入 CSV/Excel 文件路径或 URL（http/https）")
+    parser = argparse.ArgumentParser(description="Amazon Review Analyzer V2.0 — Agent 原生版")
+    parser.add_argument("input_file", nargs="?", default=None,
+                        help="输入 CSV/Excel 文件路径或 URL（使用 --source sorftime 时可省略）")
+    # V2.0: 数据来源
+    parser.add_argument("--source", choices=["csv", "sorftime"], default="csv",
+                        help="数据来源: csv(默认) 或 sorftime")
+    parser.add_argument("--asin", help="产品 ASIN（--source sorftime 时必填）")
+    parser.add_argument("--site", default="US",
+                        help="站点代码（默认 US，可选 UK/DE/JP 等）")
+    # V2.0: 模板与输出
+    parser.add_argument("--template", default="premium-gold",
+                        help="可视化看板模板名称（默认 premium-gold）")
+    parser.add_argument("--feishu-sync", action="store_true",
+                        help="同步结果到飞书文档（需要 lark-cli）")
+    # 原有参数
     parser.add_argument("--engine", choices=["claude", "opencode"], default=None,
                         help="CLI 引擎: claude (默认) 或 opencode")
     parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
-    # 默认20而非30,避免CLI超时(与config.py中30的差异是有意设计)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
     parser.add_argument("--mode", choices=["1", "2", "3"], default=None,
                         help="分析模式: 1=Gemini增强(需Key), 2=混动(CLI打标+Gemini看板), 3=CLI本地(免费)")
@@ -168,6 +179,12 @@ def main():
     parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
     args = parser.parse_args()
+
+    # 参数校验
+    if args.source == "sorftime" and not args.asin:
+        parser.error("--source sorftime 需要 --asin 参数")
+    if args.source == "csv" and not args.input_file:
+        parser.error("CSV 模式需要提供输入文件路径")
 
     # 判断是否缺少关键参数
     _missing_params = []
@@ -207,8 +224,28 @@ def main():
         config.CLI_ENGINE = args.engine
         print(f"🔧 CLI 引擎: {config.CLI_ENGINE}")
 
-    # 1. 解析输入（支持 URL 自动下载）
-    resolved_file = download_if_url(args.input_file)
+    # V2.0: 数据获取（支持 Sorftime 或本地 CSV）
+    if args.source == "sorftime":
+        print(f"\n📡 [数据获取] 从 Sorftime 获取评论数据...")
+        print(f"   ASIN: {args.asin}, 站点: {args.site}")
+        fetcher = get_fetcher("sorftime")
+        if not fetcher.validate_config():
+            print("❌ Sorftime 配置无效。请设置 SORFTIME_API_KEY 环境变量。")
+            sys.exit(1)
+        try:
+            csv_path_str = fetcher.fetch(args.asin, fields=None, site=args.site)
+            resolved_file = csv_path_str
+            print(f"✅ 数据获取完成: {csv_path_str}")
+        except Exception as e:
+            print(f"❌ Sorftime 数据获取失败: {e}")
+            sys.exit(1)
+    else:
+        # 原有 CSV 路径
+        if not args.input_file:
+            print("❌ CSV 模式需要提供输入文件路径")
+            sys.exit(1)
+        resolved_file = download_if_url(args.input_file)
+
     input_path = Path(resolved_file)
     if not input_path.exists():
         print(f"❌ 错误：找不到文件: {input_path}")
@@ -289,7 +326,7 @@ def main():
         config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         print(f"📁 自定义输出目录: {config.OUTPUT_DIR}")
 
-    asin = extract_asin_from_file(resolved_file)
+    asin = args.asin if args.source == "sorftime" else extract_asin_from_file(resolved_file)
 
     # 截断评论
     if len(reviews) > config.MAX_REVIEWS:
@@ -371,14 +408,75 @@ def main():
             insights_md=insights_md,
             creator_name=config.HTML_CREATOR_NAME
         )
-        print(f"✅ [Phase 4/4] 可视化看板构建完成！文件: {html_path.name}\n")
+        print(f"✅ [Phase 4/5] 可视化看板构建完成！文件: {html_path.name}\n")
+
+        # Phase 5 (V2.0): 输出管理 — 使用 OutputManager 生成完整输出
+        print(f"📦 [Phase 5/5] 生成完整输出包...")
+        from src.output_manager import generate_outputs, select_template
+
+        # 选择模板
+        template_name = args.template
+        available_templates = [t["name"] for t in list_templates() if isinstance(list_templates(), list)]
+        # 如果模板不存在，使用默认
+        try:
+            from src.template_engine import list_templates as _lt
+            available = [t["name"] for t in _lt()]
+            if template_name not in available:
+                print(f"   ⚠️ 模板 '{template_name}' 不存在，使用默认模板")
+                template_name = available[0] if available else "premium-gold"
+        except Exception:
+            pass
+
+        # 准备分析数据给 OutputManager
+        analysis_data_for_output = {
+            "asin": asin,
+            "product_name": asin,
+            "total_reviews": len(tagged_reviews),
+            "avg_rating": stats.get("avg_rating", 0),
+            "summary": summary,
+            "sentiment": stats.get("sentiment", {}),
+            "sentiment_distribution": stats.get("sentiment", {}),
+            "tag_statistics": stats.get("top_tags", {}),
+            "top_tags": stats.get("top_tags", {}),
+            "personas": [{"name": p.get("name", ""), "count": p.get("count", 0), "tags": p.get("tags", {})} for p in personas],
+            "golden_samples": golden_samples,
+            "insights_md": insights_md,
+            "statistics": stats,
+        }
+
+        output_config = {
+            "template_name": template_name,
+            "sync_feishu": args.feishu_sync,
+            "output_dir": str(config.OUTPUT_DIR),
+            "asin": asin,
+            "creator": config.HTML_CREATOR_NAME,
+        }
+
+        output_results = generate_outputs(analysis_data_for_output, output_config)
+
+        # 飞书同步结果
+        feishu_result = output_results.get("feishu_result", {})
+        if args.feishu_sync:
+            if feishu_result and feishu_result.get("success"):
+                print(f"   ✅ 飞书同步成功！")
+                if feishu_result.get("doc_url"):
+                    print(f"   📄 文档: {feishu_result['doc_url']}")
+            else:
+                error = feishu_result.get("error", "未知错误") if feishu_result else "同步失败"
+                print(f"   ⚠️ 飞书同步失败: {error}")
+                print(f"   💡 本地文件已安全生成，不影响使用")
 
         # 最终输出结果
+        final_md = output_results.get("md_path", str(md_path))
+        final_html = output_results.get("html_path", str(html_path))
+
         print("\n" + "✨" * 30)
         print("🎉 分析任务圆满完成！")
-        print(f"  - 洞察报告: {md_path.name}")
+        print(f"  - 洞察报告: {Path(final_md).name}")
         print(f"  - 结构数据: {csv_path.name}")
-        print(f"  - 可视化看板: {html_path.name}")
+        print(f"  - 可视化看板: {Path(final_html).name} (模板: {template_name})")
+        if args.feishu_sync and feishu_result and feishu_result.get("doc_url"):
+            print(f"  - 飞书文档: {feishu_result['doc_url']}")
         print("✨" * 30 + "\n")
 
     except Exception as e:
