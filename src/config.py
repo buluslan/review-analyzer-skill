@@ -204,11 +204,6 @@ class Config:
         """获取标签体系配置文件路径"""
         return self.REFERENCES_DIR / self.TAG_SYSTEM_PATH
 
-    @property
-    def template_path(self) -> Path:
-        """获取 HTML 模板文件路径"""
-        return self.ASSETS_DIR / "report.html"
-
     def get_csv_path(self, asin: str) -> Path:
         """获取 CSV 输出路径: 评论采集及打标数据_{ASIN}.csv"""
         project_dir = self._get_project_dir(asin)
