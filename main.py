@@ -139,7 +139,7 @@ def main():
                         help="站点代码（默认 US，可选 UK/DE/JP 等）")
     # V2.0: 模板与输出
     parser.add_argument("--template", default="premium-gold",
-                        help="可视化看板模板名称（默认 premium-gold）")
+                        help="可视化看板模板名称（默认 premium-gold，传 none 跳过HTML生成）")
     parser.add_argument("--feishu-sync", action="store_true",
                         help="同步结果到飞书文档（需要 lark-cli）")
     # 原有参数
@@ -322,17 +322,20 @@ def main():
         print(f"📦 [Phase 4/4] 生成完整输出包...")
         from src.output_manager import generate_outputs, select_template
 
-        # 选择模板
+        # 选择模板（none 表示跳过 HTML 生成）
         template_name = args.template
-        # 如果模板不存在，使用默认
-        try:
-            from src.template_engine import list_templates as _lt
-            available = [t["name"] for t in _lt()]
-            if template_name not in available:
-                print(f"   ⚠️ 模板 '{template_name}' 不存在，使用默认模板")
-                template_name = available[0] if available else "premium-gold"
-        except Exception:
-            pass
+        if template_name.lower() == "none":
+            template_name = None  # 跳过 HTML 看板
+        else:
+            # 如果模板不存在，使用默认
+            try:
+                from src.template_engine import list_templates as _lt
+                available = [t["name"] for t in _lt()]
+                if template_name not in available:
+                    print(f"   ⚠️ 模板 '{template_name}' 不存在，使用默认模板")
+                    template_name = available[0] if available else "premium-gold"
+            except Exception:
+                pass
 
         # 构建统计摘要
         summary = {
@@ -395,7 +398,10 @@ def main():
         print("🎉 分析任务圆满完成！")
         print(f"  - 洞察报告: {Path(final_md).name}")
         print(f"  - 结构数据: {csv_path.name}")
-        print(f"  - 可视化看板: {Path(final_html).name} (模板: {template_name})")
+        if final_html:
+            print(f"  - 可视化看板: {Path(final_html).name} (模板: {template_name})")
+        else:
+            print(f"  - 可视化看板: 已跳过")
         if args.feishu_sync and feishu_result and feishu_result.get("doc_url"):
             print(f"  - 飞书文档: {feishu_result['doc_url']}")
             wb_count = feishu_result.get("whiteboard_count", 0)
