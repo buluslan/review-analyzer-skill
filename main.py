@@ -21,8 +21,7 @@ from src.data_loader import load_reviews_from_file, download_if_url
 from src.review_analyzer import analyze_all
 from src.user_persona_analyzer import analyze_user_personas
 from src.insights_generator import calculate_stats_summary, generate_insights
-from src.report_generator import generate_html_report
-from src.config import config, mask_api_key
+from src.config import config
 
 # V2.0 新模块
 from src.data_fetchers import get_fetcher, list_fetchers
@@ -43,23 +42,22 @@ def print_intro():
 
 
 def config_wizard(total_available: int,
-                  preset_max=None, preset_mode=None, preset_creator=None):
+                  preset_max=None, preset_creator=None):
     """
     交互式配置向导（强制交互模式）
 
     Args:
         total_available: 可用的评论总数
         preset_max: 预设的分析数量（命令行提供）
-        preset_mode: 预设的模式（命令行提供）
         preset_creator: 预设的署名（命令行提供）
 
     Returns:
-        tuple: (max_reviews, mode, creator_name)
+        tuple: (max_reviews, creator)
     """
 
     # Q1 (打标深度)
-    print(f"🚀 欢迎使用电商评论AI深度洞察器 (V1.0 Created By Buluu@新西楼)")
-    print(f"📦 [向导 1/3] 文件共有 {total_available} 条有效评论，您计划打标分析多少条？")
+    print(f"🚀 欢迎使用电商评论AI深度洞察器 (V2.0 Created By Buluu@新西楼)")
+    print(f"📦 [向导 1/2] 文件共有 {total_available} 条有效评论，您计划打标分析多少条？")
     if preset_max is not None:
         print(f"   [当前预设: {preset_max} 条]")
         max_rev_input = input(f"   请输入数量 (直接回车使用预设值 {preset_max} 条) >>> ").strip()
@@ -71,32 +69,8 @@ def config_wizard(total_available: int,
     # 确保不超过可用数量
     max_rev = min(max_rev, total_available)
 
-    # Q2 (推理引擎选择)
-    print("\n🤖 [向导 2/3] 请选择 AI 引擎组合：")
-    print()
-    print("   [1] Gemini增强模式（推荐）")
-    print("       调用Gemini API")
-    print("       使用【Gemini 3.1 flash】生成洞察报告")
-    print("       使用【Gemini 3.1 pro】生成可视化看板（需要API Key，产生费用）")
-    print()
-    print("   [2] Claude CLI+Gemini混动模式")
-    print("       文字报告使用Claude Code内置模型")
-    print("       可视化看板使用【Gemini 3.1 pro】生成（需要API Key，产生费用）")
-    print()
-    print("   [3] Claude CLI 本地模式")
-    print("       使用您的Claude Code中的内置模型进行打标、推理、报告和看板生成")
-    print()
-    mode_names = {"1": "Gemini增强", "2": "CLI+Gemini混动", "3": "Claude CLI 全程"}
-    if preset_mode is not None:
-        print(f"   [当前预设: {mode_names.get(preset_mode, preset_mode)} 模式]")
-        mode_input = input(f"   输入编号 [直接回车使用预设值 {preset_mode}] >>> ").strip()
-        mode = mode_input if mode_input in ["1", "2", "3"] else preset_mode
-    else:
-        mode_input = input("   输入编号 [默认值: 1] >>> ").strip()
-        mode = mode_input if mode_input in ["1", "2", "3"] else "1"
-
-    # Q3 (报告署名)
-    print("\n✍️ [向导 3/3] 报告需要个性化署名吗？")
+    # Q2 (报告署名)
+    print("\n✍️ [向导 2/2] 报告需要个性化署名吗？")
     if preset_creator is not None:
         print(f"   [当前预设: {preset_creator}]")
         creator_input = input(f"   请输入署名 (直接回车使用预设值 '{preset_creator}') >>> ").strip()
@@ -110,11 +84,11 @@ def config_wizard(total_available: int,
     print("\n" + "=" * 60)
     print("✅ 配置确认：")
     print(f"   📊 分析数量: {max_rev} 条")
-    print(f"   🤖 运行模式: {mode_names.get(mode, mode)}")
+    print(f"   🤖 运行模式: CLI 本地模式")
     print(f"   ✍️  报告署名: {creator or 'AI Assistant'}")
     print("=" * 60 + "\n")
 
-    return (max_rev, mode, creator)
+    return (max_rev, creator)
 
 
 def save_tagged_reviews_to_csv(tagged_reviews: list, asin: str) -> Path:
@@ -173,10 +147,9 @@ def main():
                         help="CLI 引擎: claude (默认) 或 opencode")
     parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
-    parser.add_argument("--mode", choices=["1", "2", "3"], default=None,
-                        help="分析模式: 1=Gemini增强(需Key), 2=混动(CLI打标+Gemini看板), 3=CLI本地(免费)")
+    parser.add_argument("--concurrent", type=int, default=None,
+                        help="最大并发批次数 (默认4, 上限8)")
     parser.add_argument("--creator", help="报告署名/品牌", default=None)
-    parser.add_argument("--gemini-key", help="Gemini API Key (也可通过环境变量配置)")
     parser.add_argument("--output-dir", help="自定义输出目录")
     args = parser.parse_args()
 
@@ -190,8 +163,6 @@ def main():
     _missing_params = []
     if args.max_reviews is None:
         _missing_params.append("--max-reviews")
-    if args.mode is None:
-        _missing_params.append("--mode")
     if args.creator is None:
         _missing_params.append("--creator")
     needs_interaction = len(_missing_params) > 0
@@ -209,7 +180,6 @@ def main():
         print("  请通过命令行提供完整参数：")
         print(f"    python3 main.py '{args.input_file}' \\")
         print("      --max-reviews 100 \\")
-        print("      --mode 1 \\")
         print("      --creator '你的署名'")
         print()
         print("  💡 提示：如需使用交互式菜单，请直接在终端中运行此命令。")
@@ -258,23 +228,20 @@ def main():
 
     # 3. 配置合并 (优先级：命令行 > 向导 > 默认)
     if not needs_interaction:
-        # 三个参数都已通过命令行提供，跳过向导
+        # 两个参数都已通过命令行提供，跳过向导
         print(f"\n✅ 检测到完整命令行参数，跳过交互式向导")
         max_reviews = args.max_reviews
-        mode = args.mode
         creator = args.creator
     else:
         # 在 TTY 环境且缺少参数 → 启动交互式向导
-        wizard_max_reviews, wizard_mode, wizard_creator = config_wizard(
+        wizard_max_reviews, wizard_creator = config_wizard(
             total_available=total_available,
             preset_max=args.max_reviews,
-            preset_mode=args.mode,
             preset_creator=args.creator
         )
         print()  # 向导结束后添加空行
         # 向导结果优先
         max_reviews = wizard_max_reviews
-        mode = wizard_mode
         creator = wizard_creator
 
     # 应用配置
@@ -284,36 +251,14 @@ def main():
     if creator:
         config.HTML_CREATOR_NAME = creator
 
-    # Key 处理
-    gemini_key = args.gemini_key or os.environ.get("GEMINI_API_KEY") or config.GEMINI_API_KEY
-    if gemini_key:
-        config.GEMINI_API_KEY = gemini_key
+    # 并发数配置
+    if args.concurrent:
+        config.MAX_CONCURRENT_AGENTS = args.concurrent
 
-    # 模式分配 (与SKILL.md中的选项顺序一致)
-    if mode == "1":
-        # 模式1: Gemini增强模式 - 全程使用Gemini API
-        config.INSIGHTS_PROVIDER = "gemini"
-        config.GEMINI_MODEL = "gemini-3-flash-preview"  # 文字报告专用模型
-        config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 可视化看板专用模型
-        print("💡 模式：Gemini 增强模式 (Flash报告 + 3.1 Pro看板)")
-    elif mode == "2":
-        # 模式2: Claude CLI+Gemini混动模式 - 打标用CLI，看板用Gemini
-        config.INSIGHTS_PROVIDER = "cli"
-        config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"  # 可视化看板专用模型
-        print("💡 模式：混动模式 (CLI 打标 + Gemini 3.1 Pro 看板)")
-    elif mode == "3":
-        # 模式3: Claude CLI 本地模式 - 全程使用本地模型
-        config.INSIGHTS_PROVIDER = "cli"
-        config.HTML_GENERATION_SOURCE = "local"
-        engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
-        print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
-
-    # 检查 Key 依赖
-    if config.HTML_GENERATION_SOURCE == "gemini" and not config.GEMINI_API_KEY:
-        print("⚠️  警告：选择了 Gemini 模式但未配置 API Key。将回退至本地渲染。")
-        config.HTML_GENERATION_SOURCE = "local"
+    # 模式固定为 CLI 本地模式
+    engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
+    print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
+    print(f"🔧 并发线程数: {config.MAX_CONCURRENT_AGENTS}")
 
     # 应用自定义输出目录
     if args.output_dir:
@@ -351,12 +296,7 @@ def main():
         # Phase 3: AI 撰写深度战略洞察报告
         print(f"📝 [Phase 3/4] AI深度战略洞察报告生成中...")
         print(f"   - 正在生成 {len(personas)} 个用户画像分析...")
-        if config.INSIGHTS_PROVIDER == "gemini":
-            print(f"   - 使用引擎: Gemini API ({config.GEMINI_MODEL})")
-            print(f"   - 正在调用 Gemini API 生成洞察...")
-        else:
-            print(f"   - 使用引擎: Claude Code CLI")
-            print(f"   - 正在调用 Claude CLI 生成洞察...")
+        print(f"   - 使用引擎: {engine_label}")
         stats = calculate_stats_summary(tagged_reviews)
         insights_md = generate_insights(
             stats=stats,
@@ -378,40 +318,8 @@ def main():
         # 保存 CSV
         csv_path = save_tagged_reviews_to_csv(tagged_reviews, asin)
 
-        # Phase 4: 渲染可视化看板
-        if config.HTML_GENERATION_SOURCE == "gemini":
-            print(f"🎨 [Phase 4/4] 可视化看板渲染中...")
-            print(f"   - 使用引擎: Gemini {config.HTML_GENERATION_MODEL}")
-            print(f"   - 正在调用 Gemini API 生成HTML...")
-            print(f"   - 预计需要 3-5 分钟，请耐心等待...")
-        else:
-            print(f"🎨 [Phase 4/4] 可视化看板渲染中...")
-            print(f"   - 使用引擎: 本地模板 (黑金看板)")
-            print(f"   - 正在渲染本地模板...")
-
-        summary = {
-            "total": len(tagged_reviews),
-            "tagged": stats["tagged"],
-            "persona_count": len(personas),
-            "avg_rating": stats.get("avg_rating", 0),
-            "sentiment": stats.get("sentiment", {}),
-            "top_tags": stats.get("top_tags", {})
-        }
-
-        html_path = generate_html_report(
-            asin=asin,
-            summary=summary,
-            personas=personas,
-            sentiment_distribution=stats["sentiment"],
-            tag_statistics=stats["top_tags"],
-            golden_samples=golden_samples,
-            insights_md=insights_md,
-            creator_name=config.HTML_CREATOR_NAME
-        )
-        print(f"✅ [Phase 4/5] 可视化看板构建完成！文件: {html_path.name}\n")
-
-        # Phase 5 (V2.0): 输出管理 — 使用 OutputManager 生成完整输出
-        print(f"📦 [Phase 5/5] 生成完整输出包...")
+        # Phase 4 (V2.0): 输出管理 — 统一生成 MD + HTML看板 + 飞书同步
+        print(f"📦 [Phase 4/4] 生成完整输出包...")
         from src.output_manager import generate_outputs, select_template
 
         # 选择模板
@@ -426,6 +334,16 @@ def main():
         except Exception:
             pass
 
+        # 构建统计摘要
+        summary = {
+            "total": len(tagged_reviews),
+            "tagged": stats["tagged"],
+            "persona_count": len(personas),
+            "avg_rating": stats.get("avg_rating", 0),
+            "sentiment": stats.get("sentiment", {}),
+            "top_tags": stats.get("top_tags", {})
+        }
+
         # 准备分析数据给 OutputManager
         analysis_data_for_output = {
             "asin": asin,
@@ -437,6 +355,7 @@ def main():
             "sentiment_distribution": stats.get("sentiment", {}),
             "tag_statistics": stats.get("top_tags", {}),
             "top_tags": stats.get("top_tags", {}),
+            "dimensional_stats": stats.get("dimensional_stats", {}),
             "personas": [{"name": p.get("name", ""), "count": p.get("count", 0), "tags": p.get("tags", {})} for p in personas],
             "golden_samples": golden_samples,
             "insights_md": insights_md,
@@ -470,7 +389,7 @@ def main():
 
         # 最终输出结果
         final_md = output_results.get("md_path", str(md_path))
-        final_html = output_results.get("html_path", str(html_path))
+        final_html = output_results.get("html_path", "")
 
         print("\n" + "✨" * 30)
         print("🎉 分析任务圆满完成！")

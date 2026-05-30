@@ -62,7 +62,6 @@ def main():
     parser.add_argument("input_file", help="输入文件路径")
     parser.add_argument("--max-reviews", type=int, default=None, help="最大处理评论数")
     parser.add_argument("--batch-size", type=int, default=30, help="每批处理数量")
-    parser.add_argument("--mode", choices=["cli", "gemini"], default="cli", help="分析模式")
     parser.add_argument("--creator", default="AI分析", help="报告署名")
     args = parser.parse_args()
 
@@ -76,9 +75,7 @@ def main():
     asin = extract_asin_from_file(args.input_file)
     print(f"📦 ASIN: {asin}")
 
-    # 设置模式
-    config.INSIGHTS_PROVIDER = args.mode
-    config.HTML_GENERATION_SOURCE = "local" if args.mode == "cli" else "gemini"
+    # 设置配置（统一 CLI 本地模式）
     config.HTML_CREATOR_NAME = args.creator
 
     try:
@@ -100,7 +97,6 @@ def main():
 
         # 🟢 打标分析
         print(f"\n🚀 [Phase 1] 正在进行 AI 深度打标分析...")
-        print(f"   处理模式: {args.mode.upper()}")
         print(f"   批次大小: {args.batch_size}")
         tagged_reviews = analyze_all(reviews, batch_size=args.batch_size)
         print(f"   ✅ 打标完成: {len(tagged_reviews)} 条")

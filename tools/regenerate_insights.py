@@ -49,21 +49,17 @@ def load_tagged_csv(csv_path: str):
 
 def main():
     if len(sys.argv) < 2:
-        print("用法: python3 regenerate_insights.py <已打标CSV文件路径> [--creator 署名] [--mode 1|2|3]")
+        print("用法: python3 regenerate_insights.py <已打标CSV文件路径> [--creator 署名]")
         sys.exit(1)
 
     csv_path = sys.argv[1]
     creator = "AI Assistant"
-    mode = "1"
 
     # 解析可选参数
     i = 2
     while i < len(sys.argv):
         if sys.argv[i] == "--creator" and i + 1 < len(sys.argv):
             creator = sys.argv[i + 1]
-            i += 2
-        elif sys.argv[i] == "--mode" and i + 1 < len(sys.argv):
-            mode = sys.argv[i + 1]
             i += 2
         else:
             i += 1
@@ -80,22 +76,8 @@ def main():
     config.OUTPUT_DIR = csv_file_path.parent
     config.HTML_CREATOR_NAME = creator
 
-    # 设置API Key
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    if gemini_key:
-        config.GEMINI_API_KEY = gemini_key
-
-    # 设置模式
-    if mode == "1":
-        config.INSIGHTS_PROVIDER = "gemini"
-        config.GEMINI_MODEL = "gemini-3-flash-preview"
-        print("🤖 使用 Gemini 增强模式生成报告")
-    elif mode == "2":
-        config.INSIGHTS_PROVIDER = "cli"
-        print("🤖 使用 Claude CLI 模式生成报告")
-    else:
-        config.INSIGHTS_PROVIDER = "cli"
-        print("🤖 使用 Claude CLI 本地模式生成报告")
+    # 统一 CLI 本地模式
+    print("🤖 使用 CLI 本地模式生成报告")
 
     # 加载已打标数据
     print(f"\n📄 正在加载已打标数据...")
@@ -124,10 +106,7 @@ def main():
     # Phase 2: 生成洞察报告
     print(f"\n📝 [Phase 2/2] AI深度战略洞察报告生成中...")
     print(f"   - 正在生成 {len(personas)} 个用户画像分析...")
-    if config.INSIGHTS_PROVIDER == "gemini":
-        print(f"   - 使用引擎: Gemini API ({config.GEMINI_MODEL})")
-    else:
-        print(f"   - 使用引擎: Claude Code CLI")
+    print(f"   - 使用引擎: CLI")
 
     from src.insights_generator import generate_insights_with_metadata
     

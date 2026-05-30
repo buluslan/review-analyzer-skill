@@ -1,7 +1,6 @@
 """
-HTML 报告生成模块 V1.0 - 黑金奢华看板
-使用 Gemini API 生成专业决策级别的可视化 HTML 数据看板
-严格按照 prompt_html.json 和 prompt_html.md 的规范生成
+HTML 报告生成模块 V1.0 - 本地渲染版
+使用 Jinja2 模板引擎渲染可视化 HTML 数据看板
 """
 
 import json
@@ -19,57 +18,10 @@ try:
 except ImportError:
     JINJA2_AVAILABLE = False
 
-try:
-    import google.generativeai as genai
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-
-from src.config import config, mask_api_key
+from src.config import config
 
 # 配置日志
 logger = logging.getLogger(__name__)
-
-
-def _load_json_template() -> Dict:
-    """加载 JSON 数据模板"""
-    json_path = config.REFERENCES_DIR / "可视化看板prompt/prompt_html.json"
-    if json_path.exists():
-        with open(json_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-
-def _load_system_prompt() -> str:
-    """加载黑金奢华 HTML 生成系统提示词"""
-    prompt_path = config.REFERENCES_DIR / "可视化看板prompt/prompt_html.md"
-    if prompt_path.exists():
-        with open(prompt_path, "r", encoding="utf-8") as f:
-            return f.read()
-    return ""
-
-
-def _extract_html_from_response(response_text: str) -> str:
-    """从 Gemini 响应中提取 HTML 代码"""
-    # 尝试提取 html 代码块
-    html_pattern = r'```html\s*(.*?)\s*```'
-    match = re.search(html_pattern, response_text, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-
-    # 尝试提取通用代码块
-    code_pattern = r'```\s*(.*?)\s*```'
-    match = re.search(code_pattern, response_text, re.DOTALL)
-    if match:
-        content = match.group(1).strip()
-        if content.startswith('<') and ('</html>' in content or '</body>' in content):
-            return content
-
-    # 如果没有代码块，检查是否是纯 HTML
-    if response_text.strip().startswith('<'):
-        return response_text.strip()
-
-    return response_text.strip()
 
 
 def _extract_strategic_json(insights_md: Optional[str]) -> Dict:
@@ -624,15 +576,15 @@ def generate_html_report(
     tag_statistics: Optional[Dict] = None,
     golden_samples: Optional[List[Dict]] = None,
     insights_md: Optional[str] = None,
-    creator_name: str = "Gemini-1.5-Pro",
+    creator_name: str = "AI Assistant",
 ) -> Path:
-    """生成黑金奢华可视化 HTML 报告"""
+    """生成可视化 HTML 报告（本地 Jinja2 渲染）"""
     output_path = config.get_html_path(asin)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 1. 提取结构化数据 (用于分析源)
     _ = _extract_strategic_json(insights_md)
-    
+
     # 2. 清洗 insights_md (剥离 strategic_json 块供前端展示)
     clean_md = insights_md or ""
     if "<strategic_json>" in clean_md:
@@ -646,56 +598,9 @@ def generate_html_report(
         insights_md=clean_md, creator_name=creator_name
     )
 
-    # 4. 模式判定：如果显式指定 local 或没有 API Key，直接走本地渲染
-    if config.HTML_GENERATION_SOURCE == "local" or not config.GEMINI_API_KEY:
-        print(f"   💡 进入「本地经典模式」生成可视化看板...")
-        _render_with_jinja2(asin, json_data, clean_md, output_path)
-        return output_path
-
-    # 5. 尝试使用 Gemini 生成 (高品质生成式渲染)
-    print(f"   🎨 使用 Gemini {config.HTML_GENERATION_MODEL} 生成黑金奢华看板...")
-    try:
-        if not GEMINI_AVAILABLE:
-            raise RuntimeError("google-generativeai 未安装")
-
-        # 安全地记录API Key配置（仅显示后4位）
-        logger.debug(f"配置 Gemini API Key: {mask_api_key(config.GEMINI_API_KEY)}")
-        genai.configure(api_key=config.GEMINI_API_KEY)
-        system_prompt = _load_system_prompt()
-        if not system_prompt:
-            raise RuntimeError("找不到 prompt_html.md")
-
-        system_prompt = system_prompt.replace("{CREATOR_NAME}", creator_name)
-
-        full_prompt = f"# JSON 数据输入\n\n```json\n{json.dumps(json_data, ensure_ascii=False, indent=2)}\n```\n\n# 产品名称\n{product_name or asin}\n\n# 报告原文\n{clean_md}\n"
-
-        model = genai.GenerativeModel(
-            model_name=config.HTML_GENERATION_MODEL,
-            system_instruction=system_prompt
-        )
-
-        response = model.generate_content(
-            full_prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=config.HTML_GENERATION_TEMPERATURE,
-                max_output_tokens=65536,
-            )
-        )
-
-        html_content = _extract_html_from_response(response.text)
-        if not html_content or len(html_content) < 500:
-            raise ValueError("Gemini 生成的 HTML 异常")
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(html_content)
-
-        print(f"   ✅ HTML 报告生成成功: {output_path.name}")
-        return output_path
-
-    except Exception as e:
-        print(f"   ⚠️ Gemini 渲染故障 ({e})，正在自动退位至「本地经典模式」...")
-        _render_with_jinja2(asin, json_data, clean_md, output_path)
-        return output_path
+    # 4. 本地渲染
+    _render_with_jinja2(asin, json_data, clean_md, output_path)
+    return output_path
 
 # ========== 保留的辅助函数（向后兼容） ==========
 

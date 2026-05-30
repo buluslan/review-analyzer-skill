@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ product_name or 'Amazon Review Analysis' }} - 评论分析报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ============================================
-           DATA-JOURNALIST DASHBOARD
-           Editorial financial publication aesthetic
+           PREMIUM GOLD DASHBOARD
+           Dark theme + Gold accent editorial aesthetic
            ============================================ */
 
         :root {
-            /* Color Palette - Deep editorial tones with warm accents */
+            /* Color Palette */
             --bg-deep: #0d1117;
             --bg-card: #161b22;
             --bg-card-hover: #1c2128;
@@ -22,7 +23,7 @@
             --text-secondary: #8b949e;
             --text-muted: #6e7681;
 
-            /* Accent colors - unexpected warm palette against dark */
+            /* Accent colors */
             --accent-gold: #d29922;
             --accent-coral: #ff7b72;
             --accent-teal: #7ee787;
@@ -35,6 +36,16 @@
             --sentiment-neutral: #8b949e;
             --sentiment-negative: #ff7b72;
             --sentiment-strong-negative: #da3633;
+
+            /* Priority colors */
+            --priority-p0: #da3633;
+            --priority-p1: #d29922;
+            --priority-p2: #79c0ff;
+
+            /* Severity colors */
+            --severity-critical: #da3633;
+            --severity-major: #d29922;
+            --severity-minor: #6e7681;
 
             /* Spacing scale */
             --space-xs: 0.25rem;
@@ -137,7 +148,7 @@
         }
 
         .header-meta-item::before {
-            content: '●';
+            content: '\25CF';
             color: var(--accent-gold);
             font-size: 0.5rem;
         }
@@ -158,7 +169,7 @@
         }
 
         /* ============================================
-           SUMMARY CARDS - Stat grid
+           SUMMARY CARDS (Section 01)
            ============================================ */
         .summary-grid {
             display: grid;
@@ -216,7 +227,7 @@
         }
 
         /* ============================================
-           SECTION HEADERS
+           SECTION HEADERS (Shared)
            ============================================ */
         .section {
             margin-bottom: var(--space-2xl);
@@ -254,79 +265,7 @@
         }
 
         /* ============================================
-           USER PERSONAS - Character cards
-           ============================================ */
-        .personas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: var(--space-lg);
-        }
-
-        .persona-card {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: var(--space-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .persona-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle at corner, var(--persona-color, var(--accent-gold)) 0%, transparent 70%);
-            opacity: 0.1;
-        }
-
-        .persona-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            margin-bottom: var(--space-md);
-        }
-
-        .persona-name {
-            font-family: var(--font-display);
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .persona-count {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--persona-color, var(--accent-gold));
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-
-        .persona-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-sm);
-        }
-
-        .persona-tag {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            color: var(--text-secondary);
-        }
-
-        .persona-tag-value {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        /* ============================================
-           SENTIMENT DISTRIBUTION - Bar chart
+           SENTIMENT DISTRIBUTION (Section 02)
            ============================================ */
         .sentiment-chart {
             background: var(--bg-card);
@@ -388,54 +327,410 @@
             color: var(--text-primary);
         }
 
-        /* ============================================
-           TAG STATISTICS - Tag cloud grid
-           ============================================ */
-        .tags-grid {
+        .executive-brief {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .brief-card,
+        .chart-card {
+            background: linear-gradient(135deg, rgba(22, 27, 34, 0.96), rgba(13, 17, 23, 0.98));
+            border: 1px solid rgba(210, 153, 34, 0.14);
+            border-radius: 8px;
+            padding: var(--space-xl);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+        }
+
+        .brief-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .brief-text {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            line-height: 1.8;
+        }
+
+        .brief-metric-list {
+            display: grid;
+            gap: var(--space-md);
+        }
+
+        .brief-metric {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-md);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .brief-metric:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .brief-metric span {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+
+        .brief-metric strong {
+            font-family: var(--font-display);
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            white-space: nowrap;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .chart-card {
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title {
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            text-align: center;
+        }
+
+        .chart-frame {
+            position: relative;
+            flex: 1;
+            min-height: 280px;
+        }
+
+        .segment-need,
+        .story-need,
+        .positioning-text {
+            white-space: normal;
+        }
+
+        .editorial-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: var(--space-xl);
+            align-items: stretch;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .judgement-panel {
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.12), rgba(22, 27, 34, 0.96) 42%, rgba(13, 17, 23, 0.98));
+            border: 1px solid rgba(210, 153, 34, 0.28);
+            border-radius: 8px;
+            padding: var(--space-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .judgement-panel::after {
+            content: '';
+            position: absolute;
+            right: -120px;
+            top: -120px;
+            width: 260px;
+            height: 260px;
+            border: 1px solid rgba(210, 153, 34, 0.18);
+            transform: rotate(28deg);
+        }
+
+        .judgement-kicker,
+        .module-kicker {
+            color: var(--accent-gold);
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: var(--space-md);
+        }
+
+        .judgement-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 4.2rem);
+            line-height: 1.05;
+            max-width: 920px;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .judgement-detail {
+            max-width: 860px;
+            color: var(--text-secondary);
+            font-size: 1.02rem;
+            line-height: 1.8;
+        }
+
+        .tension-panel {
+            background: rgba(22, 27, 34, 0.92);
+            border: 1px solid rgba(255, 123, 114, 0.24);
+            border-radius: 8px;
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tension-title {
+            font-family: var(--font-display);
+            color: var(--text-primary);
+            font-size: 1.45rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .tension-text {
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .quadrant-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 3px solid var(--quadrant-accent);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            min-height: 220px;
+        }
+
+        .quadrant-card[data-accent="gold"] { --quadrant-accent: var(--accent-gold); }
+        .quadrant-card[data-accent="green"] { --quadrant-accent: var(--accent-teal); }
+        .quadrant-card[data-accent="red"] { --quadrant-accent: var(--accent-coral); }
+        .quadrant-card[data-accent="blue"] { --quadrant-accent: var(--accent-blue); }
+
+        .quadrant-eyebrow {
+            color: var(--quadrant-accent);
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: var(--space-sm);
+        }
+
+        .quadrant-title {
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            font-size: 1.22rem;
+            line-height: 1.25;
+            margin-bottom: var(--space-md);
+        }
+
+        .quadrant-text {
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-size: 0.9rem;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .strategy-column {
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: var(--space-xl);
+        }
+
+        .strategy-column.moat { border-top: 4px solid var(--accent-gold); }
+        .strategy-column.risk { border-top: 4px solid var(--accent-coral); }
+
+        .strategy-title {
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .strategy-item {
+            padding: var(--space-md);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: var(--space-md);
+        }
+
+        .strategy-item:last-child { margin-bottom: 0; }
+        .strategy-item h4 {
+            color: var(--accent-gold);
+            margin-bottom: var(--space-xs);
+        }
+        .strategy-column.risk .strategy-item h4 { color: var(--accent-coral); }
+        .strategy-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+        .strategy-metric {
+            color: var(--accent-blue);
+            font-size: 0.78rem;
+            margin-top: var(--space-sm);
+        }
+
+        .voc-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .voc-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .voc-card.negative { border-color: rgba(255, 123, 114, 0.24); }
+        .voc-card.positive { border-color: rgba(210, 153, 34, 0.24); }
+
+        .voc-main {
+            padding: var(--space-lg);
+        }
+
+        .voc-header {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .voc-title {
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            font-size: 1.12rem;
+        }
+
+        .voc-status {
+            color: var(--accent-gold);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .voc-need {
+            color: var(--accent-gold);
+            font-size: 0.82rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .voc-quote {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-style: italic;
+            padding-left: var(--space-md);
+            border-left: 2px solid var(--accent-gold);
+        }
+
+        .voc-analysis {
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(0, 0, 0, 0.28);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+            line-height: 1.65;
+        }
+
+        /* ============================================
+           USER PERSONAS (Section 03)
+           ============================================ */
+        .personas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .persona-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at corner, var(--persona-color, var(--accent-gold)) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+
+        .persona-name {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .persona-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--persona-color, var(--accent-gold));
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .segment-need {
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            line-height: 1.65;
+            margin-bottom: var(--space-md);
+        }
+
+        .persona-tags {
+            display: flex;
+            flex-wrap: wrap;
             gap: var(--space-sm);
         }
 
-        .tag-item {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: var(--space-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s ease;
-        }
-
-        .tag-item:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .tag-name {
-            font-size: 0.813rem;
+        .persona-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             color: var(--text-secondary);
         }
 
-        .tag-count {
-            font-family: var(--font-mono);
-            font-size: 0.875rem;
-            color: var(--accent-blue);
+        .persona-tag-value {
+            color: var(--text-primary);
             font-weight: 500;
         }
 
-        /* Tag dimension headers */
-        .tag-dimension {
-            grid-column: 1 / -1;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--accent-gold);
-            margin-top: var(--space-md);
-            margin-bottom: var(--space-xs);
-        }
-
         /* ============================================
-           GOLDEN SAMPLES - Review cards
+           GOLDEN SAMPLES (Section 04)
            ============================================ */
         .samples-list {
             display: flex;
@@ -520,32 +815,581 @@
         }
 
         /* ============================================
-           INSIGHTS SECTION - Markdown content
+           INSIGHT CARDS (Section 05 - overview_insights)
            ============================================ */
-        .insights-content {
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .insight-card {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            padding: var(--space-xl);
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .insights-content {
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .insight-card-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--accent-gold);
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+
+        .insight-card-title {
+            font-family: var(--font-display);
+            font-size: 1.063rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .insight-card-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Product positioning block */
+        .positioning-block {
+            background: var(--bg-card);
+            border: 1px solid rgba(210, 153, 34, 0.15);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 8px 8px 0;
+            padding: var(--space-lg) var(--space-xl);
+        }
+
+        .positioning-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-gold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .positioning-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ============================================
+           SELLING POINTS CARDS (Section 06)
+           ============================================ */
+        .value-pain-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+        }
+
+        .value-pain-column-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .value-pain-column-title .icon-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        /* Selling card - left green bar */
+        .selling-card,
+        .pain-card,
+        .opportunity-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .selling-card:hover,
+        .pain-card:hover,
+        .opportunity-card:hover {
+            transform: translateY(-1px);
+        }
+
+        .selling-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--accent-teal);
+        }
+
+        .selling-card-title,
+        .pain-card-title,
+        .opportunity-card-title {
+            font-family: var(--font-display);
+            font-size: 1.063rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .selling-card-finding,
+        .pain-card-finding,
+        .opportunity-card-finding {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-sm);
+        }
+
+        .selling-card-data,
+        .pain-card-data,
+        .opportunity-card-data {
+            font-family: var(--font-mono);
+            font-size: 0.813rem;
+            color: var(--accent-blue);
+            margin-bottom: var(--space-md);
+        }
+
+        .user-quote {
+            border-left: 3px solid var(--accent-gold);
+            padding-left: var(--space-md);
+            margin-top: var(--space-sm);
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           PAIN POINTS CARDS (Section 06)
+           ============================================ */
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--pain-severity-color, var(--severity-minor));
+        }
+
+        .pain-card.severity-critical::before { background: var(--severity-critical); }
+        .pain-card.severity-major::before { background: var(--severity-major); }
+        .pain-card.severity-minor::before { background: var(--severity-minor); }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.688rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-sm);
+        }
+
+        .severity-badge.critical {
+            background: rgba(218, 54, 51, 0.15);
+            color: var(--severity-critical);
+            border: 1px solid rgba(218, 54, 51, 0.3);
+        }
+
+        .severity-badge.major {
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--severity-major);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+
+        .severity-badge.minor {
+            background: rgba(110, 118, 129, 0.15);
+            color: var(--severity-minor);
+            border: 1px solid rgba(110, 118, 129, 0.3);
+        }
+
+        /* ============================================
+           IMPROVEMENTS (Section 07)
+           ============================================ */
+        .improvements-groups {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .improvement-group {
+            min-width: 0;
+        }
+
+        .improvement-group-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--accent-gold);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(210, 153, 34, 0.15);
+        }
+
+        .improvement-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            transition: background 0.2s ease;
+        }
+
+        .improvement-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.688rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .priority-badge.p0 {
+            background: rgba(218, 54, 51, 0.15);
+            color: var(--priority-p0);
+            border: 1px solid rgba(218, 54, 51, 0.3);
+        }
+
+        .priority-badge.p1 {
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--priority-p1);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+
+        .priority-badge.p2 {
+            background: rgba(121, 192, 255, 0.15);
+            color: var(--priority-p2);
+            border: 1px solid rgba(121, 192, 255, 0.3);
+        }
+
+        .improvement-content {
+            flex: 1;
+        }
+
+        .improvement-title {
+            font-size: 0.938rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .improvement-desc {
+            font-size: 0.813rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Action table */
+        .action-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: var(--space-xl);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .action-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .action-table thead th {
+            background: var(--bg-elevated);
+            color: var(--accent-gold);
+            font-weight: 500;
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 2px solid var(--accent-gold);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .action-table tbody td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        .action-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .action-table tbody tr:nth-child(odd) {
+            background: var(--bg-card);
+        }
+
+        .action-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .action-table .col-action { min-width: 250px; }
+        .action-table .col-impact { min-width: 100px; }
+        .action-table .col-source { min-width: 80px; }
+
+        /* Quick wins */
+        .quick-wins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .quick-win-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 8px 8px 0;
+            padding: var(--space-lg);
+            transition: transform 0.3s ease;
+        }
+
+        .quick-win-card:hover {
+            transform: translateY(-1px);
+        }
+
+        .quick-win-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .quick-win-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           OPPORTUNITY CARDS (Section 08)
+           ============================================ */
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .opportunity-card {
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .opportunity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--accent-blue);
+        }
+
+        /* ============================================
+           USER STORIES (Section 09)
+           ============================================ */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .story-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .story-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .story-sentiment-bar {
+            height: 4px;
+            width: 100%;
+        }
+
+        .story-sentiment-bar.positive { background: var(--accent-teal); }
+        .story-sentiment-bar.negative { background: var(--sentiment-negative); }
+        .story-sentiment-bar.mixed { background: var(--accent-blue); }
+
+        .story-content {
+            padding: var(--space-lg);
+        }
+
+        .story-title {
+            font-family: var(--font-display);
+            font-size: 1.063rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .story-profile {
+            font-size: 0.813rem;
+            color: var(--accent-gold);
+            margin-bottom: var(--space-md);
+        }
+
+        .story-need {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+        }
+
+        .story-quotes {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .story-quote {
+            border-left: 3px solid rgba(210, 153, 34, 0.4);
+            padding-left: var(--space-md);
+            font-size: 0.813rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           COLLAPSIBLE SECTION (Section 10)
+           ============================================ */
+        .collapsible-section {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-lg) var(--space-xl);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .collapsible-header-text {
+            font-family: var(--font-display);
+            font-size: 1.063rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .collapsible-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            transition: transform 0.3s ease, background 0.2s ease;
+            font-size: 0.75rem;
+        }
+
+        .collapsible-section.expanded .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .collapsible-section.expanded .collapsible-body {
+            max-height: 8000px;
+        }
+
+        .collapsible-body-inner {
+            padding: 0 var(--space-xl) var(--space-xl);
+        }
+
+        /* ============================================
+           REMAINING CHAPTERS HTML CONTENT
+           ============================================ */
+        .deep-content {
             font-family: var(--font-body);
             color: var(--text-secondary);
             line-height: 1.8;
         }
 
-        .insights-content h1 {
+        .deep-content h1 {
             font-family: var(--font-display);
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 500;
             color: var(--text-primary);
+            margin-top: var(--space-xl);
             margin-bottom: var(--space-lg);
-            padding-bottom: var(--space-md);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .insights-content h2 {
+        .deep-content h2 {
             font-family: var(--font-display);
             font-size: 1.25rem;
             font-weight: 500;
@@ -554,7 +1398,7 @@
             margin-bottom: var(--space-md);
         }
 
-        .insights-content h3 {
+        .deep-content h3 {
             font-size: 1.063rem;
             font-weight: 500;
             color: var(--text-primary);
@@ -562,20 +1406,20 @@
             margin-bottom: var(--space-sm);
         }
 
-        .insights-content p {
+        .deep-content p {
             margin-bottom: var(--space-md);
         }
 
-        .insights-content ul, .insights-content ol {
+        .deep-content ul, .deep-content ol {
             margin-left: var(--space-lg);
             margin-bottom: var(--space-md);
         }
 
-        .insights-content li {
+        .deep-content li {
             margin-bottom: var(--space-sm);
         }
 
-        .insights-content blockquote {
+        .deep-content blockquote {
             border-left: 3px solid var(--accent-gold);
             padding-left: var(--space-md);
             margin: var(--space-md) 0;
@@ -583,7 +1427,7 @@
             font-style: italic;
         }
 
-        .insights-content code {
+        .deep-content code {
             font-family: var(--font-mono);
             font-size: 0.875rem;
             background: var(--bg-deep);
@@ -591,8 +1435,70 @@
             border-radius: 3px;
         }
 
-        .insights-content strong {
+        .deep-content strong {
             color: var(--text-primary);
+        }
+
+        /* Data tables inside deep content */
+        .deep-content table,
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .deep-content table thead th,
+        .data-table thead th {
+            background: var(--bg-elevated);
+            color: var(--accent-gold);
+            font-weight: 500;
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 2px solid rgba(210, 153, 34, 0.3);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .deep-content table tbody td,
+        .data-table tbody td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        .deep-content table tbody tr:nth-child(even),
+        .data-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .deep-content table tbody tr:hover,
+        .data-table tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Hide mermaid code blocks */
+        .deep-content pre code.language-mermaid,
+        pre code.language-mermaid {
+            display: none;
+        }
+
+        .deep-content pre {
+            background: var(--bg-deep);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: var(--space-md);
+            overflow-x: auto;
+            margin: var(--space-md) 0;
+        }
+
+        .deep-content pre code {
+            background: none;
+            padding: 0;
         }
 
         /* ============================================
@@ -630,8 +1536,14 @@
 
         .summary-card,
         .persona-card,
-        .tag-item,
-        .sample-card {
+        .sample-card,
+        .insight-card,
+        .selling-card,
+        .pain-card,
+        .opportunity-card,
+        .story-card,
+        .quick-win-card,
+        .improvement-item {
             animation: fadeSlideIn 0.5s ease-out backwards;
         }
 
@@ -644,6 +1556,28 @@
         .persona-card:nth-child(2) { animation-delay: 0.15s; }
         .persona-card:nth-child(3) { animation-delay: 0.2s; }
         .persona-card:nth-child(4) { animation-delay: 0.25s; }
+
+        .insight-card:nth-child(1) { animation-delay: 0.05s; }
+        .insight-card:nth-child(2) { animation-delay: 0.1s; }
+        .insight-card:nth-child(3) { animation-delay: 0.15s; }
+        .insight-card:nth-child(4) { animation-delay: 0.2s; }
+        .insight-card:nth-child(5) { animation-delay: 0.25s; }
+
+        .selling-card:nth-child(1) { animation-delay: 0.05s; }
+        .selling-card:nth-child(2) { animation-delay: 0.1s; }
+        .selling-card:nth-child(3) { animation-delay: 0.15s; }
+
+        .pain-card:nth-child(1) { animation-delay: 0.05s; }
+        .pain-card:nth-child(2) { animation-delay: 0.1s; }
+        .pain-card:nth-child(3) { animation-delay: 0.15s; }
+
+        .story-card:nth-child(1) { animation-delay: 0.05s; }
+        .story-card:nth-child(2) { animation-delay: 0.1s; }
+        .story-card:nth-child(3) { animation-delay: 0.15s; }
+
+        .quick-win-card:nth-child(1) { animation-delay: 0.05s; }
+        .quick-win-card:nth-child(2) { animation-delay: 0.1s; }
+        .quick-win-card:nth-child(3) { animation-delay: 0.15s; }
 
         /* ============================================
            RESPONSIVE
@@ -667,7 +1601,24 @@
             }
 
             .personas-grid,
-            .tags-grid {
+            .insights-grid,
+            .charts-grid,
+            .quadrant-grid,
+            .strategy-grid,
+            .voc-grid,
+            .improvements-groups,
+            .quick-wins-grid,
+            .opportunities-grid,
+            .stories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .editorial-hero,
+            .executive-brief {
+                grid-template-columns: 1fr;
+            }
+
+            .value-pain-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -675,6 +1626,20 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: var(--space-sm);
+            }
+
+            .sentiment-label {
+                min-width: 70px;
+                font-size: 0.75rem;
+            }
+
+            .action-table-wrapper {
+                font-size: 0.813rem;
+            }
+
+            .action-table thead th,
+            .action-table tbody td {
+                padding: var(--space-sm) var(--space-md);
             }
         }
 
@@ -686,6 +1651,17 @@
         .mb-sm { margin-bottom: var(--space-sm); }
         .mb-md { margin-bottom: var(--space-md); }
         .mb-lg { margin-bottom: var(--space-lg); }
+        .mb-xl { margin-bottom: var(--space-xl); }
+
+        .subsection-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
     </style>
 </head>
 <body>
@@ -699,61 +1675,75 @@
                 <div class="header-meta-item">{{ analysis_date }}</div>
                 <div class="header-meta-item">Amazon Review Analysis</div>
             </div>
-            <h1 class="header-title">{{ product_name or 'Product Review Analysis' }}</h1>
+            <h1 class="header-title">{{ product_name or 'Product Review Analysis' }} 评论深度洞察分析报告</h1>
             <p class="header-subtitle">
-                基于 {{ summary.total_reviews }} 条评论的AI深度分析 · 22维度标签体系 · 用户画像洞察
+                共分析 {{ summary.total_reviews }} 条评论，完成 {{ summary.tagged_reviews }} 条有效打标；正面评价 {{ summary.positive_rate }}%，负面风险 {{ summary.negative_rate }}%，平均评分 {{ summary.avg_rating|round(1) }}/5
             </p>
         </header>
 
         <!-- ============================================
-             SUMMARY CARDS
+             01 - 核心数据概览
              ============================================ -->
         <section class="summary-grid">
             <div class="summary-card" style="--card-accent: var(--accent-blue);">
-                <div class="summary-card-label">Total Reviews</div>
+                <div class="summary-card-label">分析评论总数</div>
                 <div class="summary-card-value">{{ summary.total_reviews }}<span class="summary-card-unit">条</span></div>
             </div>
             <div class="summary-card" style="--card-accent: var(--accent-teal);">
-                <div class="summary-card-label">Tagged</div>
-                <div class="summary-card-value">{{ summary.tagged_reviews }}<span class="summary-card-unit">条</span></div>
+                <div class="summary-card-label">正面评价占比</div>
+                <div class="summary-card-value">{{ summary.positive_rate }}<span class="summary-card-unit">%</span></div>
             </div>
             <div class="summary-card" style="--card-accent: var(--accent-purple);">
-                <div class="summary-card-label">User Personas</div>
-                <div class="summary-card-value">{{ summary.persona_count }}<span class="summary-card-unit">个</span></div>
+                <div class="summary-card-label">负面风险占比</div>
+                <div class="summary-card-value">{{ summary.negative_rate }}<span class="summary-card-unit">%</span></div>
             </div>
             <div class="summary-card" style="--card-accent: var(--accent-gold);">
-                <div class="summary-card-label">Avg Rating</div>
+                <div class="summary-card-label">平均评分</div>
                 <div class="summary-card-value">{{ summary.avg_rating|round(1) }}<span class="summary-card-unit">/5</span></div>
             </div>
         </section>
 
-        {% if personas %}
-        <!-- ============================================
-             USER PERSONAS
-             ============================================ -->
+        {% if premium_dashboard %}
         <section class="section">
             <div class="section-header">
                 <span class="section-number">01</span>
                 <div>
-                    <h2 class="section-title">核心用户画像</h2>
-                    <p class="section-subtitle">基于 {{ summary.tagged_reviews }} 条评论识别的典型用户群体</p>
+                    <h2 class="section-title">洞察总览</h2>
+                    <p class="section-subtitle">核心判断、主要矛盾与四象限决策摘要</p>
                 </div>
             </div>
 
-            <div class="personas-grid">
-                {% for persona in personas %}
-                <div class="persona-card" style="--persona-color: {{ persona.color or 'var(--accent-gold)' }};">
-                    <div class="persona-header">
-                        <div class="persona-name">{{ persona.name }}</div>
-                        <div class="persona-count">{{ persona.count }} 条</div>
+            <div class="editorial-hero">
+                <div class="judgement-panel">
+                    <div class="judgement-kicker">Board Judgement</div>
+                    <div class="judgement-title">{{ premium_dashboard.hero_judgement }}</div>
+                    <div class="judgement-detail">{{ premium_dashboard.hero_detail or overview_lead }}</div>
+                </div>
+                <div class="tension-panel">
+                    <div>
+                        <div class="module-kicker">Core Tension</div>
+                        <div class="tension-title">增长不是问题，失控点才是问题</div>
+                        <div class="tension-text">{{ premium_dashboard.core_tension }}</div>
                     </div>
-                    <div class="persona-tags">
-                        {% for key, value in persona.tags.items() if value and value not in ['未提及', '不明', '无'] %}
-                        <div class="persona-tag">
-                            {{ key }}: <span class="persona-tag-value">{{ value }}</span>
+                    <div class="brief-metric-list" style="margin-top: var(--space-xl);">
+                        <div class="brief-metric">
+                            <span>有效样本</span>
+                            <strong>{{ summary.tagged_reviews }} / {{ summary.total_reviews }}</strong>
                         </div>
-                        {% endfor %}
+                        <div class="brief-metric">
+                            <span>正面 / 负面</span>
+                            <strong>{{ summary.positive_rate }}% / {{ summary.negative_rate }}%</strong>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="quadrant-grid">
+                {% for item in premium_dashboard.quadrants %}
+                <div class="quadrant-card" data-accent="{{ item.accent }}">
+                    <div class="quadrant-eyebrow">{{ item.eyebrow }}</div>
+                    <div class="quadrant-title">{{ item.title }}</div>
+                    <div class="quadrant-text">{{ item.text }}</div>
                 </div>
                 {% endfor %}
             </div>
@@ -761,7 +1751,7 @@
         {% endif %}
 
         <!-- ============================================
-             SENTIMENT DISTRIBUTION
+             02 - 情感分布
              ============================================ -->
         <section class="section">
             <div class="section-header">
@@ -796,79 +1786,22 @@
             </div>
         </section>
 
-        <!-- ============================================
-             TAG STATISTICS
-             ============================================ -->
+        {% if dashboard_charts %}
         <section class="section">
             <div class="section-header">
                 <span class="section-number">03</span>
                 <div>
-                    <h2 class="section-title">标签统计</h2>
-                    <p class="section-subtitle">22维度标签出现频次</p>
+                    <h2 class="section-title">数据遥测矩阵</h2>
+                    <p class="section-subtitle">从情感、功能、场景、价格与高频标签中提取可视化信号</p>
                 </div>
             </div>
 
-            <div class="tags-grid">
-                {% set dimensions = {
-                    '人群维度': ['人群_性别', '人群_年龄段', '人群_职业', '人群_购买角色'],
-                    '场景维度': ['场景_使用场景'],
-                    '功能维度': ['功能_满意度', '功能_具体功能'],
-                    '质量维度': ['质量_材质', '质量_做工', '质量_耐用性'],
-                    '服务维度': ['服务_发货速度', '服务_包装质量', '服务_客服响应', '服务_退换货', '服务_保修'],
-                    '体验维度': ['体验_舒适度', '体验_易用性', '体验_外观设计', '体验_价格感知'],
-                    '市场维度': ['竞品_竞品对比', '复购_复购意愿'],
-                    '情感维度': ['情感_总体评价']
-                } %}
-
-                {% for dimension_name, tags in dimensions.items() %}
-                <div class="tag-dimension">{{ dimension_name }}</div>
-                {% for tag_name in tags %}
-                {% set tag_count = tag_statistics.get(tag_name, 0) %}
-                <div class="tag-item">
-                    <span class="tag-name">{{ tag_name }}</span>
-                    <span class="tag-count">{{ tag_count }}</span>
-                </div>
-                {% endfor %}
-                {% endfor %}
-            </div>
-        </section>
-
-        {% if golden_samples %}
-        <!-- ============================================
-             GOLDEN SAMPLES
-             ============================================ -->
-        <section class="section">
-            <div class="section-header">
-                <span class="section-number">04</span>
-                <div>
-                    <h2 class="section-title">精选评论样本</h2>
-                    <p class="section-subtitle">高信息密度评论深度解析</p>
-                </div>
-            </div>
-
-            <div class="samples-list">
-                {% for sample in golden_samples %}
-                <div class="sample-card" onclick="this.classList.toggle('expanded')">
-                    <div class="sample-header">
-                        <span class="sample-sentiment {{ sample.sentiment_class }}">{{ sample.sentiment }}</span>
-                        <div class="sample-rating">
-                            {% for i in range(sample.rating|int) %}
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="sample-body">
-                        <p class="sample-text">{{ sample.body }}</p>
-                        <div class="sample-tags">
-                            {% for tag_key, tag_value in sample.tags.items() if tag_value and tag_value not in ['未提及', '不明', '无'] %}
-                            <span class="sample-tag">{{ tag_key }}: {{ tag_value }}</span>
-                            {% endfor %}
-                            {% if sample.info_score %}
-                            <span class="sample-tag" style="border-color: var(--accent-gold); color: var(--accent-gold);">信息密度: {{ sample.info_score }}/20</span>
-                            {% endif %}
-                        </div>
+            <div class="charts-grid">
+                {% for chart in dashboard_charts %}
+                <div class="chart-card">
+                    <div class="chart-title">{{ chart.title }}</div>
+                    <div class="chart-frame">
+                        <canvas id="{{ chart.id }}"></canvas>
                     </div>
                 </div>
                 {% endfor %}
@@ -876,21 +1809,174 @@
         </section>
         {% endif %}
 
-        {% if insights_md %}
-        <!-- ============================================
-             INSIGHTS REPORT
-             ============================================ -->
+        {% if premium_dashboard.moat_cards or premium_dashboard.vulnerability_cards %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <div>
+                    <h2 class="section-title">Brand Moat / Vulnerability</h2>
+                    <p class="section-subtitle">把报告中的卖点和痛点压缩成商业决策语言</p>
+                </div>
+            </div>
+            <div class="strategy-grid">
+                <div class="strategy-column moat">
+                    <div class="strategy-title">Brand Moat</div>
+                    {% for card in premium_dashboard.moat_cards %}
+                    <div class="strategy-item">
+                        <h4>{{ card.title }}</h4>
+                        <p>{{ card.text }}</p>
+                        {% if card.metric %}<div class="strategy-metric">{{ card.metric }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="strategy-column risk">
+                    <div class="strategy-title">Vulnerability</div>
+                    {% for card in premium_dashboard.vulnerability_cards %}
+                    <div class="strategy-item">
+                        <h4>{{ card.title }}</h4>
+                        <p>{{ card.text }}</p>
+                        {% if card.metric %}<div class="strategy-metric">{{ card.metric }}</div>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if premium_dashboard.voc_cards %}
         <section class="section">
             <div class="section-header">
                 <span class="section-number">05</span>
                 <div>
-                    <h2 class="section-title">深度洞察分析</h2>
-                    <p class="section-subtitle">AI生成的综合分析报告</p>
+                    <h2 class="section-title">Market Resonance</h2>
+                    <p class="section-subtitle">原声穿透与典型受众镜像解析</p>
+                </div>
+            </div>
+            <div class="voc-grid">
+                {% for card in premium_dashboard.voc_cards %}
+                <div class="voc-card {{ card.tone }}">
+                    <div class="voc-main">
+                        <div class="voc-header">
+                            <div class="voc-title">{{ card.title }}</div>
+                            <div class="voc-status">{{ card.status }}</div>
+                        </div>
+                        {% if card.need %}<div class="voc-need">核心需求：{{ card.need }}</div>{% endif %}
+                        {% if card.quote %}<div class="voc-quote">"{{ card.quote }}"</div>{% endif %}
+                    </div>
+                    <div class="voc-analysis">{{ card.analysis }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ============================================
+             06 - 改进与行动
+             ============================================ -->
+        {% if improvements or action_table or quick_wins %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">06</span>
+                <div>
+                    <h2 class="section-title">改进与行动</h2>
+                    <p class="section-subtitle">优先级排序的行动建议与快速胜利</p>
                 </div>
             </div>
 
-            <div class="insights-content">
-                {{ insights_md|safe }}
+            {% if improvements %}
+            <div class="improvements-groups">
+                {% for group_key, group_items in improvements.items() %}
+                {% if group_items %}
+                <div class="improvement-group">
+                    {% set group_label = {'product': '产品改进', 'service': '服务改进', 'expectation': '用户期望'}.get(group_key, group_key) %}
+                    <div class="improvement-group-title">{{ group_label }}</div>
+                    {% for item in group_items %}
+                    {% set p_class = 'p' ~ item.priority|replace('P', '')|replace('p', '') %}
+                    <div class="improvement-item">
+                        <span class="priority-badge {{ p_class }}">{{ item.priority }}</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">{{ item.title }}</div>
+                            {% if item.desc %}
+                            <div class="improvement-desc">{{ item.desc }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if action_table %}
+            <div class="subsection-title">行动清单</div>
+            <div class="action-table-wrapper">
+                <table class="action-table">
+                    <thead>
+                        <tr>
+                            <th class="col-action">行动项</th>
+                            <th>优先级</th>
+                            <th class="col-impact">预期影响</th>
+                            <th class="col-source">来源</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in action_table %}
+                        {% set p_class = 'p' ~ row.priority|replace('P', '')|replace('p', '') %}
+                        <tr>
+                            <td>{{ row.action }}</td>
+                            <td><span class="priority-badge {{ p_class }}">{{ row.priority }}</span></td>
+                            <td>{{ row.impact }}</td>
+                            <td>{{ row.source }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if quick_wins %}
+            <div class="subsection-title">快速胜利</div>
+            <div class="quick-wins-grid">
+                {% for qw in quick_wins %}
+                <div class="quick-win-card">
+                    <div class="quick-win-title">{{ qw.title }}</div>
+                    <div class="quick-win-desc">{{ qw.desc }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <!-- ============================================
+             07 - 机会与竞品
+             ============================================ -->
+        {% if opportunities %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">07</span>
+                <div>
+                    <h2 class="section-title">机会与竞品</h2>
+                    <p class="section-subtitle">市场机会与竞争格局洞察</p>
+                </div>
+            </div>
+
+            <div class="opportunities-grid">
+                {% for opp in opportunities %}
+                <div class="opportunity-card">
+                    <div class="opportunity-card-title">{{ opp.title }}</div>
+                    <div class="opportunity-card-finding">{{ opp.finding }}</div>
+                    {% if opp.data %}
+                    <div class="opportunity-card-data">{{ opp.data }}</div>
+                    {% endif %}
+                    {% if opp.quotes %}
+                    {% for quote in opp.quotes %}
+                    <blockquote class="user-quote">{{ quote }}</blockquote>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
         </section>
         {% endif %}
@@ -900,9 +1986,9 @@
              ============================================ -->
         <footer class="footer">
             <div class="footer-logo">Amazon Review Analyzer</div>
-            <p>Generated by AI · {{ analysis_date }}</p>
+            <p>Generated by AI &middot; {{ analysis_date }}</p>
             <p style="margin-top: 0.5rem; font-size: 0.75rem;">
-                Powered by Claude AI · 22-Dimension Tag System · User Persona Analysis
+                Powered by Claude AI &middot; Multi-Dimension Tag System &middot; User Persona Analysis
             </p>
         </footer>
     </div>
@@ -911,13 +1997,43 @@
          INTERACTIVE SCRIPTS
          ============================================ -->
     <script>
-        // Auto-expand first sample card
+        // Toggle collapsible sections
+        function toggleCollapsible(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('expanded');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            const firstSample = document.querySelector('.sample-card');
-            if (firstSample) {
-                setTimeout(() => {
-                    firstSample.classList.add('expanded');
-                }, 500);
+            if (window.Chart) {
+                Chart.defaults.color = '#8b949e';
+                Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+                var dashboardCharts = {{ dashboard_charts|tojson }};
+                dashboardCharts.forEach(function(item) {
+                    var canvas = document.getElementById(item.id);
+                    if (!canvas || !item.config) return;
+                    item.config.options = item.config.options || {};
+                    item.config.options.responsive = true;
+                    item.config.options.maintainAspectRatio = false;
+                    item.config.options.plugins = item.config.options.plugins || {};
+                    item.config.options.plugins.legend = item.config.options.plugins.legend || {};
+                    item.config.options.plugins.legend.labels = Object.assign(
+                        { color: '#8b949e', boxWidth: 10, padding: 14 },
+                        item.config.options.plugins.legend.labels || {}
+                    );
+                    item.config.options.plugins.tooltip = Object.assign(
+                        {
+                            backgroundColor: 'rgba(13,17,23,0.95)',
+                            titleColor: '#d29922',
+                            bodyColor: '#f0f6fc',
+                            borderColor: 'rgba(210,153,34,0.45)',
+                            borderWidth: 1
+                        },
+                        item.config.options.plugins.tooltip || {}
+                    );
+                    new Chart(canvas, item.config);
+                });
             }
         });
     </script>

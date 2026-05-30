@@ -1,10 +1,8 @@
 """
-洞察报告生成模块 V1.0 - 双模洞察系统
+洞察报告生成模块 V1.0 - CLI 原生版
 
-重大变更：
-- 支持双模式生成洞察报告：CLI 原生版 / Gemini API
-- CLI 模式：使用 subprocess 调用宿主系统的 Claude Code CLI (claude -p)
-- Gemini 模式：使用 Google Gemini API 生成高质量洞察报告
+统一使用 subprocess 调用宿主 CLI 引擎生成洞察报告。
+支持 claude / opencode 双引擎，由 config 自动适配。
 """
 
 import json
@@ -14,14 +12,10 @@ from typing import List, Dict
 from collections import Counter
 from datetime import datetime
 
-# 尝试导入 Gemini，失败时标记为不可用
-try:
-    import google.generativeai as genai
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
+# 模块级缓存：最近一次 strategic_json 数据（供 HTML 看板使用）
+_last_strategic_data: Dict = {}
 
-from src.config import config, mask_api_key
+from src.config import config
 from src.prompts.templates import get_insights_prompt_md, get_insights_prompt_txt
 
 # 配置日志
@@ -131,7 +125,7 @@ def generate_insights(
 ) -> str:
     """生成洞察报告（分发器）
 
-    根据 config.INSIGHTS_PROVIDER 选择 CLI 或 Gemini API
+    根据 config 构建提示词，统一使用 CLI 引擎生成
 
     Args:
         stats: 统计摘要，来自 calculate_stats_summary()
@@ -196,58 +190,28 @@ def generate_insights(
                 product_name=product_name
             )
 
-    # 根据配置选择生成方式
-    if config.INSIGHTS_PROVIDER == "gemini":
-        report_text = _generate_via_gemini(prompt, asin)
-    else:  # 默认使用 CLI
-        report_text = _generate_via_cli(prompt, asin)
+    # 统一使用 CLI 引擎生成
+    report_text = _generate_via_cli(prompt, asin)
 
     # V1.0 优化：剥离 <strategic_json> 标签，确保 Markdown 报告内容纯净
+    global _last_strategic_data
+    _last_strategic_data = {}
     if report_text and "<strategic_json>" in report_text:
-        import re
-        report_text = re.sub(r'<strategic_json>.*?</strategic_json>', '', report_text, flags=re.DOTALL).strip()
+        import re as _re
+        # 先提取 strategic_json 供 HTML 看板使用
+        _match = _re.search(
+            r'<strategic_json>\s*(\{.*?\})\s*</strategic_json>',
+            report_text, _re.DOTALL,
+        )
+        if _match:
+            try:
+                _last_strategic_data = json.loads(_match.group(1))
+            except json.JSONDecodeError:
+                pass
+        # 再从报告中移除
+        report_text = _re.sub(r'<strategic_json>.*?</strategic_json>', '', report_text, flags=_re.DOTALL).strip()
 
     return report_text
-
-
-def _generate_via_gemini(
-    prompt: str,
-    asin: str
-) -> str:
-    """使用 Gemini API 生成洞察报告"""
-    if not GEMINI_AVAILABLE:
-        raise ImportError("google-generativeai 未安装，请运行: pip install google-generativeai")
-
-    if not config.GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY 未配置")
-
-    try:
-        # 安全地记录API Key配置（仅显示后4位）
-        logger.debug(f"配置 Gemini API Key: {mask_api_key(config.GEMINI_API_KEY)}")
-        genai.configure(api_key=config.GEMINI_API_KEY)
-        model = genai.GenerativeModel(
-            model_name=config.GEMINI_MODEL,
-            generation_config=genai.types.GenerationConfig(
-                temperature=config.GEMINI_TEMPERATURE,
-                max_output_tokens=config.GEMINI_MAX_TOKENS,
-            )
-        )
-
-        logger.debug(f"调用 Gemini API: ASIN={asin}")
-
-        response = model.generate_content(prompt)
-        report_text = response.text
-
-        if not report_text:
-            logger.error("Gemini API 返回空内容")
-            return ""
-
-        logger.info(f"成功生成洞察报告(Gemini): ASIN={asin}, 字数={len(report_text)}")
-        return report_text
-
-    except Exception as e:
-        logger.error(f"Gemini API 调用失败: {str(e)}")
-        return ""
 
 
 def _generate_via_cli(prompt: str, asin: str) -> str:
@@ -424,3 +388,15 @@ def summarize_stats(stats: Dict) -> str:
             parts.append(f"{top_sentiment} {top_pct:.0f}%")
 
     return "，".join(parts) + "。"
+
+
+def get_last_strategic_data() -> Dict:
+    """获取最近一次 generate_insights() 调用提取的 strategic_json 数据。
+
+    供 HTML 看板模板使用：strategy、execution_matrix、top_pain_points 等。
+    在 generate_insights() 调用之后、报告剥离 <strategic_json> 之前提取。
+
+    Returns:
+        strategic_json 字典，可能为空。
+    """
+    return _last_strategic_data

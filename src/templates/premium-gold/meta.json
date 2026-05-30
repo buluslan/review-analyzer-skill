@@ -1,0 +1,21 @@
+{
+  "name": "premium-gold",
+  "version": "2.0",
+  "description": "金色奢华暗色主题 — 品牌展示、高管汇报，四象限决策摘要 + 数据遥测矩阵",
+  "author": "Buluu@新西楼",
+  "sections": [
+    "洞察总览",
+    "情感分布",
+    "数据遥测矩阵",
+    "Brand Moat / Vulnerability",
+    "Market Resonance",
+    "改进与行动",
+    "机会与竞品"
+  ],
+  "features": [
+    "dark-theme",
+    "chartjs",
+    "jinja2-ssr",
+    "responsive"
+  ]
+}

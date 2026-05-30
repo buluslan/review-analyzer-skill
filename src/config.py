@@ -7,7 +7,7 @@
 - 新增可视化模板系统配置
 - 新增飞书同步配置
 - 新增图表引擎配置
-- 保留 Gemini 模式用于洞察报告和 HTML 看板生成
+- 统一使用 CLI 引擎，不再支持 Gemini API
 """
 
 import os
@@ -80,32 +80,27 @@ class Config:
     PROJECT_NAME: str = "评论分析项目"  # 项目名称
 
     # ==================== 并发配置 ====================
-    # 最大并发子进程数（调用 claude -p）- 从环境变量读取，默认 2
-    MAX_CONCURRENT_AGENTS: int = int(os.getenv("MAX_CONCURRENT", "2"))
+    # 最大并发子进程数（调用 claude -p）- 从环境变量读取，默认 4
+    MAX_CONCURRENT_AGENTS: int = int(os.getenv("MAX_CONCURRENT", "4"))
 
     # ==================== 快速模式配置 ====================
     QUICK_MODE_MAX_REVIEWS: int = 30  # 快速模式默认获取评论数
 
-    # ==================== 洞察报告生成配置 ====================
-    INSIGHTS_PROVIDER: str = "cli"  # 可选: cli / gemini
+    # ==================== 报告生成配置 ====================
     INSIGHTS_FORMAT: str = "txt"  # 可选: md / txt
-    GEMINI_API_KEY: str = ""  # 从环境变量读取或用户输入
-    GEMINI_MODEL: str = "gemini-3-flash-preview"  # 使用 Gemini 3 Flash Preview
-    GEMINI_TEMPERATURE: float = 0.7
-    GEMINI_MAX_TOKENS: int = 8192
-
-    # ==================== HTML 报告生成配置 V1.0 =============
-    HTML_GENERATION_MODEL: str = os.getenv("HTML_REPORT_MODEL", "gemini-3.1-pro-preview")
-    HTML_GENERATION_TEMPERATURE: float = 0.8  # 创意温度更高
     HTML_CREATOR_NAME: str = os.getenv("HTML_CREATOR_NAME", "Buluu@新西楼")
-    HTML_SYSTEM_PROMPT_PATH: str = "prompt_html.md"  # 黑金奢华提示词路径
-    HTML_GENERATION_SOURCE: str = "gemini"          # 可选: gemini / local
 
     def __post_init__(self):
         """初始化后验证"""
         # 确保输出目录存在
         self.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+        # 并发上限保护：超过 8 可能导致系统资源不足或 CLI rate limit
+        MAX_CONCURRENT_CAP = 8
+        if self.MAX_CONCURRENT_AGENTS > MAX_CONCURRENT_CAP:
+            print(f"⚠️  并发数 {self.MAX_CONCURRENT_AGENTS} 超过上限 {MAX_CONCURRENT_CAP}，已自动调整为 {MAX_CONCURRENT_CAP}")
+            self.MAX_CONCURRENT_AGENTS = MAX_CONCURRENT_CAP
 
         # V2.0: CLI 引擎不再是必须的（打标由宿主 Agent 执行）
         # 仅在洞察报告和 HTML 看板生成时才需要 CLI
@@ -228,28 +223,6 @@ class Config:
         """获取 Markdown 洞察输出路径: 分析洞察报告_{ASIN}.md"""
         project_dir = self._get_project_dir(asin)
         return project_dir / f"分析洞察报告_{asin}.md"
-
-
-def mask_api_key(key: str) -> str:
-    """屏蔽API Key，只显示后4位
-
-    Args:
-        key: API Key字符串
-
-    Returns:
-        屏蔽后的字符串，格式为 ********1234
-
-    Examples:
-        >>> mask_api_key("AIzaSyD1234567890")
-        '********7890'
-        >>> mask_api_key("")
-        '***'
-        >>> mask_api_key("short")
-        '***'
-    """
-    if not key or len(key) < 8:
-        return "***"
-    return f"{'*' * 8}{key[-4:]}"
 
 
 # 全局配置实例
