@@ -7,8 +7,9 @@
 
 import json
 import logging
+import re
 import subprocess
-from typing import List, Dict
+from typing import List, Dict, Optional
 from collections import Counter
 from datetime import datetime
 
@@ -192,6 +193,10 @@ def generate_insights(
 
     # 统一使用 CLI 引擎生成
     report_text = _generate_via_cli(prompt, asin)
+
+    # 兜底：确保必需的 mermaid 图表存在（AI 可能跳过 mermaid 生成）
+    if report_text:
+        report_text = _ensure_mermaid_charts(report_text, stats, personas)
 
     # V1.0 优化：剥离 <strategic_json> 标签，确保 Markdown 报告内容纯净
     global _last_strategic_data
@@ -400,3 +405,517 @@ def get_last_strategic_data() -> Dict:
         strategic_json 字典，可能为空。
     """
     return _last_strategic_data
+
+
+# ==================== Mermaid 兜底机制 ====================
+
+def _ensure_mermaid_charts(report_text: str, stats: Dict, personas: List[Dict]) -> str:
+    """确保报告中包含必需的 mermaid 图表，缺失时从数据自动生成。
+
+    检查报告中 4 个关键章节是否包含对应的 mermaid 代码块。
+    如果章节标题存在但 mermaid 缺失，则从 stats/personas 数据自动生成并注入。
+
+    Args:
+        report_text: AI 生成的洞察报告 Markdown 文本
+        stats: 统计摘要数据，来自 calculate_stats_summary()
+        personas: 用户画像列表，来自 analyze_user_personas()
+
+    Returns:
+        补全 mermaid 后的报告文本（如无缺失则原样返回）
+    """
+    if not report_text:
+        return report_text
+
+    # 定义 4 个必需的 mermaid 图表及其对应的章节
+    required_charts = [
+        {
+            "key": "pain_points_matrix",
+            # 匹配第五章「主要痛点与负面归因」的标题
+            "heading_patterns": [
+                r"#{2,3}\s*.*(?:主要痛点|痛点与负面|痛点.*归因|Pain\s*Point)",
+            ],
+            "mermaid_keywords": ["graph TD", "graph LR"],
+            "generator": _generate_pain_points_matrix,
+        },
+        {
+            "key": "competitor_mindmap",
+            # 匹配第七章「潜在机会与差异化」的标题
+            "heading_patterns": [
+                r"#{2,3}\s*.*(?:潜在机会|差异化|竞品|Opportunit|Differentiat)",
+            ],
+            "mermaid_keywords": ["mindmap"],
+            "generator": _generate_competitor_mindmap,
+        },
+        {
+            "key": "topic_mindmap",
+            # 匹配第十一章「关键词与话题聚类」的标题
+            "heading_patterns": [
+                r"#{2,3}\s*.*(?:关键词|话题聚类|Topic\s*Cluster|Keyword)",
+            ],
+            "mermaid_keywords": ["mindmap"],
+            "generator": _generate_topic_mindmap,
+        },
+        {
+            "key": "action_matrix",
+            # 匹配第十三章「行动决策仪表盘」的标题
+            "heading_patterns": [
+                r"#{2,3}\s*.*(?:行动决策|行动.*仪表盘|Action\s*Dashboard|Decision)",
+            ],
+            "mermaid_keywords": ["graph TD", "graph LR"],
+            "generator": _generate_action_matrix,
+        },
+    ]
+
+    injected_count = 0
+    for chart_config in required_charts:
+        # 找到章节标题的位置
+        heading_match = _find_heading_match(report_text, chart_config["heading_patterns"])
+        if not heading_match:
+            # 章节标题不存在，跳过（AI 可能没有输出该章节）
+            continue
+
+        # 检查该章节标题后面是否已经有 mermaid 代码块
+        heading_end = heading_match.end()
+        # 查找下一个同级或更高级标题的位置（章节边界）
+        next_heading_pos = _find_next_heading_pos(
+            report_text, heading_match.start(), heading_match.group(0)
+        )
+
+        section_text = report_text[heading_end:next_heading_pos]
+
+        # 检查该章节中是否已存在 mermaid 代码块且包含对应关键词
+        has_mermaid = bool(re.search(r"```mermaid", section_text))
+        if has_mermaid:
+            # 已有 mermaid，检查是否包含预期的关键词
+            has_expected_content = any(
+                kw in section_text for kw in chart_config["mermaid_keywords"]
+            )
+            if has_expected_content:
+                continue  # mermaid 完好，无需兜底
+
+        # 需要兜底：生成 mermaid 并注入
+        mermaid_block = chart_config["generator"](stats, personas)
+        if mermaid_block:
+            report_text = _inject_mermaid_after_heading(
+                report_text, heading_match, mermaid_block
+            )
+            injected_count += 1
+            logger.info("Mermaid 兜底注入: %s", chart_config["key"])
+
+    if injected_count > 0:
+        logger.info("Mermaid 兜底完成: 共注入 %d 个图表", injected_count)
+
+    return report_text
+
+
+def _find_heading_match(
+    text: str, patterns: List[str]
+) -> Optional[re.Match]:
+    """在文本中查找第一个匹配的章节标题。
+
+    Args:
+        text: 报告全文
+        patterns: 正则表达式列表，用于匹配章节标题
+
+    Returns:
+        第一个匹配的 re.Match 对象，未找到返回 None
+    """
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            return match
+    return None
+
+
+def _find_next_heading_pos(text: str, current_heading_start: int, current_heading: str) -> int:
+    """查找当前章节之后的下一个同级或更高级标题的位置。
+
+    Args:
+        text: 报告全文
+        current_heading_start: 当前标题在文本中的起始位置
+        current_heading: 当前标题的完整匹配文本
+
+    Returns:
+        下一章节的起始位置，如果没有下一章节则返回文本末尾位置
+    """
+    # 从当前标题之后开始搜索
+    search_start = current_heading_start + len(current_heading)
+
+    # 匹配 ## 或 ### 开头的标题行
+    next_match = re.search(r"\n#{2,3}\s+", text[search_start:])
+    if next_match:
+        return search_start + next_match.start()
+    return len(text)
+
+
+def _inject_mermaid_after_heading(
+    report_text: str, heading_match: re.Match, mermaid_block: str
+) -> str:
+    """在章节标题之后注入 mermaid 代码块。
+
+    在标题行的下一行插入 mermaid 代码块，标题和 mermaid 之间保留一个空行。
+
+    Args:
+        report_text: 报告全文
+        heading_match: 章节标题的 re.Match 对象
+        mermaid_block: 要注入的 mermaid 代码（含 ```mermaid 包裹）
+
+    Returns:
+        注入后的报告文本
+    """
+    insert_pos = heading_match.end()
+    # 确保在标题行的换行符之后插入
+    injection = f"\n\n{mermaid_block}\n\n"
+    return report_text[:insert_pos] + injection + report_text[insert_pos:]
+
+
+def _generate_competitor_mindmap(stats: Dict, personas: List[Dict]) -> str:
+    """从竞品对比数据生成竞品定位思维导图 (mermaid mindmap)。
+
+    从 stats["dimensional_stats"] 中提取含"竞品"/"品牌"/"对比"关键词的维度，
+    构建 mermaid mindmap 格式的竞品定位图。
+
+    Args:
+        stats: 统计数据，含 dimensional_stats 子字典
+        personas: 用户画像列表（未使用，保持接口一致）
+
+    Returns:
+        mermaid 代码块字符串（含 ```mermaid 包裹），数据不足时返回简化版
+    """
+    dimensional_stats = stats.get("dimensional_stats", {})
+    noise_values = {"不明", "未提及", "无", "未知", "不明确", "其他"}
+
+    # 提取竞品相关维度
+    competitor_dims = {
+        k: v for k, v in dimensional_stats.items()
+        if any(kw in k for kw in ["竞品", "品牌", "对比"])
+    }
+
+    # 收集竞品数据（品牌名 + 提及次数）
+    competitors = []
+    for dim_key, dim_data in competitor_dims.items():
+        valid_items = {
+            val: count for val, count in dim_data.items()
+            if val not in noise_values and count > 0
+        }
+        # 按提及次数降序排列，取前 5
+        sorted_items = sorted(valid_items.items(), key=lambda x: x[1], reverse=True)[:5]
+        for val, count in sorted_items:
+            # 避免重复添加同一竞品
+            if not any(c["name"] == val for c in competitors):
+                competitors.append({"name": val, "count": count})
+
+    # 按提及次数排序
+    competitors.sort(key=lambda x: x["count"], reverse=True)
+    competitors = competitors[:5]
+
+    # 构建 mermaid mindmap
+    lines = ["mindmap", "  root((竞品定位地图))"]
+
+    if competitors:
+        for comp in competitors:
+            safe_name = _sanitize_mermaid_text(comp["name"])
+            count_info = f"提及{comp['count']}次"
+            lines.append(f"    [{safe_name}]")
+            lines.append(f"      ({count_info})")
+    else:
+        # 数据不足时的简化版
+        lines.append("    [无竞品数据]")
+        lines.append("      (数据不足)")
+
+    mermaid_code = "\n".join(lines)
+    return f"```mermaid\n{mermaid_code}\n```"
+
+
+def _generate_topic_mindmap(stats: Dict, personas: List[Dict]) -> str:
+    """从标签统计数据生成话题聚类思维导图 (mermaid mindmap)。
+
+    从 stats["top_tags"] 和 stats["dimensional_stats"] 中提取高频话题，
+    按维度归类后构建 mermaid mindmap 格式的话题聚类图。
+
+    Args:
+        stats: 统计数据，含 top_tags 和 dimensional_stats
+        personas: 用户画像列表（未使用，保持接口一致）
+
+    Returns:
+        mermaid 代码块字符串（含 ```mermaid 包裹），数据不足时返回简化版
+    """
+    top_tags = stats.get("top_tags", {})
+    dimensional_stats = stats.get("dimensional_stats", {})
+    noise_values = {"不明", "未提及", "无", "未知", "不明确", "其他"}
+
+    # 按维度归类标签（维度 -> Top 3 值）
+    dimension_topics = {}
+    for tag_key, count in top_tags.items():
+        if ":" not in tag_key:
+            continue
+        dim_name, dim_value = tag_key.split(":", 1)
+        if dim_value in noise_values:
+            continue
+        if dim_name not in dimension_topics:
+            dimension_topics[dim_name] = []
+        dimension_topics[dim_name].append({"value": dim_value, "count": count})
+
+    # 每个维度取 Top 3
+    for dim_name in dimension_topics:
+        dimension_topics[dim_name].sort(key=lambda x: x["count"], reverse=True)
+        dimension_topics[dim_name] = dimension_topics[dim_name][:3]
+
+    # 取提及量最高的 5 个维度
+    sorted_dims = sorted(
+        dimension_topics.items(),
+        key=lambda x: sum(item["count"] for item in x[1]),
+        reverse=True,
+    )[:5]
+
+    # 构建 mermaid mindmap
+    lines = ["mindmap", "  root((话题聚类))"]
+
+    if sorted_dims:
+        for dim_name, items in sorted_dims:
+            # 维度名保留中文，去掉前缀下划线部分
+            display_dim = dim_name.split("_")[-1] if "_" in dim_name else dim_name
+            safe_dim = _sanitize_mermaid_text(display_dim)
+            lines.append(f"    [{safe_dim}]")
+            for item in items:
+                safe_val = _sanitize_mermaid_text(item["value"])
+                lines.append(f"      ({safe_val} {item['count']}次)")
+    else:
+        lines.append("    [无话题数据]")
+        lines.append("      (数据不足)")
+
+    mermaid_code = "\n".join(lines)
+    return f"```mermaid\n{mermaid_code}\n```"
+
+
+
+def _generate_action_matrix(stats: Dict, personas: List[Dict]) -> str:
+    """从痛点/卖点数据生成行动优先级矩阵 (mermaid flowchart)。
+
+    从情感分布和标签数据推断行动优先级，构建 mermaid flowchart 格式
+    的行动仪表盘。
+
+    Args:
+        stats: 统计数据，含 sentiment 和 dimensional_stats
+        personas: 用户画像列表
+
+    Returns:
+        mermaid 代码块字符串（含 ```mermaid 包裹），数据不足时返回简化版
+    """
+    dimensional_stats = stats.get("dimensional_stats", {})
+    sentiment_data = stats.get("sentiment", {})
+    top_tags = stats.get("top_tags", {})
+    noise_values = {"不明", "未提及", "无", "未知", "不明确", "其他"}
+
+    # 从负面标签中提取痛点（用于 Quick Win / Strategic Investment）
+    pain_points = []
+    for tag_key, count in top_tags.items():
+        if ":" not in tag_key:
+            continue
+        dim_name, dim_value = tag_key.split(":", 1)
+        if dim_value in noise_values:
+            continue
+        # 识别可能的问题维度
+        if any(kw in dim_name for kw in ["痛点", "不满", "问题", "缺点", "负面"]):
+            pain_points.append({"value": dim_value, "count": count})
+
+    pain_points.sort(key=lambda x: x["count"], reverse=True)
+
+    # 从正面标签中提取优势
+    selling_points = []
+    for tag_key, count in top_tags.items():
+        if ":" not in tag_key:
+            continue
+        dim_name, dim_value = tag_key.split(":", 1)
+        if dim_value in noise_values:
+            continue
+        if any(kw in dim_name for kw in ["卖点", "优势", "好评", "亮点", "正面"]):
+            selling_points.append({"value": dim_value, "count": count})
+
+    selling_points.sort(key=lambda x: x["count"], reverse=True)
+
+    # 计算负面比例
+    total = stats.get("total", 1)
+    negative_count = sum(
+        sentiment_data.get(s, 0)
+        for s in ["不推荐", "强烈不推荐"]
+    )
+    negative_ratio = negative_count / total if total > 0 else 0
+
+    # 构建行动建议
+    quick_wins = []
+    strategic = []
+    low_priority = []
+
+    # 高频痛点 -> Quick Win（容易改进且影响大）
+    for pp in pain_points[:2]:
+        safe_name = _sanitize_mermaid_text(pp["value"])
+        quick_wins.append(f"{safe_name} - 影响{pp['count']}位用户")
+
+    # 如果负面比例高，添加情感改进建议
+    if negative_ratio > 0.2 and not quick_wins:
+        pct = f"{negative_ratio * 100:.0f}%"
+        quick_wins.append(f"改善负面评价 - {pct}差评率")
+
+    # 中频痛点或优化项 -> Strategic Investment
+    for pp in pain_points[2:4]:
+        safe_name = _sanitize_mermaid_text(pp["value"])
+        strategic.append(f"改进{safe_name} - 战略优化")
+
+    # 优势相关 -> Strategic Investment（巩固优势）
+    for sp in selling_points[:2]:
+        safe_name = _sanitize_mermaid_text(sp["value"])
+        strategic.append(f"巩固{safe_name} - {sp['count']}次正面提及")
+
+    # Low Priority：如果数据不足则给默认建议
+    if not low_priority:
+        low_priority.append("监控长尾反馈趋势")
+
+    # 兜底：如果所有行动列表都为空
+    if not quick_wins and not strategic:
+        quick_wins.append("分析热门评论反馈进行改进")
+        strategic.append("制定差异化竞争策略")
+
+    # 构建 mermaid flowchart
+    lines = ["graph TD", "    A[行动仪表盘] --> B[快速见效]", "    A --> C[战略投入]", "    A --> D[低优先级]"]
+
+    for i, qw in enumerate(quick_wins[:2], 1):
+        lines.append(f"    B --> B{i}[{qw}]")
+
+    for i, si in enumerate(strategic[:2], 1):
+        lines.append(f"    C --> C{i}[{si}]")
+
+    for i, lp in enumerate(low_priority[:1], 1):
+        lines.append(f"    D --> D{i}[{lp}]")
+
+    mermaid_code = "\n".join(lines)
+    return f"```mermaid\n{mermaid_code}\n```"
+
+
+def _generate_pain_points_matrix(stats: Dict, personas: List[Dict]) -> str:
+    """从痛点/负面数据生成痛点严重性矩阵 (mermaid flowchart)。
+
+    从标签数据中提取负面/痛点相关信息，按严重程度分级后构建
+    mermaid flowchart 格式的痛点决策树。
+
+    Args:
+        stats: 统计数据，含 sentiment 和 dimensional_stats
+        personas: 用户画像列表
+
+    Returns:
+        mermaid 代码块字符串（含 ```mermaid 包裹），数据不足时返回简化版
+    """
+    dimensional_stats = stats.get("dimensional_stats", {})
+    sentiment_data = stats.get("sentiment", {})
+    top_tags = stats.get("top_tags", {})
+    noise_values = {"不明", "未提及", "无", "未知", "不明确", "其他"}
+
+    # 提取负面/问题相关标签
+    pain_items = []
+    for tag_key, count in top_tags.items():
+        if ":" not in tag_key:
+            continue
+        dim_name, dim_value = tag_key.split(":", 1)
+        if dim_value in noise_values:
+            continue
+        if any(kw in dim_name for kw in ["痛点", "不满", "问题", "缺点", "负面", "抱怨"]):
+            pain_items.append({"value": dim_value, "count": count, "dim": dim_name})
+
+    pain_items.sort(key=lambda x: x["count"], reverse=True)
+
+    total = stats.get("total", 1)
+    severe_count = sum(
+        sentiment_data.get(s, 0) for s in ["不推荐", "强烈不推荐"]
+    )
+
+    # 按严重程度分级
+    critical = []
+    severe = []
+    moderate = []
+
+    for item in pain_items:
+        pct = item["count"] / total * 100 if total > 0 else 0
+        entry = {
+            "value": _sanitize_mermaid_text(item["value"]),
+            "pct": f"{pct:.0f}%",
+        }
+        if pct >= 10:
+            critical.append(entry)
+        elif pct >= 5:
+            severe.append(entry)
+        else:
+            moderate.append(entry)
+
+    # 如果没有显式痛点数据，从负面情感比例推断
+    if not pain_items and severe_count > 0:
+        negative_pct = severe_count / total * 100
+        critical.append({
+            "value": "高差评率",
+            "pct": f"{negative_pct:.0f}%",
+        })
+
+    # 构建 mermaid flowchart
+    lines = [
+        "graph TD",
+        "    A[痛点分析] --> B[致命级]",
+        "    A --> C[严重级]",
+        "    A --> D[一般级]",
+    ]
+
+    for i, item in enumerate(critical[:2], 1):
+        lines.append(f"    B --> B{i}[{item['value']} - {item['pct']}用户受影响]")
+
+    for i, item in enumerate(severe[:2], 1):
+        lines.append(f"    C --> C{i}[{item['value']} - {item['pct']}用户受影响]")
+
+    for i, item in enumerate(moderate[:1], 1):
+        lines.append(f"    D --> D{i}[{item['value']}]")
+
+    # 如果某个级别为空，添加占位
+    if not critical:
+        lines.append("    B --> B1[暂无致命级问题]")
+    if not severe:
+        lines.append("    C --> C1[暂无严重级问题]")
+    if not moderate:
+        lines.append("    D --> D1[持续监控用户反馈]")
+
+    mermaid_code = "\n".join(lines)
+    return f"```mermaid\n{mermaid_code}\n```"
+
+
+def _sanitize_mermaid_text(text: str) -> str:
+    """清理文本使其适用于 mermaid 节点标签。
+
+    mermaid 对特殊字符敏感（括号、引号等），但支持中文显示。
+    此函数保留中文内容，仅移除 mermaid 语法中的保留字符，
+    截断过长文本以避免节点溢出。
+
+    语言规则：默认中文，英文专有名词和用户原话保持英文。
+
+    Args:
+        text: 原始文本（可能含中文、英文、特殊字符）
+
+    Returns:
+        清理后的安全文本字符串
+    """
+    if not text:
+        return "N/A"
+
+    # 移除 mermaid 语法中的保留字符（保留中文、英文、数字、空格、常用标点）
+    cleaned = text.strip()
+    for char in ['[', ']', '(', ')', '{', '}', '"', "'", '#', '&', '|', '%']:
+        cleaned = cleaned.replace(char, '')
+
+    # 压缩连续空格
+    while '  ' in cleaned:
+        cleaned = cleaned.replace('  ', ' ')
+
+    cleaned = cleaned.strip()
+    if not cleaned:
+        return "N/A"
+
+    # 截断到 40 字符，避免节点过长
+    if len(cleaned) > 40:
+        cleaned = cleaned[:37] + "..."
+
+    return cleaned
