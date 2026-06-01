@@ -105,9 +105,7 @@ def main():
 
     # 参数检查
     if len(sys.argv) < 2:
-        print("用法: python3 generate_from_tagged.py <已打标CSV路径> [--mode 1|2|3] [--creator 署名] [--output-dir 输出目录]")
-        print("  mode: 1=Gemini增强, 2=混动, 3=CLI本地 (默认: 1)")
-        print("  --output-dir: 指定输出目录，默认与CSV同目录")
+        print("用法: python3 generate_from_tagged.py <已打标CSV路径> [--creator 署名] [--output-dir 输出目录]")
         sys.exit(1)
 
     csv_path = sys.argv[1]
@@ -116,58 +114,24 @@ def main():
         sys.exit(1)
 
     # 解析参数
-    mode = "1"  # 默认Gemini增强模式
     creator = "AI Assistant"
     output_dir = None  # 默认输出到CSV同目录
 
     for i in range(2, len(sys.argv)):
-        if sys.argv[i] == "--mode" and i + 1 < len(sys.argv):
-            mode = sys.argv[i + 1]
-        elif sys.argv[i] == "--creator" and i + 1 < len(sys.argv):
+        if sys.argv[i] == "--creator" and i + 1 < len(sys.argv):
             creator = sys.argv[i + 1]
         elif sys.argv[i] == "--output-dir" and i + 1 < len(sys.argv):
             output_dir = sys.argv[i + 1]
 
-    # 初始化配置 - 直接修改全局config
-    # 如果指定了输出目录，使用它；否则使用CSV所在目录
+    # 初始化配置
     if output_dir:
         config.OUTPUT_DIR = Path(output_dir)
     else:
-        # 使用CSV所在目录作为输出目录
         config.OUTPUT_DIR = Path(csv_path).parent
 
-    # 设置模式
-    if mode == "1":
-        # Gemini增强模式
-        config.INSIGHTS_PROVIDER = "gemini"
-        config.GEMINI_MODEL = "gemini-3-flash-preview"
-        config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"
-        config.HTML_CREATOR_NAME = creator
-        print("💡 模式：Gemini 增强模式 (Flash报告 + 3.1 Pro看板)")
-    elif mode == "2":
-        # 混动模式
-        config.INSIGHTS_PROVIDER = "cli"
-        config.HTML_GENERATION_SOURCE = "gemini"
-        config.HTML_GENERATION_MODEL = "gemini-3.1-pro-preview"
-        config.HTML_CREATOR_NAME = creator
-        print("💡 模式：混动模式 (CLI报告 + Gemini看板)")
-    else:
-        # CLI本地模式
-        config.INSIGHTS_PROVIDER = "cli"
-        config.HTML_GENERATION_SOURCE = "local"
-        config.HTML_CREATOR_NAME = creator
-        print("💡 模式：CLI 本地模式")
-
-    # 检查API Key - 从环境变量读取（已通过 load_dotenv() 加载 .env）
-    gemini_key = os.environ.get("GEMINI_API_KEY", "")
-    if gemini_key:
-        config.GEMINI_API_KEY = gemini_key
-
-    if config.HTML_GENERATION_SOURCE == "gemini":
-        if not config.GEMINI_API_KEY:
-            print("⚠️  警告：Gemini模式需要API Key，将回退到本地模式")
-            config.HTML_GENERATION_SOURCE = "local"
+    # 统一 CLI 本地模式
+    config.HTML_CREATOR_NAME = creator
+    print("💡 模式：CLI 本地模式")
 
     # 加载已打标CSV
     reviews, df = load_tagged_csv(csv_path)
@@ -192,12 +156,7 @@ def main():
 
     # Phase 3: 洞察报告生成
     print(f"\n📝 [Phase 3/3] AI深度战略洞察报告生成中...")
-    print(f"   - 使用引擎: {config.INSIGHTS_PROVIDER.upper()}")
-
-    if config.INSIGHTS_PROVIDER == "gemini":
-        print(f"   - 正在调用 Gemini API 生成洞察...")
-    else:
-        print(f"   - 正在调用 Claude CLI 生成洞察...")
+    print(f"   - 使用引擎: CLI")
 
     result = generate_insights_with_metadata(
         tagged_reviews=reviews,
@@ -215,7 +174,7 @@ def main():
 
     # Phase 4: 可视化看板
     print(f"\n🎨 [Phase 4/3] 可视化看板渲染中...")
-    print(f"   - 使用引擎: {config.HTML_GENERATION_SOURCE.upper()}")
+    print(f"   - 使用引擎: 本地模板")
 
     # 计算统计数据
     stats = calculate_stats_summary(reviews)

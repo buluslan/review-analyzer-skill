@@ -502,15 +502,22 @@
 
     <script>
     // Analysis data is injected here by the template engine
-    window.__ANALYSIS_DATA__ = {
-        "title": "Product ASIN Review Analysis",
-        "asin": "B001OAXE0S",
-        "total_reviews": 20,
-        "avg_rating": 3.4,
-        "statistics": {},
-        "chapters": [],
-        "charts": []
-    };
+    if (!window.__ANALYSIS_DATA__) {
+        window.__ANALYSIS_DATA__ = {
+            "title": "Review Analysis",
+            "asin": "",
+            "total_reviews": 0,
+            "avg_rating": 0,
+            "meta": {},
+            "kpis": [],
+            "charts_data": {},
+            "strategy": {},
+            "execution_matrix": [],
+            "voc_quotes": [],
+            "market_insights": [],
+            "chapters": []
+        };
+    }
 
     (function() {
         const D = window.__ANALYSIS_DATA__;

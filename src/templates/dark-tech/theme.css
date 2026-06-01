@@ -1,0 +1,199 @@
+/* ============================================
+   DARK TECH — Cyberpunk Dark Theme
+   Cyan Accent · JetBrains Mono · Glow Effects
+   ============================================ */
+
+:root {
+    /* --- Typography --- */
+    --font-display: 'Inter', 'Segoe UI', 'Noto Sans SC', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', 'Noto Sans SC', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+    /* --- Surfaces --- */
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface-hero: #1a2332;
+    --surface-elevated: #1e293b;
+    --surface-recessed: #080c14;
+
+    /* --- Borders --- */
+    --border: rgba(255, 255, 255, 0.08);
+    --border-bright: rgba(255, 255, 255, 0.15);
+    --border-accent: rgba(0, 229, 200, 0.25);
+    --border-accent-soft: rgba(0, 229, 200, 0.35);
+    --border-danger: rgba(239, 68, 68, 0.25);
+    --border-p0: rgba(239, 68, 68, 0.3);
+    --border-p1: rgba(0, 229, 200, 0.3);
+    --border-p2: rgba(59, 130, 246, 0.25);
+    --border-muted: rgba(100, 116, 139, 0.2);
+
+    /* --- Text --- */
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+
+    /* --- Accent: Cyan --- */
+    --gold: #00e5c8;
+    --gold-bright: #33ffd9;
+    --gold-dim: rgba(0, 229, 200, 0.08);
+
+    /* --- Semantic --- */
+    --green: #22c55e;
+    --green-bg: rgba(34, 197, 94, 0.10);
+    --red: #ef4444;
+    --red-bg: rgba(239, 68, 68, 0.10);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59, 130, 246, 0.10);
+    --orange: #f59e0b;
+
+    /* --- Sentiment --- */
+    --sentiment-strong-positive: #22c55e;
+    --sentiment-positive: #4ade80;
+    --sentiment-neutral: #94a3b8;
+    --sentiment-negative: #ef4444;
+    --sentiment-strong-negative: #dc2626;
+
+    /* --- Priority --- */
+    --priority-p0: #ef4444;
+    --priority-p1: #00e5c8;
+    --priority-p2: #3b82f6;
+
+    /* --- Spacing --- */
+    --sp-xs: 0.25rem;
+    --sp-sm: 0.5rem;
+    --sp-md: 1rem;
+    --sp-lg: 1.5rem;
+    --sp-xl: 2rem;
+    --sp-2xl: 3rem;
+    --sp-3xl: 4rem;
+
+    /* --- Theme-specific helpers --- */
+    --surface-alt: rgba(255, 255, 255, 0.03);
+    --surface-inset: rgba(0, 0, 0, 0.4);
+    --surface-hover-subtle: rgba(255, 255, 255, 0.02);
+    --surface-hover: rgba(255, 255, 255, 0.04);
+    --surface-badge-muted: rgba(100, 116, 139, 0.12);
+}
+
+/* ============================================
+   4-LAYER DEPTH SYSTEM (dark glass)
+   ============================================ */
+.depth-hero {
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.88) 0%, rgba(17, 24, 39, 0.7) 55%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 229, 200, 0.12);
+    box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.5),
+        0 2px 8px rgba(0, 229, 200, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.depth-elevated {
+    background: rgba(17, 24, 39, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.depth-default {
+    background: rgba(17, 24, 39, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.depth-recessed {
+    background: var(--surface-recessed);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   AMBIENT — Subtle cyan glow
+   ============================================ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 15%, rgba(0, 229, 200, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 85%, rgba(59, 130, 246, 0.015) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   HEADER — Cyan accent line
+   ============================================ */
+.header {
+    border-bottom-color: var(--border-accent);
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+}
+
+/* ============================================
+   KPI STRIP — First card cyan highlight
+   ============================================ */
+.kpi-card:first-child {
+    background: var(--surface-hero);
+}
+
+.kpi-card:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+}
+
+/* ============================================
+   JUDGEMENT PANEL — Circular cyan decoration
+   ============================================ */
+.judgement-panel::after {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: -100px;
+    width: 240px;
+    height: 240px;
+    border: 1px solid rgba(0, 229, 200, 0.1);
+    border-radius: 50%;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+/* ============================================
+   SENTIMENT FILL — Subtle highlight overlay
+   ============================================ */
+.sentiment-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent 50%);
+}
+
+/* ============================================
+   PERSONA CARD — Cyan radial decoration
+   ============================================ */
+.persona-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at corner, var(--gold) 0%, transparent 70%);
+    opacity: 0.05;
+}

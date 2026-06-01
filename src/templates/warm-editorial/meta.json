@@ -1,0 +1,51 @@
+{
+  "name": "warm-editorial",
+  "version": "3.0",
+  "description": "报纸编辑主题 — 暖纸色底、墨色标题、铜色强调，Source Serif 衬线字体",
+  "author": "Buluu@新西楼",
+  "sections": [
+    "洞察总览",
+    "情感分布",
+    "核心用户画像",
+    "数据遥测矩阵",
+    "核心卖点 & 痛点",
+    "典型用户深度解析",
+    "改进建议",
+    "机会与差异化",
+    "行动决策仪表盘",
+    "精选评论样本",
+    "深度内容"
+  ],
+  "features": [
+    "light-theme",
+    "chartjs",
+    "jinja2-ssr",
+    "responsive",
+    "shared-base"
+  ],
+  "fonts_url": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">",
+  "chart_theme": {
+    "defaultColor": "#4a5568",
+    "defaultBorderColor": "rgba(27,54,93,0.08)",
+    "legendColor": "#4a5568",
+    "legendFont": "'JetBrains Mono', monospace",
+    "tooltipBg": "rgba(255,254,249,0.96)",
+    "tooltipTitleColor": "#B5652A",
+    "tooltipTitleFont": "'JetBrains Mono', monospace",
+    "tooltipBodyColor": "#1B365D",
+    "tooltipBodyFont": "'Inter', sans-serif",
+    "tooltipBorderColor": "rgba(181,101,42,0.2)",
+    "tickColor": "#8a8a7a",
+    "tickFont": "'JetBrains Mono', monospace",
+    "gridColor": "rgba(27,54,93,0.06)",
+    "palette": [
+      "#B5652A",
+      "#2d6a4f",
+      "#b03a2e",
+      "#1B365D",
+      "#c4883a",
+      "#8a8a7a",
+      "#8b1a1a"
+    ]
+  }
+}

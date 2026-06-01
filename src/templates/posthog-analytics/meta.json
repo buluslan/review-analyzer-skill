@@ -1,0 +1,51 @@
+{
+  "name": "posthog-analytics",
+  "version": "3.0",
+  "description": "暖白分析主题 — PostHog 风格，橙色强调色，数据驱动呈现",
+  "author": "Buluu@新西楼",
+  "sections": [
+    "洞察总览",
+    "情感分布",
+    "核心用户画像",
+    "数据遥测矩阵",
+    "核心卖点 & 痛点",
+    "典型用户深度解析",
+    "改进建议",
+    "机会与差异化",
+    "行动决策仪表盘",
+    "精选评论样本",
+    "深度内容"
+  ],
+  "features": [
+    "light-theme",
+    "chartjs",
+    "jinja2-ssr",
+    "responsive",
+    "shared-base"
+  ],
+  "fonts_url": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">",
+  "chart_theme": {
+    "defaultColor": "#4d4f46",
+    "defaultBorderColor": "rgba(0,0,0,0.06)",
+    "legendColor": "#4d4f46",
+    "legendFont": "'JetBrains Mono', monospace",
+    "tooltipBg": "rgba(255,255,255,0.96)",
+    "tooltipTitleColor": "#F54E00",
+    "tooltipTitleFont": "'JetBrains Mono', monospace",
+    "tooltipBodyColor": "#1a1a2e",
+    "tooltipBodyFont": "'Inter', sans-serif",
+    "tooltipBorderColor": "rgba(245,78,0,0.2)",
+    "tickColor": "#8a8c84",
+    "tickFont": "'JetBrains Mono', monospace",
+    "gridColor": "rgba(0,0,0,0.04)",
+    "palette": [
+      "#F54E00",
+      "#4CAF50",
+      "#dc3232",
+      "#5B8DEF",
+      "#f59e0b",
+      "#8a8c84",
+      "#b71c1c"
+    ]
+  }
+}

@@ -1,7 +1,6 @@
 """
-HTML 报告生成模块 V1.0 - 黑金奢华看板
-使用 Gemini API 生成专业决策级别的可视化 HTML 数据看板
-严格按照 prompt_html.json 和 prompt_html.md 的规范生成
+HTML 报告生成模块 V1.0 - 本地渲染版
+使用 Jinja2 模板引擎渲染可视化 HTML 数据看板
 """
 
 import json
@@ -19,57 +18,10 @@ try:
 except ImportError:
     JINJA2_AVAILABLE = False
 
-try:
-    import google.generativeai as genai
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-
-from src.config import config, mask_api_key
+from src.config import config
 
 # 配置日志
 logger = logging.getLogger(__name__)
-
-
-def _load_json_template() -> Dict:
-    """加载 JSON 数据模板"""
-    json_path = config.REFERENCES_DIR / "可视化看板prompt/prompt_html.json"
-    if json_path.exists():
-        with open(json_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-
-def _load_system_prompt() -> str:
-    """加载黑金奢华 HTML 生成系统提示词"""
-    prompt_path = config.REFERENCES_DIR / "可视化看板prompt/prompt_html.md"
-    if prompt_path.exists():
-        with open(prompt_path, "r", encoding="utf-8") as f:
-            return f.read()
-    return ""
-
-
-def _extract_html_from_response(response_text: str) -> str:
-    """从 Gemini 响应中提取 HTML 代码"""
-    # 尝试提取 html 代码块
-    html_pattern = r'```html\s*(.*?)\s*```'
-    match = re.search(html_pattern, response_text, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-
-    # 尝试提取通用代码块
-    code_pattern = r'```\s*(.*?)\s*```'
-    match = re.search(code_pattern, response_text, re.DOTALL)
-    if match:
-        content = match.group(1).strip()
-        if content.startswith('<') and ('</html>' in content or '</body>' in content):
-            return content
-
-    # 如果没有代码块，检查是否是纯 HTML
-    if response_text.strip().startswith('<'):
-        return response_text.strip()
-
-    return response_text.strip()
 
 
 def _extract_strategic_json(insights_md: Optional[str]) -> Dict:
@@ -550,54 +502,67 @@ def _render_with_jinja2(
     insights_md: str,
     output_path: Path
 ) -> None:
-    """使用 Jinja2 本地渲染 HTML (降级方案)"""
+    """使用 V2.0 模板引擎渲染 HTML（通过 template_engine 统一入口）"""
+    try:
+        from src.template_engine import render as _tpl_render
+        from src.chart_engine import generate_all_charts
+
+        # 构建 analysis_data（与 main.py Phase 4 对齐）
+        sentiment_distribution = json_data.get("sentiment_distribution", {})
+        summary_raw = json_data.get("summary", {})
+        if not summary_raw:
+            # 从 json_data 的 meta/kpis 反推
+            total_reviews = int(json_data.get("meta", {}).get("sample_size", 0))
+            kpis = json_data.get("kpis", [])
+            avg_rating = 4.5
+            for kpi in kpis:
+                if kpi.get("title") == "Average Rating":
+                    try:
+                        avg_rating = float(kpi.get("value", 4.5))
+                    except (ValueError, TypeError):
+                        pass
+                    break
+            summary_raw = {"total": total_reviews, "tagged": total_reviews, "avg_rating": avg_rating}
+
+        analysis_data = {
+            "asin": asin,
+            "product_name": json_data.get("meta", {}).get("product_name", asin),
+            "summary": summary_raw,
+            "sentiment": sentiment_distribution,
+            "sentiment_distribution": sentiment_distribution,
+            "tag_statistics": json_data.get("tag_statistics", {}),
+            "dimensional_stats": json_data.get("dimensional_stats", {}),
+            "personas": json_data.get("personas", []),
+            "golden_samples": json_data.get("golden_samples", []),
+            "insights_md": insights_md,
+            "statistics": json_data.get("statistics", {}),
+        }
+
+        chart_configs = generate_all_charts(analysis_data)
+        html_content = _tpl_render(config.DEFAULT_TEMPLATE, analysis_data, chart_configs)
+        output_path.write_text(html_content, encoding="utf-8")
+        return
+    except Exception as exc:
+        logger.warning("V2.0 模板引擎渲染失败，降级到基础渲染: %s", exc)
+
+    # 降级：使用内置基础模板（最小可用 HTML）
     if not JINJA2_AVAILABLE:
         raise ImportError("❌ 未安装 jinja2，无法进行本地渲染。请运行: pip install jinja2")
 
-    template_path = config.template_path
-    if not template_path.exists():
-        raise FileNotFoundError(f"❌ 找不到 HTML 模板: {template_path}")
-
-    with open(template_path, "r", encoding="utf-8") as f:
-        template_content = f.read()
-
-    # 准备模板数据
     total_reviews = int(json_data.get("meta", {}).get("sample_size", 0))
-
-    # 从KPI数据中提取平均评分
-    kpis = json_data.get("kpis", [])
-    avg_rating = 4.5  # 默认值
-    for kpi in kpis:
-        if kpi.get("title") == "Average Rating":
-            try:
-                avg_rating = float(kpi.get("value", 4.5))
-            except (ValueError, TypeError):
-                avg_rating = 4.5
-            break
-
-    template_vars = {
-        "asin": asin,
-        "product_name": json_data.get("meta", {}).get("product_name", asin),
-        "analysis_date": datetime.now().strftime("%Y-%m-%d"),
-        "summary": {
-            "total_reviews": total_reviews,
-            "tagged_reviews": total_reviews, # 本地模式默认全显示
-            "persona_count": len(json_data.get("personas", [])),
-            "avg_rating": avg_rating  # 从KPI数据中提取
-        },
-        "personas": json_data.get("personas", []),
-        "sentiment_distribution": json_data.get("sentiment_distribution", {}),
-        "tag_statistics": json_data.get("tag_statistics", {}),
-        "golden_samples": json_data.get("golden_samples", []),
-        "insights_md": insights_md,
-    }
-
-    # 渲染
-    template = jinja2.Template(template_content)
-    html_content = template.render(**template_vars)
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html_content)
+    product_name = json_data.get("meta", {}).get("product_name", asin)
+    html_content = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>{product_name} - 评论分析报告</title></head>
+<body style="font-family:sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;">
+<h1>{product_name} 评论深度分析报告</h1>
+<p>ASIN: {asin} | 分析评论: {total_reviews} 条</p>
+<hr>
+<pre style="white-space:pre-wrap;line-height:1.8;">{insights_md or '报告内容为空'}</pre>
+<hr>
+<p style="color:#888;font-size:0.8rem;">Generated by Review Analyzer Skill V2.0</p>
+</body></html>"""
+    output_path.write_text(html_content, encoding="utf-8")
 
 
 def _get_user_status(sample: Dict) -> str:
@@ -624,15 +589,15 @@ def generate_html_report(
     tag_statistics: Optional[Dict] = None,
     golden_samples: Optional[List[Dict]] = None,
     insights_md: Optional[str] = None,
-    creator_name: str = "Gemini-1.5-Pro",
+    creator_name: str = "AI Assistant",
 ) -> Path:
-    """生成黑金奢华可视化 HTML 报告"""
+    """生成可视化 HTML 报告（本地 Jinja2 渲染）"""
     output_path = config.get_html_path(asin)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 1. 提取结构化数据 (用于分析源)
     _ = _extract_strategic_json(insights_md)
-    
+
     # 2. 清洗 insights_md (剥离 strategic_json 块供前端展示)
     clean_md = insights_md or ""
     if "<strategic_json>" in clean_md:
@@ -646,56 +611,9 @@ def generate_html_report(
         insights_md=clean_md, creator_name=creator_name
     )
 
-    # 4. 模式判定：如果显式指定 local 或没有 API Key，直接走本地渲染
-    if config.HTML_GENERATION_SOURCE == "local" or not config.GEMINI_API_KEY:
-        print(f"   💡 进入「本地经典模式」生成可视化看板...")
-        _render_with_jinja2(asin, json_data, clean_md, output_path)
-        return output_path
-
-    # 5. 尝试使用 Gemini 生成 (高品质生成式渲染)
-    print(f"   🎨 使用 Gemini {config.HTML_GENERATION_MODEL} 生成黑金奢华看板...")
-    try:
-        if not GEMINI_AVAILABLE:
-            raise RuntimeError("google-generativeai 未安装")
-
-        # 安全地记录API Key配置（仅显示后4位）
-        logger.debug(f"配置 Gemini API Key: {mask_api_key(config.GEMINI_API_KEY)}")
-        genai.configure(api_key=config.GEMINI_API_KEY)
-        system_prompt = _load_system_prompt()
-        if not system_prompt:
-            raise RuntimeError("找不到 prompt_html.md")
-
-        system_prompt = system_prompt.replace("{CREATOR_NAME}", creator_name)
-
-        full_prompt = f"# JSON 数据输入\n\n```json\n{json.dumps(json_data, ensure_ascii=False, indent=2)}\n```\n\n# 产品名称\n{product_name or asin}\n\n# 报告原文\n{clean_md}\n"
-
-        model = genai.GenerativeModel(
-            model_name=config.HTML_GENERATION_MODEL,
-            system_instruction=system_prompt
-        )
-
-        response = model.generate_content(
-            full_prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=config.HTML_GENERATION_TEMPERATURE,
-                max_output_tokens=65536,
-            )
-        )
-
-        html_content = _extract_html_from_response(response.text)
-        if not html_content or len(html_content) < 500:
-            raise ValueError("Gemini 生成的 HTML 异常")
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(html_content)
-
-        print(f"   ✅ HTML 报告生成成功: {output_path.name}")
-        return output_path
-
-    except Exception as e:
-        print(f"   ⚠️ Gemini 渲染故障 ({e})，正在自动退位至「本地经典模式」...")
-        _render_with_jinja2(asin, json_data, clean_md, output_path)
-        return output_path
+    # 4. 本地渲染
+    _render_with_jinja2(asin, json_data, clean_md, output_path)
+    return output_path
 
 # ========== 保留的辅助函数（向后兼容） ==========
 

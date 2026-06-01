@@ -285,19 +285,22 @@ def generate_outputs(
     except Exception as exc:
         logger.error("Markdown 报告生成失败: %s", exc)
 
-    # 3. 生成 HTML 看板
+    # 3. 生成 HTML 看板（template_name 为 None 时跳过）
     try:
         template_name = output_config.get("template_name")
-        if not template_name:
-            templates = list_templates()
-            template_name = templates[0]["name"] if templates else "premium-gold"
+        if template_name is None:
+            logger.info("已跳过 HTML 看板生成（用户未选择模板）")
+        else:
+            if not template_name:
+                templates = list_templates()
+                template_name = templates[0]["name"] if templates else "premium-gold"
 
-        html_path = output_dir / f"可视化洞察报告_{asin}.html"
-        _write_html_dashboard(
-            html_path, analysis_data, chart_configs, template_name, asin, creator
-        )
-        result["html_path"] = str(html_path)
-        logger.info("HTML 看板已生成: %s", html_path)
+            html_path = output_dir / f"可视化洞察报告_{asin}.html"
+            _write_html_dashboard(
+                html_path, analysis_data, chart_configs, template_name, asin, creator
+            )
+            result["html_path"] = str(html_path)
+            logger.info("HTML 看板已生成: %s", html_path)
     except Exception as exc:
         logger.error("HTML 看板生成失败: %s", exc)
 

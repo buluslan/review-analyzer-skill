@@ -6,9 +6,6 @@ requests==2.32.3
 # HTML 解析库
 beautifulsoup4==4.12.3
 
-# Gemini API (Google AI Studio)
-google-generativeai==0.8.4
-
 # ==================== 数据处理 ====================
 
 # 数据处理和分析

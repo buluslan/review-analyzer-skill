@@ -369,8 +369,17 @@ def generate_all_charts(analysis_data: dict) -> List[ChartConfig]:
     """
     sentiment = analysis_data.get("sentiment", analysis_data.get("sentiment_distribution"))
     personas = analysis_data.get("personas", [])
-    dimensional_stats = analysis_data.get("dimensional_stats", analysis_data.get("tag_statistics", {}))
-    tag_statistics = analysis_data.get("tag_statistics", analysis_data.get("dimensional_stats", {}))
+    statistics = analysis_data.get("statistics", {})
+    dimensional_stats = (
+        analysis_data.get("dimensional_stats")
+        or statistics.get("dimensional_stats")
+        or analysis_data.get("tag_statistics", {})
+    )
+    tag_statistics = (
+        analysis_data.get("tag_statistics")
+        or statistics.get("dimensional_stats")
+        or analysis_data.get("dimensional_stats", {})
+    )
     top_tags = analysis_data.get("top_tags", {})
 
     builders = [

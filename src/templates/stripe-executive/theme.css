@@ -1,0 +1,194 @@
+/* ============================================
+   STRIPE EXECUTIVE — Financial Enterprise Theme
+   Emerald Accent · Clean Surfaces · Inter
+   ============================================ */
+
+:root {
+    /* --- Typography --- */
+    --font-display: 'Inter', 'Segoe UI', 'Noto Sans SC', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', 'Noto Sans SC', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+    /* --- Surfaces (微绿调冷灰 — sophisticated executive) --- */
+    --bg: #EEF1EF;
+    --surface: #ffffff;
+    --surface-hero: #E0F2ED;
+    --surface-elevated: #F0F5F3;
+    --surface-recessed: #E2E7E4;
+
+    /* --- Borders --- */
+    --border: rgba(0, 0, 0, 0.08);
+    --border-bright: rgba(0, 0, 0, 0.13);
+    --border-accent: rgba(4, 120, 87, 0.3);
+    --border-accent-soft: rgba(4, 120, 87, 0.5);
+    --border-danger: rgba(200, 50, 50, 0.2);
+    --border-p0: rgba(200, 50, 50, 0.25);
+    --border-p1: rgba(4, 120, 87, 0.25);
+    --border-p2: rgba(13, 156, 111, 0.2);
+    --border-muted: rgba(100, 116, 110, 0.15);
+
+    /* --- Text --- */
+    --text: #0f1d17;
+    --text-dim: #3a4f44;
+    --text-muted: #6b7f73;
+
+    /* --- Accent: Emerald --- */
+    --gold: #047857;
+    --gold-bright: #059669;
+    --gold-dim: rgba(4, 120, 87, 0.10);
+
+    /* --- Semantic --- */
+    --green: #047857;
+    --green-bg: rgba(4, 120, 87, 0.08);
+    --red: #c53030;
+    --red-bg: rgba(200, 50, 50, 0.06);
+    --blue: #047857;
+    --blue-bg: rgba(4, 120, 87, 0.06);
+    --orange: #b45309;
+
+    /* --- Sentiment --- */
+    --sentiment-strong-positive: #047857;
+    --sentiment-positive: #10b981;
+    --sentiment-neutral: #6b7f73;
+    --sentiment-negative: #c53030;
+    --sentiment-strong-negative: #991b1b;
+
+    /* --- Priority --- */
+    --priority-p0: #c53030;
+    --priority-p1: #047857;
+    --priority-p2: #0d9c6f;
+
+    /* --- Spacing --- */
+    --sp-xs: 0.25rem;
+    --sp-sm: 0.5rem;
+    --sp-md: 1rem;
+    --sp-lg: 1.5rem;
+    --sp-xl: 2rem;
+    --sp-2xl: 3rem;
+    --sp-3xl: 4rem;
+
+    /* --- Theme-specific helpers --- */
+    --surface-alt: rgba(4, 120, 87, 0.02);
+    --surface-inset: rgba(0, 0, 0, 0.03);
+    --surface-hover-subtle: rgba(0, 0, 0, 0.02);
+    --surface-hover: rgba(0, 0, 0, 0.04);
+    --surface-badge-muted: rgba(100, 116, 110, 0.10);
+}
+
+/* ============================================
+   4-LAYER DEPTH SYSTEM (emerald glass)
+   ============================================ */
+.depth-hero {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.6) 60%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(4, 120, 87, 0.15);
+    box-shadow:
+        0 8px 32px rgba(4, 120, 87, 0.07),
+        0 2px 8px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.depth-elevated {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.depth-default {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.depth-recessed {
+    background: var(--surface-recessed);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================================
+   AMBIENT — Subtle emerald atmosphere
+   ============================================ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 15% 20%, rgba(4, 120, 87, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 80%, rgba(4, 120, 87, 0.012) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   HEADER — Soft gradient into page, no hard line
+   ============================================ */
+.header {
+    background: transparent;
+    border-bottom-color: rgba(4, 120, 87, 0.12);
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--gold);
+}
+
+/* ============================================
+   KPI STRIP — Emerald tinted gap
+   ============================================ */
+.kpi-strip {
+    background: rgba(4, 120, 87, 0.12);
+}
+
+.kpi-card:first-child {
+    background: var(--surface-hero);
+}
+
+.kpi-card:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gold);
+}
+
+/* ============================================
+   JUDGEMENT PANEL — Circular emerald decoration
+   ============================================ */
+.judgement-panel::after {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: -100px;
+    width: 240px;
+    height: 240px;
+    border: 1px solid rgba(4, 120, 87, 0.08);
+    border-radius: 50%;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+/* ============================================
+   PERSONA CARD — Emerald radial decoration
+   ============================================ */
+.persona-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at corner, var(--gold) 0%, transparent 70%);
+    opacity: 0.04;
+}

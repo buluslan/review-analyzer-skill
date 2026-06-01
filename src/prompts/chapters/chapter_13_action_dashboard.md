@@ -4,20 +4,31 @@
 
 将全部分析结论整合为一张可执行的决策看板，帮助决策者快速判断"该做什么、先做什么"。
 
-### 必须输出：行动优先级矩阵
+### ⚠️ 强制要求 [MUST]：行动优先级矩阵
 
-在本章节开头，**必须**输出以下 mermaid flowchart 图（注意：代码块内必须全部使用英文，中文会导致渲染失败）：
+在本章节开头，**必须**输出 mermaid flowchart 代码块来展示行动优先级矩阵。如果你不输出这段 mermaid 代码，该章节将无法生成可视化图表，飞书白板将显示为空。
+
+输出格式如下（注意必须包含完整的 ```mermaid 起止标记）：
 
 ```mermaid
-graph TD
-    A[Action Dashboard] --> B[Quick Win]
-    A --> C[Strategic Investment]
-    A --> D[Low Priority]
-    B --> B1[Action Name - expected impact]
-    B --> B2[Action Name - expected impact]
-    C --> C1[Action Name - expected impact]
-    D --> D1[Action Name]
+flowchart TB
+    subgraph P0[P0 立即行动]
+        A1[行动项1<br/>预期影响描述]
+        A2[行动项2<br/>预期影响描述]
+    end
+    subgraph P1[P1 战略投入]
+        B1[行动项3<br/>预期影响描述]
+    end
+    subgraph P2[P2 低优先级]
+        C1[行动项4<br/>预期影响描述]
+    end
+    P0 -->|立即执行| P1
+    P1 -->|提前规划| P2
 ```
+
+**语言规则**：mermaid 节点文本默认使用中文，不要翻译为英文。注意 mermaid 节点内不要使用引号（""）等特殊字符，如有需要用书名号或直接省略。
+
+输出前请确认：你的回答中是否包含 ```mermaid 代码块？如果没有，请补上。
 
 坐标值根据行动的实施难度（x轴，越右越难）和影响力（y轴，越上越高）综合评定。
 
@@ -45,7 +56,7 @@ graph TD
 
 ### 必须包含的内容
 
-- 必须输出 mermaid flowchart 图（英文，不用quadrantChart）
+- ⚠️ **必须**输出完整的 ```mermaid 代码块（含 ```mermaid 起始标记和 ``` 结束标记），这是不可跳过的输出项
 - 行动项表格格式：`| 行动项 | 优先级 | 预期影响 | 来源 |`
 - 每个行动项关联来源章节（如 Ch5-#1）
 - 快速胜利清单（P0 项）

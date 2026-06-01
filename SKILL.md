@@ -35,7 +35,7 @@ AI驱动的电商评论深度分析工具，Agent原生设计，任何主流AI C
 ### 环境准备
 
 ```bash
-pip install pandas jinja2 google-genai requests python-dotenv tqdm
+pip install pandas jinja2 requests python-dotenv tqdm
 ```
 
 ### 数据输入方式
@@ -50,64 +50,30 @@ python3 main.py --source sorftime --asin B001OAXE0S --site US --max-reviews 100 
 
 ## 工作流程
 
-### 第一步：收集参数（必须）
+### 第一步：收集参数
 
 ❗ **必须使用 AskUserQuestion 工具依次收集**，严禁跳过或猜测用户意图。
 
-**Q1: 数据来源**
+**Q1: 数据来源**（必须）
 - "本地CSV文件（上传文件路径）"
 - "Sorftime平台获取（需要API Key，输入ASIN即可）"
 
 **Q1.5: Sorftime字段选择**（仅当选择Sorftime时）
 展示可用字段清单，必选字段已锁定（标题、正文、星级），推荐字段可勾选。
 
-**Q2: 分析数量**
+**Q2: 分析数量**（必须）
 - "100条 (推荐) - 平衡速度与质量"
 - "300条 - 更全面分析"
 - "全部 - 分析所有评论"
 
-**Q3: 可视化模板选择**
-展示可用模板列表，包含风格描述和适用场景。
-
-**Q4: 报告署名**
-- "默认：AI Assistant"
-- "我想自定义署名"
-
-**Q5: 飞书同步**
+**Q3: 飞书同步**（必须）
 - "仅生成本地文件"
 - "同步到飞书文档（需要lark-cli已安装且已认证）"
 
-### 第二步：执行分析
-
-```bash
-# 本地CSV模式
-python3 main.py "<CSV文件路径>" \
-  --max-reviews <数量> \
-  --creator "<署名>" \
-  --template <模板名> \
-  --feishu-sync <true|false>
-
-# Sorftime模式
-python3 main.py \
-  --source sorftime \
-  --asin <ASIN> \
-  --site US \
-  --max-reviews <数量> \
-  --creator "<署名>" \
-  --template <模板名> \
-  --feishu-sync <true|false>
-```
-
-### 第三步：展示结果
-
-| 输出文件 | 内容 |
-|---------|------|
-| `评论采集及打标数据_{ASIN}.csv` | 22维度标签数据 |
-| `分析洞察报告_{ASIN}.md` | 13章深度洞察报告 |
-| `可视化洞察报告_{ASIN}.html` | 可视化看板（用户选定模板） |
-| 飞书文档（可选） | 完整报告 + 画板图表 |
-
-## 可视化模板
+**Q4: 可视化模板**（可选）
+- "否 — 不需要生成可视化HTML" — 跳过HTML看板生成
+- "使用默认模板 (premium-gold)" — 直接使用默认模板
+- "我想选择模板" — 展示以下6种可用模板：
 
 | 模板 | 风格 | 适用场景 |
 |------|------|---------|
@@ -117,6 +83,43 @@ python3 main.py \
 | linear-minimal | 极简靛蓝风 | 工程团队、数据驱动决策 |
 | dark-tech | 暗色科技风 | 技术评审、数据密集场景 |
 | warm-editorial | 暖纸编辑风 | 阅读分享、团队协作文档 |
+
+**Q5: 报告署名**（⚠️ 仅当 Q4 选择了模板（非"否"）时才触发此问题）
+- "默认：AI Assistant"
+- "我想自定义署名"
+
+### 第二步：执行分析
+
+```bash
+# 本地CSV模式（最小参数）
+python3 main.py "<CSV文件路径>" \
+  --max-reviews <数量> \
+  --feishu-sync <true|false>
+
+# 本地CSV模式（完整参数，含自定义模板和署名）
+python3 main.py "<CSV文件路径>" \
+  --max-reviews <数量> \
+  --template <模板名> \
+  --creator "<署名>" \
+  --feishu-sync <true|false>
+
+# Sorftime模式
+python3 main.py \
+  --source sorftime \
+  --asin <ASIN> \
+  --site US \
+  --max-reviews <数量> \
+  --feishu-sync <true|false>
+```
+
+### 第三步：展示结果
+
+| 输出文件 | 内容 |
+|---------|------|
+| `评论采集及打标数据_{ASIN}.csv` | 22维度标签数据 |
+| `分析洞察报告_{ASIN}.md` | 13章深度洞察报告 |
+| `可视化洞察报告_{ASIN}.html` | 可视化看板（可选，用户选择模板时生成） |
+| 飞书文档（可选） | 完整报告 + 画板图表 |
 
 ## 参考资料
 
