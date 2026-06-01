@@ -50,6 +50,8 @@ Phase 3: 洞察报告生成（14章结构化报告）
 Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 ```
 
+> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 14 章完整内容 + 飞书白板 mermaid 图表
+
 ---
 
 ## 核心特性
@@ -194,10 +196,6 @@ python3 replay_phase2to5.py output/B09XYZ123-评论分析项目-6.1/评论采集
 ---
 
 ## 输出示例
-
-> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)**
->
-> 包含 14 章完整内容：洞察总览 → 用户画像 → 卖点痛点 → 改进建议 → 行动决策仪表盘，以及飞书白板 mermaid 图表。
 
 运行完成后，将在 `output/` 目录生成以下文件：
 
