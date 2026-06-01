@@ -1,7 +1,21 @@
 {
   "name": "linear-minimal",
   "version": "3.0",
-  "description": "极简白色主题 — Linear/Apple 风格，干净边框与留白，Indigo 强调色",
+  "description": "极简白色主题 — Linear/Apple 风格，干净边框与留白，纯蓝强调色",
+  "author": "Buluu@新西楼",
+  "sections": [
+    "洞察总览",
+    "情感分布",
+    "核心用户画像",
+    "数据遥测矩阵",
+    "核心卖点 & 痛点",
+    "典型用户深度解析",
+    "改进建议",
+    "机会与差异化",
+    "行动决策仪表盘",
+    "精选评论样本",
+    "深度内容"
+  ],
   "features": [
     "light-theme",
     "chartjs",

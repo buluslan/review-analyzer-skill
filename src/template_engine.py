@@ -252,9 +252,7 @@ def _chart_to_js_config(chart: Any) -> Optional[dict]:
     data = cc.get("data", {})
     values = data.get("values", data.get("data", []))
     labels = data.get("labels", [])
-    colors = cc.get("config", {}).get("colors") or [
-        "#d29922", "#79c0ff", "#7ee787", "#ff7b72", "#d2a8ff", "#ffa657"
-    ]
+    colors = cc.get("config", {}).get("colors") or list(_DEFAULT_PALETTE)
     return {
         "type": chart_type,
         "data": {
@@ -269,7 +267,12 @@ def _chart_to_js_config(chart: Any) -> Optional[dict]:
     }
 
 
-def _dimension_bar_chart(title: str, dim_data: dict, horizontal: bool = False) -> Optional[dict]:
+# 默认调色板（当主题未提供 palette 时的 fallback）
+_DEFAULT_PALETTE = ["#d29922", "#79c0ff", "#7ee787", "#ff7b72", "#d2a8ff", "#ffa657"]
+
+
+def _dimension_bar_chart(title: str, dim_data: dict, horizontal: bool = False,
+                         palette: list = None) -> Optional[dict]:
     """Build a compact Chart.js bar config from dimensional statistics."""
     if not dim_data:
         return None
@@ -284,7 +287,7 @@ def _dimension_bar_chart(title: str, dim_data: dict, horizontal: bool = False) -
     items = sorted(filtered.items(), key=lambda item: item[1], reverse=True)[:6]
     labels = [item[0] for item in items]
     values = [item[1] for item in items]
-    colors = ["#d29922", "#79c0ff", "#7ee787", "#ff7b72", "#d2a8ff", "#ffa657"]
+    colors = (palette or _DEFAULT_PALETTE)[:max(len(labels), 1)]
     options = {
         "responsive": True,
         "maintainAspectRatio": False,
@@ -747,9 +750,7 @@ def _transform_for_js_templates(
             strategy = {"moat_pros": moat_pros, "vulnerability_cons": vuln_cons}
             execution_matrix = cached.get("execution_matrix", [])
     except Exception:
-        pass
-
-    # 降级：尝试从 insights_md 中解析（如果未被剥离）
+        logger.debug("strategic_json 解析失败，将尝试从 insights_md 降级解析", exc_info=True)
     if not strategy and insights_md:
         strategy, execution_matrix = _parse_strategic_json(insights_md)
 
@@ -1257,6 +1258,13 @@ def _jinja2_render(
         for kw in ["价格", "易用", "场景", "外观", "舒适", "做工", "耐用", "功能", "满意度"]:
             if kw in t:
                 existing_keywords.add(kw)
+    # 从 extra_context 中提取主题 palette（共享基座模式）
+    _theme_palette = None
+    if extra_context:
+        _ct = extra_context.get("chart_theme")
+        if isinstance(_ct, dict):
+            _theme_palette = _ct.get("palette")
+
     for title, dim_key, horizontal in fallback_chart_specs:
         if len(dashboard_charts) >= 8:
             break
@@ -1268,7 +1276,10 @@ def _jinja2_render(
                 break
         if skip:
             continue
-        js_config = _dimension_bar_chart(title, dimensional_stats.get(dim_key, {}), horizontal)
+        js_config = _dimension_bar_chart(
+            title, dimensional_stats.get(dim_key, {}), horizontal,
+            palette=_theme_palette,
+        )
         if not js_config:
             continue
         idx = len(dashboard_charts)

@@ -2,6 +2,20 @@
   "name": "warm-editorial",
   "version": "3.0",
   "description": "报纸编辑主题 — 暖纸色底、墨色标题、铜色强调，Source Serif 衬线字体",
+  "author": "Buluu@新西楼",
+  "sections": [
+    "洞察总览",
+    "情感分布",
+    "核心用户画像",
+    "数据遥测矩阵",
+    "核心卖点 & 痛点",
+    "典型用户深度解析",
+    "改进建议",
+    "机会与差异化",
+    "行动决策仪表盘",
+    "精选评论样本",
+    "深度内容"
+  ],
   "features": [
     "light-theme",
     "chartjs",
