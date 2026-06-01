@@ -1,14 +1,16 @@
 ---
 name: review-analyzer-skill
+version: 2.0.0
+author: Buluu@新西楼
 description: |
   Agent 原生的电商评论深度分析工具 V2.0。
-  支持22维度智能标签、13章深度洞察报告、多风格可视化看板、Sorftime平台数据对接、飞书文档同步。
+  支持22维度智能标签、14章深度洞察报告、6套主题可视化看板（共享基座+玻璃拟态）、Sorftime平台数据对接、飞书文档同步。
 
   当用户需要以下功能时触发：
   - 分析电商产品评论（Amazon等平台）
   - 从评论中提取用户画像、痛点和VOC（客户之声）
   - 生成产品洞察报告和机会点分析
-  - 创建专业的可视化分析看板
+  - 创建专业的可视化分析看板（6套主题可选）
   - 通过Sorftime获取产品评论数据
   - 将分析结果同步到飞书文档
 
@@ -25,8 +27,8 @@ AI驱动的电商评论深度分析工具，Agent原生设计，任何主流AI C
 ## 核心特性
 
 - **22维度智能标签系统**: 人群/场景/功能/质量/服务/体验/市场/情感
-- **13章深度洞察报告**: 加深现有章节 + 新增时间趋势、情感背离、话题聚类、购买动机归因、行动仪表盘
-- **多风格可视化看板**: 5+种HTML模板（Premium Gold / PostHog Analytics / Stripe Executive / Linear Minimal / Dark Tech / Warm Editorial）
+- **14章深度洞察报告**: 洞察总览→用户画像→卖点痛点→改进建议→行动仪表盘→数据附录
+- **6套主题可视化看板**: 共享基座架构，玻璃拟态质感（Premium Gold / Dark Tech / Linear Minimal / PostHog Analytics / Stripe Executive / Warm Editorial）
 - **Sorftime数据对接**: 通过MCP/API/CLI获取亚马逊产品评论数据
 - **飞书完整同步**: 文档 + 画板图表一键同步到飞书
 
