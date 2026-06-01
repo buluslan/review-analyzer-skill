@@ -1,0 +1,37 @@
+{
+  "name": "stripe-executive",
+  "version": "3.0",
+  "description": "金融企业主题 — 翡翠绿点缀，冷静专业，高管汇报呈现",
+  "features": [
+    "light-theme",
+    "chartjs",
+    "jinja2-ssr",
+    "responsive",
+    "shared-base"
+  ],
+  "fonts_url": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">",
+  "chart_theme": {
+    "defaultColor": "#3a4f44",
+    "defaultBorderColor": "rgba(0,0,0,0.06)",
+    "legendColor": "#3a4f44",
+    "legendFont": "'JetBrains Mono', monospace",
+    "tooltipBg": "rgba(255,255,255,0.96)",
+    "tooltipTitleColor": "#047857",
+    "tooltipTitleFont": "'JetBrains Mono', monospace",
+    "tooltipBodyColor": "#0f1d17",
+    "tooltipBodyFont": "'Inter', sans-serif",
+    "tooltipBorderColor": "rgba(4,120,87,0.2)",
+    "tickColor": "#6b7f73",
+    "tickFont": "'JetBrains Mono', monospace",
+    "gridColor": "rgba(0,0,0,0.04)",
+    "palette": [
+      "#047857",
+      "#059669",
+      "#c53030",
+      "#0d9488",
+      "#b45309",
+      "#6b7f73",
+      "#991b1b"
+    ]
+  }
+}

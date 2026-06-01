@@ -1,0 +1,191 @@
+/* ============================================
+   PREMIUM GOLD v3 — Editorial Dark Theme
+   Anti-AI Slop · Playfair Display · Warm Black-Gold
+   ============================================ */
+
+:root {
+    /* --- Typography --- */
+    --font-display: 'Playfair Display', 'Georgia', 'Noto Serif SC', serif;
+    --font-body: 'Source Sans 3', 'Segoe UI', 'Noto Sans SC', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+
+    /* --- Surfaces (warm black, not GitHub blue-black) --- */
+    --bg: #070707;
+    --surface: #111111;
+    --surface-hero: #15130f;
+    --surface-elevated: #1a1816;
+    --surface-recessed: #0c0b0a;
+
+    /* --- Borders --- */
+    --border: rgba(255, 255, 255, 0.06);
+    --border-bright: rgba(255, 255, 255, 0.12);
+    --border-accent: rgba(212, 167, 58, 0.22);
+    --border-accent-soft: rgba(212, 167, 58, 0.35);
+    --border-danger: rgba(201, 68, 68, 0.2);
+    --border-p0: rgba(201, 68, 68, 0.25);
+    --border-p1: rgba(212, 167, 58, 0.25);
+    --border-p2: rgba(106, 155, 199, 0.2);
+    --border-muted: rgba(107, 101, 96, 0.2);
+
+    /* --- Text --- */
+    --text: #ece5d8;
+    --text-dim: #9a9186;
+    --text-muted: #6b6560;
+
+    /* --- Accent: Gold --- */
+    --gold: #d4a73a;
+    --gold-bright: #f0c850;
+    --gold-dim: rgba(212, 167, 58, 0.07);
+    --gold-text: linear-gradient(135deg, #d4a73a 0%, #f0c850 50%, #d4a73a 100%);
+
+    /* --- Semantic --- */
+    --green: #5f9a4e;
+    --green-bg: rgba(95, 154, 78, 0.10);
+    --red: #c94444;
+    --red-bg: rgba(201, 68, 68, 0.10);
+    --blue: #6a9bc7;
+    --blue-bg: rgba(106, 155, 199, 0.10);
+    --orange: #c4883a;
+
+    /* --- Sentiment --- */
+    --sentiment-strong-positive: #5f9a4e;
+    --sentiment-positive: #7fb86e;
+    --sentiment-neutral: #8a8278;
+    --sentiment-negative: #c94444;
+    --sentiment-strong-negative: #a33030;
+
+    /* --- Priority --- */
+    --priority-p0: #c94444;
+    --priority-p1: #d4a73a;
+    --priority-p2: #6a9bc7;
+
+    /* --- Spacing --- */
+    --sp-xs: 0.25rem;
+    --sp-sm: 0.5rem;
+    --sp-md: 1rem;
+    --sp-lg: 1.5rem;
+    --sp-xl: 2rem;
+    --sp-2xl: 3rem;
+    --sp-3xl: 4rem;
+
+    /* --- Theme-specific helpers --- */
+    --surface-alt: rgba(255, 255, 255, 0.02);
+    --surface-inset: rgba(0, 0, 0, 0.3);
+    --surface-hover-subtle: rgba(255, 255, 255, 0.01);
+    --surface-hover: rgba(255, 255, 255, 0.03);
+    --surface-badge-muted: rgba(107, 101, 96, 0.12);
+}
+
+/* ============================================
+   4-LAYER DEPTH SYSTEM
+   ============================================ */
+.depth-hero {
+    background: linear-gradient(145deg, rgba(212, 167, 58, 0.08) 0%, var(--surface) 55%);
+    border: 1px solid var(--border-accent);
+    box-shadow:
+        0 4px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(212, 167, 58, 0.06);
+}
+
+.depth-elevated {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+.depth-default {
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.depth-recessed {
+    background: var(--surface-recessed);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   AMBIENT — Subtle warm grain texture
+   ============================================ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 15% 20%, rgba(212, 167, 58, 0.025) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 80%, rgba(212, 167, 58, 0.015) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   HEADER — Gold accent decorations
+   ============================================ */
+.header {
+    border-bottom-color: var(--border-accent);
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+}
+
+/* ============================================
+   KPI STRIP — First card gold highlight
+   ============================================ */
+.kpi-card:first-child {
+    background: var(--surface-hero);
+}
+
+.kpi-card:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+}
+
+/* ============================================
+   JUDGEMENT PANEL — Circular gold decoration
+   ============================================ */
+.judgement-panel::after {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: -100px;
+    width: 240px;
+    height: 240px;
+    border: 1px solid rgba(212, 167, 58, 0.12);
+    border-radius: 50%;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+/* ============================================
+   SENTIMENT FILL — Subtle highlight overlay
+   ============================================ */
+.sentiment-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 50%);
+}
+
+/* ============================================
+   PERSONA CARD — Gold radial decoration
+   ============================================ */
+.persona-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at corner, var(--gold) 0%, transparent 70%);
+    opacity: 0.06;
+}

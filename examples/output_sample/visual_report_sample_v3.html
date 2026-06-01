@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ product_name or 'Amazon Review Analysis' }} - 评论深度洞察</title>
+    <title>KitchenAid Stand Mixer - 评论深度洞察</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1560,6 +1560,86 @@
         .mb-lg { margin-bottom: var(--sp-lg); }
         .mb-xl { margin-bottom: var(--sp-xl); }
     </style>
+<script>
+window.__ANALYSIS_DATA__ = {
+  "meta": {
+    "template": "premium-gold",
+    "asin": "B001OAXE0S",
+    "analysis_date": "2026-06-01"
+  },
+  "charts": [
+    {
+      "title": "价格感知分布",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "物超所值",
+          "价格合理",
+          "偏贵"
+        ],
+        "values": [
+          340,
+          280,
+          120
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    },
+    {
+      "title": "易用性评价",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "简单易用",
+          "需要学习",
+          "复杂"
+        ],
+        "values": [
+          450,
+          180,
+          80
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    },
+    {
+      "title": "做工认知",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "做工精细",
+          "做工一般",
+          "做工粗糙"
+        ],
+        "values": [
+          380,
+          200,
+          60
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    }
+  ]
+};
+</script>
 </head>
 <body>
     <div class="container">
@@ -1568,13 +1648,13 @@
              ============================================ -->
         <header class="header">
             <div class="header-meta">
-                <div class="header-meta-item">ASIN: {{ asin }}</div>
-                <div class="header-meta-item">{{ analysis_date }}</div>
+                <div class="header-meta-item">ASIN: B001OAXE0S</div>
+                <div class="header-meta-item">2026-06-01</div>
                 <div class="header-meta-item">Amazon Review Analysis</div>
             </div>
-            <h1 class="header-title">{{ product_name or 'Product Review Analysis' }}<br>评论深度洞察报告</h1>
+            <h1 class="header-title">KitchenAid Stand Mixer<br>评论深度洞察报告</h1>
             <p class="header-subtitle">
-                共分析 {{ summary.total_reviews }} 条评论，完成 {{ summary.tagged_reviews }} 条有效打标；正面评价 {{ summary.positive_rate }}%，负面风险 {{ summary.negative_rate }}%，平均评分 {{ summary.avg_rating|round(1) }}/5
+                共分析 1284 条评论，完成 1146 条有效打标；正面评价 68.2%，负面风险 12.3%，平均评分 4.3/5
             </p>
         </header>
 
@@ -1584,23 +1664,23 @@
         <div class="kpi-strip">
             <div class="kpi-card">
                 <div class="kpi-label">Total Reviews</div>
-                <div class="kpi-value">{{ summary.total_reviews }}<span class="kpi-unit">条</span></div>
+                <div class="kpi-value">1284<span class="kpi-unit">条</span></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Positive Rate</div>
-                <div class="kpi-value">{{ summary.positive_rate }}<span class="kpi-unit">%</span></div>
+                <div class="kpi-value">68.2<span class="kpi-unit">%</span></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Negative Risk</div>
-                <div class="kpi-value">{{ summary.negative_rate }}<span class="kpi-unit">%</span></div>
+                <div class="kpi-value">12.3<span class="kpi-unit">%</span></div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Avg Rating</div>
-                <div class="kpi-value">{{ summary.avg_rating|round(1) }}<span class="kpi-unit">/5</span></div>
+                <div class="kpi-value">4.3<span class="kpi-unit">/5</span></div>
             </div>
         </div>
 
-        {% if premium_dashboard %}
+        
         <!-- ============================================
              01 — 洞察总览
              ============================================ -->
@@ -1616,65 +1696,95 @@
             <div class="editorial-hero">
                 <div class="judgement-panel depth-hero">
                     <div class="kicker">Board Judgement</div>
-                    <div class="judgement-title">{{ premium_dashboard.hero_judgement }}</div>
-                    <div class="judgement-detail">{{ premium_dashboard.hero_detail or overview_lead }}</div>
+                    <div class="judgement-title">搅拌性能是核心护城河</div>
+                    <div class="judgement-detail">85% 正面评价提及"均匀""省力"</div>
                 </div>
                 <div class="tension-panel">
                     <div>
                         <div class="kicker" style="color: var(--red);">Core Tension</div>
                         <div class="tension-title">增长不是问题，失控点才是问题</div>
-                        <div class="tension-text">{{ premium_dashboard.core_tension }}</div>
+                        <div class="tension-text">68.2% 正面评价证明产品价值成立，但 12.3% 负面评价集中指向「痛点1: 电机耐久性不足」。当前看板的关键不是继续证明好评，而是识别哪一个短板会吞噬增长。</div>
                     </div>
                     <div class="tension-metrics">
                         <div class="tension-metric">
                             <span>有效样本</span>
-                            <strong>{{ summary.tagged_reviews }} / {{ summary.total_reviews }}</strong>
+                            <strong>1146 / 1284</strong>
                         </div>
                         <div class="tension-metric">
                             <span>正面 / 负面</span>
-                            <strong>{{ summary.positive_rate }}% / {{ summary.negative_rate }}%</strong>
+                            <strong>68.2% / 12.3%</strong>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="quadrant-grid">
-                {% for item in premium_dashboard.quadrants %}
-                <div class="quadrant-card depth-default" data-accent="{{ item.accent }}" style="--i: {{ loop.index0 }}">
-                    <div class="quadrant-eyebrow">{{ item.eyebrow }}</div>
-                    <div class="quadrant-title">{{ item.title }}</div>
-                    <div class="quadrant-text">{{ item.text }}</div>
+                
+                <div class="quadrant-card depth-default" data-accent="gold" style="--i: 0">
+                    <div class="quadrant-eyebrow">Audience</div>
+                    <div class="quadrant-title">核心人群</div>
+                    <div class="quadrant-text">核心人群特征：女性为主，25-40岁，每周烘焙2-3次；多功能、稳定的搅拌体验，解放双手</div>
                 </div>
-                {% endfor %}
+                
+                <div class="quadrant-card depth-default" data-accent="green" style="--i: 1">
+                    <div class="quadrant-eyebrow">Value</div>
+                    <div class="quadrant-title">价值验证</div>
+                    <div class="quadrant-text">85%用户认可搅拌均匀度和效率；正面提及"均匀"340次</div>
+                </div>
+                
+                <div class="quadrant-card depth-default" data-accent="red" style="--i: 2">
+                    <div class="quadrant-eyebrow">Risk</div>
+                    <div class="quadrant-title">失控风险</div>
+                    <div class="quadrant-text">严重性：致命；连续使用15分钟以上容易过热停机</div>
+                </div>
+                
+                <div class="quadrant-card depth-default" data-accent="blue" style="--i: 3">
+                    <div class="quadrant-eyebrow">Move</div>
+                    <div class="quadrant-title">优先动作</div>
+                    <div class="quadrant-text">[P0] | 优化电机散热系统 → 减少40%负面评价</div>
+                </div>
+                
             </div>
 
-            {% if overview_insights %}
+            
             <div class="insights-grid">
-                {% for insight in overview_insights %}
-                <div class="insight-card" style="--i: {{ loop.index0 }}">
-                    <div class="insight-card-number">{{ loop.index }}</div>
-                    <div class="insight-card-title">{{ insight.title }}</div>
-                    <div class="insight-card-desc">{{ insight.desc }}</div>
+                
+                <div class="insight-card" style="--i: 0">
+                    <div class="insight-card-number">1</div>
+                    <div class="insight-card-title">搅拌性能是核心护城河</div>
+                    <div class="insight-card-desc">85% 正面评价提及"均匀""省力"</div>
                 </div>
-                {% endfor %}
+                
+                <div class="insight-card" style="--i: 1">
+                    <div class="insight-card-number">2</div>
+                    <div class="insight-card-title">外观设计驱动冲动消费</div>
+                    <div class="insight-card-desc">颜值即正义</div>
+                </div>
+                
+                <div class="insight-card" style="--i: 2">
+                    <div class="insight-card-number">3</div>
+                    <div class="insight-card-title">电机耐久性是最大风险</div>
+                    <div class="insight-card-desc">连续使用场景下的过热问题</div>
+                </div>
+                
             </div>
-            {% endif %}
+            
 
-            {% if overview_positioning %}
+            
             <div class="positioning-block">
                 <div class="positioning-label">产品定位</div>
-                <div class="positioning-text">{{ overview_positioning }}</div>
+                <div class="positioning-text">: 高颜值家用搅拌器，适合日常烘焙但不适合高强度商用场景 战略方向: 巩固"专业家用"定位，修复耐久性口碑，拓展轻商用市场</div>
             </div>
-            {% endif %}
+            
 
-            {% if strategy_direction %}
+            
             <div class="positioning-block" style="margin-top: var(--sp-md);">
                 <div class="positioning-label">战略方向</div>
-                <div class="positioning-text">{{ strategy_direction }}</div>
+                <div class="positioning-text">: 巩固"专业家用"定位，修复耐久性口碑，拓展轻商用市场</div>
             </div>
-            {% endif %}
+            
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              02 — 情感分布
@@ -1690,24 +1800,58 @@
 
             <div class="sentiment-chart depth-elevated">
                 <div class="sentiment-bars">
-                    {% set sentiment_order = [
-                        ('强烈推荐', 'var(--sentiment-strong-positive)'),
-                        ('推荐', 'var(--sentiment-positive)'),
-                        ('中立', 'var(--sentiment-neutral)'),
-                        ('不推荐', 'var(--sentiment-negative)'),
-                        ('强烈不推荐', 'var(--sentiment-strong-negative)')
-                    ] %}
-                    {% for label, color in sentiment_order %}
-                    {% set count = sentiment_distribution.get(label, 0) %}
-                    {% set percent = (count / summary.tagged_reviews * 100)|round(1) if summary.tagged_reviews > 0 else 0 %}
+                    
+                    
+                    
+                    
                     <div class="sentiment-bar">
-                        <div class="sentiment-label">{{ label }}</div>
+                        <div class="sentiment-label">强烈推荐</div>
                         <div class="sentiment-track">
-                            <div class="sentiment-fill" style="width: {{ percent }}%; --sentiment-color: {{ color }};"></div>
+                            <div class="sentiment-fill" style="width: 22.0%; --sentiment-color: var(--sentiment-strong-positive);"></div>
                         </div>
-                        <div class="sentiment-value">{{ count }} ({{ percent }}%)</div>
+                        <div class="sentiment-value">252 (22.0%)</div>
                     </div>
-                    {% endfor %}
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 46.2%; --sentiment-color: var(--sentiment-positive);"></div>
+                        </div>
+                        <div class="sentiment-value">530 (46.2%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">中立</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 19.5%; --sentiment-color: var(--sentiment-neutral);"></div>
+                        </div>
+                        <div class="sentiment-value">223 (19.5%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">不推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 9.8%; --sentiment-color: var(--sentiment-negative);"></div>
+                        </div>
+                        <div class="sentiment-value">112 (9.8%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">强烈不推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 2.5%; --sentiment-color: var(--sentiment-strong-negative);"></div>
+                        </div>
+                        <div class="sentiment-value">29 (2.5%)</div>
+                    </div>
+                    
                 </div>
             </div>
         </section>
@@ -1715,47 +1859,71 @@
         <!-- ============================================
              03 — 核心用户画像
              ============================================ -->
-        {% if user_segments %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">03</span>
                 <div>
                     <h2 class="section-title">核心用户画像</h2>
-                    <p class="section-subtitle">基于 {{ summary.tagged_reviews }} 条评论识别的典型用户群体</p>
+                    <p class="section-subtitle">基于 1146 条评论识别的典型用户群体</p>
                 </div>
             </div>
 
             <div class="personas-grid">
-                {% for segment in user_segments %}
-                <div class="persona-card depth-elevated" style="--i: {{ loop.index0 }}">
+                
+                <div class="persona-card depth-elevated" style="--i: 0">
                     <div class="persona-header">
-                        <div class="persona-name">{{ segment.title }}</div>
-                        {% if segment.share %}
-                        <div class="persona-count">{{ segment.share }}</div>
-                        {% endif %}
+                        <div class="persona-name">烘焙爱好者</div>
+                        
+                        <div class="persona-count">35%</div>
+                        
                     </div>
-                    {% if segment.need %}
-                    <div class="segment-need">{{ segment.need }}</div>
-                    {% endif %}
-                    {% if segment.traits %}
+                    
+                    <div class="segment-need">多功能、稳定的搅拌体验，解放双手</div>
+                    
+                    
                     <div class="persona-tags">
-                        {% for trait in segment.traits %}
-                        <span class="persona-tag">{{ trait }}</span>
-                        {% endfor %}
+                        
+                        <span class="persona-tag">女性为主，25-40岁，每周烘焙2-3次</span>
+                        
                     </div>
-                    {% endif %}
-                    {% if segment.quotes %}
-                    {% for quote in segment.quotes %}
-                    <blockquote class="user-quote" style="margin-top: var(--sp-md);">{{ quote }}</blockquote>
-                    {% endfor %}
-                    {% endif %}
+                    
+                    
                 </div>
-                {% endfor %}
+                
+                <div class="persona-card depth-elevated" style="--i: 1">
+                    <div class="persona-header">
+                        <div class="persona-name">家庭主厨</div>
+                        
+                        <div class="persona-count">28%</div>
+                        
+                    </div>
+                    
+                    <div class="segment-need">节省时间，处理多种食材</div>
+                    
+                    
+                    
+                </div>
+                
+                <div class="persona-card depth-elevated" style="--i: 2">
+                    <div class="persona-header">
+                        <div class="persona-name">专业用户</div>
+                        
+                        <div class="persona-count">22%</div>
+                        
+                    </div>
+                    
+                    <div class="segment-need">高性能、长时间连续运行</div>
+                    
+                    
+                    
+                </div>
+                
             </div>
         </section>
-        {% endif %}
+        
 
-        {% if dashboard_charts %}
+        
         <!-- ============================================
              04 — 数据遥测矩阵
              ============================================ -->
@@ -1769,22 +1937,64 @@
             </div>
 
             <div class="charts-grid">
-                {% for chart in dashboard_charts %}
+                
                 <div class="chart-card depth-elevated">
-                    <div class="chart-title">{{ chart.title }}</div>
+                    <div class="chart-title">价格感知分布</div>
                     <div class="chart-frame">
-                        <canvas id="{{ chart.id }}"></canvas>
+                        <canvas id="dashboardChart0"></canvas>
                     </div>
                 </div>
-                {% endfor %}
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">易用性评价</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart1"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">做工认知</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart2"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">使用场景</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart3"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">外观设计</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart4"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">舒适度</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart5"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">耐用性</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart6"></canvas>
+                    </div>
+                </div>
+                
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              05 — 核心卖点 & 痛点
              ============================================ -->
-        {% if selling_points or pain_points %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">05</span>
@@ -1801,24 +2011,35 @@
                         Brand Moat
                     </div>
                     <div class="cards-list">
-                        {% for sp in selling_points %}
+                        
                         <div class="selling-card">
-                            <div class="selling-card-title">{{ sp.title }}</div>
-                            {% if sp.finding %}
-                            <div class="selling-card-finding">{{ sp.finding }}</div>
-                            {% endif %}
-                            {% if sp.data %}
-                            <div class="selling-card-data">{{ sp.data }}</div>
-                            {% endif %}
-                            {% if sp.quotes %}
-                            {% for quote in sp.quotes %}
-                            {% if quote %}
-                            <blockquote class="user-quote">{{ quote }}</blockquote>
-                            {% endif %}
-                            {% endfor %}
-                            {% endif %}
+                            <div class="selling-card-title">卖点1: 搅拌性能卓越</div>
+                            
+                            <div class="selling-card-finding">85%用户认可搅拌均匀度和效率</div>
+                            
+                            
+                            <div class="selling-card-data">正面提及"均匀"340次</div>
+                            
+                            
+                            
+                            
+                            <blockquote class="user-quote">面团搅拌得非常均匀，比手工好十倍</blockquote>
+                            
+                            
+                            
                         </div>
-                        {% endfor %}
+                        
+                        <div class="selling-card">
+                            <div class="selling-card-title">卖点2: 外观设计出众</div>
+                            
+                            <div class="selling-card-finding">颜值驱动购买决策</div>
+                            
+                            
+                            <div class="selling-card-data">正面提及"好看"250次</div>
+                            
+                            
+                        </div>
+                        
                     </div>
                 </div>
 
@@ -1828,43 +2049,59 @@
                         Vulnerability
                     </div>
                     <div class="cards-list">
-                        {% for pp in pain_points %}
-                        {% set severity_class = 'minor' %}
-                        {% if pp.severity == '致命' or pp.severity == 'critical' %}
-                        {% set severity_class = 'critical' %}
-                        {% elif pp.severity == '严重' or pp.severity == 'major' %}
-                        {% set severity_class = 'major' %}
-                        {% endif %}
-                        <div class="pain-card severity-{{ severity_class }}">
-                            {% if pp.severity and pp.severity not in ('一般', '') %}
-                            <span class="severity-badge {{ severity_class }}">{{ pp.severity }}</span>
-                            {% endif %}
-                            <div class="pain-card-title">{{ pp.title }}</div>
-                            {% if pp.finding %}
-                            <div class="pain-card-finding">{{ pp.finding }}</div>
-                            {% endif %}
-                            {% if pp.data %}
-                            <div class="pain-card-data">{{ pp.data }}</div>
-                            {% endif %}
-                            {% if pp.quotes %}
-                            {% for quote in pp.quotes %}
-                            {% if quote %}
-                            <blockquote class="user-quote">{{ quote }}</blockquote>
-                            {% endif %}
-                            {% endfor %}
-                            {% endif %}
+                        
+                        
+                        
+                        
+                        
+                        <div class="pain-card severity-critical">
+                            
+                            <span class="severity-badge critical">致命</span>
+                            
+                            <div class="pain-card-title">痛点1: 电机耐久性不足</div>
+                            
+                            <div class="pain-card-finding">连续使用15分钟以上容易过热停机</div>
+                            
+                            
+                            <div class="pain-card-data">负面提及"过热"89次</div>
+                            
+                            
+                            
+                            
+                            <blockquote class="user-quote">用了一年，电机开始过热</blockquote>
+                            
+                            
+                            
                         </div>
-                        {% endfor %}
+                        
+                        
+                        
+                        
+                        
+                        <div class="pain-card severity-major">
+                            
+                            <span class="severity-badge major">严重</span>
+                            
+                            <div class="pain-card-title">痛点2: 配件接口松动</div>
+                            
+                            <div class="pain-card-finding">长时间使用后接口磨损导致异响</div>
+                            
+                            
+                            <div class="pain-card-data">负面提及"松动"67次</div>
+                            
+                            
+                        </div>
+                        
                     </div>
                 </div>
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              06 — 典型用户深度解析
              ============================================ -->
-        {% if user_stories %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">06</span>
@@ -1874,40 +2111,90 @@
                 </div>
             </div>
             <div class="stories-grid">
-                {% for story in user_stories %}
-                <div class="story-card" style="--i: {{ loop.index0 }}">
-                    <div class="story-sentiment-bar {{ story.sentiment_class }}"></div>
+                
+                <div class="story-card" style="--i: 0">
+                    <div class="story-sentiment-bar positive"></div>
                     <div class="story-content">
-                        <div class="story-title">{{ story.title }}</div>
-                        {% if story.profile %}
-                        <div class="story-profile">{{ story.profile }}</div>
-                        {% endif %}
-                        {% if story.sentiment %}
+                        <div class="story-title">故事1: 每日烘焙者的依赖</div>
+                        
+                        <div class="story-profile">烘焙爱好者，女性，30-39岁</div>
+                        
+                        
                         <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
-                            情感倾向：{{ story.sentiment }}
+                            情感倾向：正面
                         </div>
-                        {% endif %}
-                        {% if story.need %}
-                        <div class="story-need">{{ story.need }}</div>
-                        {% endif %}
-                        {% if story.quotes %}
+                        
+                        
+                        <div class="story-need">稳定可靠的日常工具</div>
+                        
+                        
                         <div class="story-quotes">
-                            {% for quote in story.quotes %}
-                            <div class="story-quote">{{ quote }}</div>
-                            {% endfor %}
+                            
+                            <div class="story-quote">每天早上用它做面包，已经离不开它了</div>
+                            
                         </div>
-                        {% endif %}
+                        
                     </div>
                 </div>
-                {% endfor %}
+                
+                <div class="story-card" style="--i: 1">
+                    <div class="story-sentiment-bar mixed"></div>
+                    <div class="story-content">
+                        <div class="story-title">故事2: 送礼场景的满意与遗憾</div>
+                        
+                        <div class="story-profile">男性，送礼给妻子</div>
+                        
+                        
+                        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
+                            情感倾向：混合
+                        </div>
+                        
+                        
+                        <div class="story-need">品牌感和仪式感</div>
+                        
+                        
+                        <div class="story-quotes">
+                            
+                            <div class="story-quote">老婆很开心，但用了半年电机出问题了</div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="story-card" style="--i: 2">
+                    <div class="story-sentiment-bar negative"></div>
+                    <div class="story-content">
+                        <div class="story-title">故事3: 专业用户的失望</div>
+                        
+                        <div class="story-profile">小型烘焙工作室经营者</div>
+                        
+                        
+                        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
+                            情感倾向：负面
+                        </div>
+                        
+                        
+                        <div class="story-need">长时间连续运行</div>
+                        
+                        
+                        <div class="story-quotes">
+                            
+                            <div class="story-quote">连续做三批面团就过热停了</div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              07 — 改进建议
              ============================================ -->
-        {% if improvements %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">07</span>
@@ -1918,34 +2205,94 @@
             </div>
 
             <div class="improvements-groups">
-                {% for group_key, group_items in improvements.items() %}
-                {% if group_items %}
+                
+                
                 <div class="improvement-group">
-                    {% set group_label = {'product': '产品改进', 'service': '服务改进', 'expectation': '用户期望'}.get(group_key, group_key) %}
-                    <div class="improvement-group-title">{{ group_label }}</div>
-                    {% for item in group_items %}
-                    {% set p_class = 'p' ~ item.priority|replace('P', '')|replace('p', '') %}
+                    
+                    <div class="improvement-group-title">产品改进</div>
+                    
+                    
                     <div class="improvement-item">
-                        <span class="priority-badge {{ p_class }}">{{ item.priority }}</span>
+                        <span class="priority-badge p0">P0</span>
                         <div class="improvement-content">
-                            <div class="improvement-title">{{ item.title }}</div>
-                            {% if item.desc %}
-                            <div class="improvement-desc">{{ item.desc }}</div>
-                            {% endif %}
+                            <div class="improvement-title">优化电机散热系统</div>
+                            
+                            <div class="improvement-desc">解决过热停机问题</div>
+                            
                         </div>
                     </div>
-                    {% endfor %}
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p1">P1</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">加固配件接口设计</div>
+                            
+                            <div class="improvement-desc">减少磨损导致的松动</div>
+                            
+                        </div>
+                    </div>
+                    
                 </div>
-                {% endif %}
-                {% endfor %}
+                
+                
+                
+                <div class="improvement-group">
+                    
+                    <div class="improvement-group-title">服务改进</div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p0">P0</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">建立快速售后通道</div>
+                            
+                            <div class="improvement-desc">配件更换无需整机寄回</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p1">P1</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">提供延保服务</div>
+                            
+                            <div class="improvement-desc">增强用户对耐久性的信心</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                
+                <div class="improvement-group">
+                    
+                    <div class="improvement-group-title">用户期望</div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p2">P2</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">明确标注适用场景</div>
+                            
+                            <div class="improvement-desc">降低商用用户的错误预期</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              08 — 机会与差异化
              ============================================ -->
-        {% if opportunities %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">08</span>
@@ -1956,30 +2303,33 @@
             </div>
 
             <div class="opportunities-grid">
-                {% for opp in opportunities %}
-                <div class="opportunity-card" style="--i: {{ loop.index0 }}">
-                    <div class="opportunity-card-title">{{ opp.title }}</div>
-                    <div class="opportunity-card-finding">{{ opp.finding }}</div>
-                    {% if opp.data %}
-                    <div class="opportunity-card-data">{{ opp.data }}</div>
-                    {% endif %}
-                    {% if opp.quotes %}
-                    {% for quote in opp.quotes %}
-                    {% if quote %}
-                    <blockquote class="user-quote">{{ quote }}</blockquote>
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
+                
+                <div class="opportunity-card" style="--i: 0">
+                    <div class="opportunity-card-title">机会1: 轻商用市场</div>
+                    <div class="opportunity-card-finding">22%用户有轻度商用需求但当前产品无法满足</div>
+                    
+                    <div class="opportunity-card-data">"工作室""小店"提及率15%</div>
+                    
+                    
                 </div>
-                {% endfor %}
+                
+                <div class="opportunity-card" style="--i: 1">
+                    <div class="opportunity-card-title">机会2: 配件生态</div>
+                    <div class="opportunity-card-finding">用户强烈希望更多功能扩展</div>
+                    
+                    <div class="opportunity-card-data">"配件""扩展"提及率28%</div>
+                    
+                    
+                </div>
+                
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              09 — 行动决策仪表盘
              ============================================ -->
-        {% if action_table or quick_wins %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">09</span>
@@ -1989,7 +2339,7 @@
                 </div>
             </div>
 
-            {% if action_table %}
+            
             <div class="action-table-wrapper">
                 <table class="action-table">
                     <thead>
@@ -2001,38 +2351,59 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in action_table %}
-                        {% set p_class = 'p' ~ row.priority|replace('P', '')|replace('p', '') %}
+                        
+                        
                         <tr>
-                            <td>{{ row.action }}</td>
-                            <td><span class="priority-badge {{ p_class }}">{{ row.priority }}</span></td>
-                            <td>{{ row.impact }}</td>
-                            <td>{{ row.source }}</td>
+                            <td>| 优化电机散热系统</td>
+                            <td><span class="priority-badge p0">P0</span></td>
+                            <td>减少40%负面评价</td>
+                            <td>痛点1</td>
                         </tr>
-                        {% endfor %}
+                        
+                        
+                        <tr>
+                            <td>建立快速售后通道</td>
+                            <td><span class="priority-badge p0">P0</span></td>
+                            <td>提升复购率15%</td>
+                            <td>痛点2</td>
+                        </tr>
+                        
+                        
+                        <tr>
+                            <td>加固配件接口</td>
+                            <td><span class="priority-badge p1">P1</span></td>
+                            <td>减少异响投诉30%</td>
+                            <td>痛点2</td>
+                        </tr>
+                        
                     </tbody>
                 </table>
             </div>
-            {% endif %}
+            
 
-            {% if quick_wins %}
+            
             <div class="subsection-title">快速胜利</div>
             <div class="quick-wins-grid">
-                {% for qw in quick_wins %}
-                <div class="quick-win-card" style="--i: {{ loop.index0 }}">
-                    <div class="quick-win-title">{{ qw.title }}</div>
-                    <div class="quick-win-desc">{{ qw.desc }}</div>
+                
+                <div class="quick-win-card" style="--i: 0">
+                    <div class="quick-win-title">配件单独售卖</div>
+                    <div class="quick-win-desc">降低售后门槛，减少用户不满</div>
                 </div>
-                {% endfor %}
+                
+                <div class="quick-win-card" style="--i: 1">
+                    <div class="quick-win-title">使用指南视频</div>
+                    <div class="quick-win-desc">教用户正确使用避免过热</div>
+                </div>
+                
             </div>
-            {% endif %}
+            
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              10 — 精选评论样本
              ============================================ -->
-        {% if golden_samples %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">10</span>
@@ -2042,46 +2413,97 @@
                 </div>
             </div>
             <div class="samples-list">
-                {% for sample in golden_samples %}
-                {% set sent_class = 'neutral' %}
-                {% if sample.sentiment in ('强烈推荐', '推荐') %}
-                {% set sent_class = sample.sentiment == '强烈推荐' and 'strong-positive' or 'positive' %}
-                {% elif sample.sentiment in ('不推荐', '强烈不推荐') %}
-                {% set sent_class = sample.sentiment == '强烈不推荐' and 'strong-negative' or 'negative' %}
-                {% endif %}
+                
+                
+                
+                
+                
                 <div class="sample-card" onclick="this.classList.toggle('expanded')">
                     <div class="sample-header">
-                        <span class="sample-sentiment {{ sent_class }}">{{ sample.sentiment }}</span>
-                        {% if sample.rating %}
+                        <span class="sample-sentiment positive">推荐</span>
+                        
                         <div class="sample-rating">
-                            {% for i in range(5) %}
-                            {% if i < (sample.rating|round|int) %}★{% else %}☆{% endif %}
-                            {% endfor %}
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ☆
+                            
                         </div>
-                        {% endif %}
+                        
                     </div>
                     <div class="sample-body">
-                        <p class="sample-text">{{ sample.body }}</p>
-                        {% if sample.tags %}
+                        <p class="sample-text">用了半年，搅拌面团非常均匀。唯一缺点是重量大。</p>
+                        
                         <div class="sample-tags">
-                            {% for tag_key, tag_val in sample.tags.items() %}
-                            {% if tag_val and tag_val not in ('不明', '未提及', '无') %}
-                            <span class="sample-tag">{{ tag_val }}</span>
-                            {% endif %}
-                            {% endfor %}
+                            
+                            
+                            <span class="sample-tag">女</span>
+                            
+                            
+                            
+                            <span class="sample-tag">家庭烘焙</span>
+                            
+                            
                         </div>
-                        {% endif %}
+                        
                     </div>
                 </div>
-                {% endfor %}
+                
+                
+                
+                
+                
+                <div class="sample-card" onclick="this.classList.toggle('expanded')">
+                    <div class="sample-header">
+                        <span class="sample-sentiment strong-positive">强烈推荐</span>
+                        
+                        <div class="sample-rating">
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                        </div>
+                        
+                    </div>
+                    <div class="sample-body">
+                        <p class="sample-text">送给老婆的生日礼物，她非常喜欢。</p>
+                        
+                        <div class="sample-tags">
+                            
+                            
+                            <span class="sample-tag">男</span>
+                            
+                            
+                            
+                            <span class="sample-tag">送礼</span>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              11 — 深度内容（剩余章节）
              ============================================ -->
-        {% if remaining_chapters_html and remaining_chapters_html.strip() %}
+        
         <section class="section">
             <div class="section-header">
                 <span class="section-number">11</span>
@@ -2092,17 +2514,28 @@
             </div>
 
             <div class="deep-content depth-default" style="padding: var(--sp-xl); border-radius: 10px;">
-                {{ remaining_chapters_html }}
+                <h2>评论时间趋势</h2>
+<p>评论量在过去12个月稳步增长，尤其在11-12月送礼季出现显著峰值。正面评价比例在3月后有所下降，与电机过热投诉增加的时间吻合。</p>
+<hr />
+<h2>评分与文本情感背离</h2>
+<p>约8%的评论存在评分-文本背离现象。这类背离主要集中在物流和包装维度。</p>
+<hr />
+<h2>关键词聚类</h2>
+<p>高频关键词可分为5个聚类：搅拌品质类、外观审美类、耐久性类、性价比类、服务类。</p>
+<hr />
+<h2>购买动机归因链</h2>
+<p>购买动机呈现明显的&quot;内容种草→品牌认知→场景匹配&quot;链路。60%用户提到在社交媒体看到推荐，40%是直接搜索品牌名进入。</p>
+
             </div>
         </section>
-        {% endif %}
+        
 
         <!-- ============================================
              FOOTER
              ============================================ -->
         <footer class="footer">
             <div class="footer-logo">Amazon Review Analyzer</div>
-            <p>Generated by AI &middot; {{ analysis_date }}</p>
+            <p>Generated by AI &middot; 2026-06-01</p>
             <p style="margin-top: 0.5rem; font-size: 0.7rem;">
                 Powered by Claude AI &middot; Multi-Dimension Tag System &middot; User Persona Analysis
             </p>
@@ -2124,7 +2557,7 @@
             Chart.defaults.color = '#9a9186';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
 
-            var dashboardCharts = {{ dashboard_charts|tojson }};
+            var dashboardCharts = [{"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [340, 280, 120], "label": "\u4ef7\u683c\u611f\u77e5\u5206\u5e03"}], "labels": ["\u7269\u8d85\u6240\u503c", "\u4ef7\u683c\u5408\u7406", "\u504f\u8d35"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart0", "title": "\u4ef7\u683c\u611f\u77e5\u5206\u5e03", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [450, 180, 80], "label": "\u6613\u7528\u6027\u8bc4\u4ef7"}], "labels": ["\u7b80\u5355\u6613\u7528", "\u9700\u8981\u5b66\u4e60", "\u590d\u6742"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart1", "title": "\u6613\u7528\u6027\u8bc4\u4ef7", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [380, 200, 60], "label": "\u505a\u5de5\u8ba4\u77e5"}], "labels": ["\u505a\u5de5\u7cbe\u7ec6", "\u505a\u5de5\u4e00\u822c", "\u505a\u5de5\u7c97\u7cd9"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart2", "title": "\u505a\u5de5\u8ba4\u77e5", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [380, 200, 90], "label": "\u4f7f\u7528\u573a\u666f"}], "labels": ["\u5bb6\u5ead\u70d8\u7119", "\u9001\u793c", "\u5546\u7528"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u4f7f\u7528\u573a\u666f"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart3", "title": "\u4f7f\u7528\u573a\u666f", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [300, 200, 80], "label": "\u5916\u89c2\u8bbe\u8ba1"}], "labels": ["\u65f6\u5c1a", "\u7b80\u7ea6", "\u4f20\u7edf"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u5916\u89c2\u8bbe\u8ba1"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart4", "title": "\u5916\u89c2\u8bbe\u8ba1", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [350, 200, 60], "label": "\u8212\u9002\u5ea6"}], "labels": ["\u5f88\u8212\u9002", "\u4e00\u822c", "\u4e0d\u8212\u9002"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u8212\u9002\u5ea6"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart5", "title": "\u8212\u9002\u5ea6", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [350, 250, 90], "label": "\u8010\u7528\u6027"}], "labels": ["\u975e\u5e38\u8010\u7528", "\u4e00\u822c\u8010\u7528", "\u5bb9\u6613\u635f\u574f"]}, "options": {"indexAxis": "y", "maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u8010\u7528\u6027"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart6", "title": "\u8010\u7528\u6027", "type": "bar"}];
             dashboardCharts.forEach(function(item) {
                 var canvas = document.getElementById(item.id);
                 if (!canvas || !item.config) return;

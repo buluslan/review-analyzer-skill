@@ -31,8 +31,31 @@ _TEMPLATES_ROOT = Path(__file__).parent / "templates"
 # 模板发现
 # ---------------------------------------------------------------------------
 
+def _load_theme_meta(theme_dir: Path) -> dict:
+    """读取主题目录下的 meta.json。
+
+    Args:
+        theme_dir: 主题目录路径
+
+    Returns:
+        meta.json 内容字典，不存在时返回空字典。
+    """
+    meta_path = theme_dir / "meta.json"
+    if meta_path.exists():
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
 def _discover_templates() -> List[Dict[str, str]]:
     """扫描模板目录，返回所有可用模板。
+
+    支持两种模板格式：
+      - 新架构（共享基座）: ``{theme_name}/theme.css`` 存在
+      - 旧架构（独立模板）: ``{theme_name}/dashboard.html`` 存在
 
     Returns:
         模板描述列表，每项包含 name / description / path。
@@ -46,28 +69,27 @@ def _discover_templates() -> List[Dict[str, str]]:
     for child in sorted(_TEMPLATES_ROOT.iterdir()):
         if not child.is_dir():
             continue
-        dashboard_html = child / "dashboard.html"
-        if not dashboard_html.exists():
+        # 跳过基座目录
+        if child.name == "base":
             continue
 
-        # 尝试读取 meta.json 获取描述，否则使用目录名
-        meta_path = child / "meta.json"
-        description = ""
-        if meta_path.exists():
-            try:
-                with open(meta_path, "r", encoding="utf-8") as f:
-                    meta = json.load(f)
-                    description = meta.get("description", "")
-            except Exception:
-                pass
+        # 优先检测新架构（theme.css）
+        theme_css = child / "theme.css"
+        dashboard_html = child / "dashboard.html"
 
+        if not theme_css.exists() and not dashboard_html.exists():
+            continue
+
+        # 读取 meta.json 获取描述
+        meta = _load_theme_meta(child)
+        description = meta.get("description", "")
         if not description:
             description = f"{child.name} 模板"
 
         results.append({
             "name": child.name,
             "description": description,
-            "path": str(dashboard_html),
+            "path": str(theme_css if theme_css.exists() else dashboard_html),
         })
 
     return results
@@ -150,6 +172,9 @@ def _normalize_insights_markdown(insights_md: str) -> str:
         return ""
 
     text = re.sub(r"<whiteboard\b[^>]*></whiteboard>", "", insights_md)
+
+    # Strip strategic_json blocks before any chapter parsing
+    text = re.sub(r"<strategic_json>.*?</strategic_json>", "", text, flags=re.DOTALL)
 
     # Feishu export may collapse adjacent bold fields into one paragraph:
     # **严重性**：致命**核心发现**：...
@@ -1002,15 +1027,21 @@ def _split_insights_for_template(insights_md: str) -> dict:
                 )
                 if section_match:
                     items_text = section_match.group(1)
-                    # 提取 - [**P0**] **标题** — 描述
+                    # 格式1: - [**P0**] **标题** — 描述（标题有粗体）
                     p_items = re.findall(
                         r"-\s*\[\*\*(P\d+)\*\*\]\s*\*\*(.+?)\*\*\s*[—–-]+\s*(.+?)(?:\n|$)",
                         items_text,
                     )
+                    # 格式2: - [**P0**] 标题 — 描述（标题无粗体）—— 降级匹配
+                    if not p_items:
+                        p_items = re.findall(
+                            r"-\s*\[\*\*(P\d+)\*\*\]\s*(.+?)\s*[—–-]+\s*(.+?)(?:\n|$)",
+                            items_text,
+                        )
                     for priority, title, desc in p_items:
                         improvements[category].append({
                             "priority": priority,
-                            "title": title,
+                            "title": title.strip(),
                             "desc": desc.strip(),
                         })
             break
@@ -1135,8 +1166,16 @@ def _jinja2_render(
     template_content: str,
     analysis_data: dict,
     chart_configs: list,
+    extra_context: dict = None,
 ) -> str:
-    """使用 Jinja2 对模板中的 {{ }} 占位符进行渲染。"""
+    """使用 Jinja2 对模板中的 {{ }} 占位符进行渲染。
+
+    Args:
+        template_content: 模板 HTML 字符串
+        analysis_data: 分析结果字典
+        chart_configs: ChartConfig 对象列表
+        extra_context: 额外的 Jinja2 上下文变量（共享基座模式使用）
+    """
     if not JINJA2_AVAILABLE:
         raise RuntimeError("jinja2 未安装，无法渲染模板。请运行: pip install jinja2")
 
@@ -1198,18 +1237,36 @@ def _jinja2_render(
         if len(dashboard_charts) >= 6:
             break
 
+    # Supplement: generate charts from dimensional_stats for dimensions
+    # not already covered by chart_configs.  Uses keyword-based substring
+    # matching to avoid duplicates (e.g. "价格感知分布" already covers "价格感知").
     dimensional_stats = analysis_data.get("dimensional_stats") or analysis_data.get("statistics", {}).get("dimensional_stats", {})
     fallback_chart_specs = [
         ("价格感知", "体验_价格感知", False),
-        ("易用性体验", "体验_易用性", False),
-        ("做工认知", "质量_做工", True),
-        ("耐用性信号", "质量_耐用性", True),
+        ("易用性", "体验_易用性", False),
+        ("使用场景", "场景_使用场景", False),
+        ("外观设计", "体验_外观设计", False),
+        ("舒适度", "体验_舒适度", False),
+        ("做工", "质量_做工", True),
+        ("耐用性", "质量_耐用性", True),
     ]
-    existing_titles = {item["title"] for item in dashboard_charts}
+    existing_keywords = set()
+    for item in dashboard_charts:
+        t = item["title"].lower()
+        # Extract core keyword: take first 2-4 chars of the title
+        for kw in ["价格", "易用", "场景", "外观", "舒适", "做工", "耐用", "功能", "满意度"]:
+            if kw in t:
+                existing_keywords.add(kw)
     for title, dim_key, horizontal in fallback_chart_specs:
-        if len(dashboard_charts) >= 6:
+        if len(dashboard_charts) >= 8:
             break
-        if title in existing_titles:
+        # Substring dedup: skip if keyword already covered by an existing chart
+        skip = False
+        for kw in existing_keywords:
+            if kw in title.lower():
+                skip = True
+                break
+        if skip:
             continue
         js_config = _dimension_bar_chart(title, dimensional_stats.get(dim_key, {}), horizontal)
         if not js_config:
@@ -1250,6 +1307,10 @@ def _jinja2_render(
         "remaining_chapters_html": insights_sections["remaining_chapters_html"],
     }
 
+    # 注入额外上下文（共享基座模式的 base_css / theme_css / chart_theme 等）
+    if extra_context:
+        context.update(extra_context)
+
     template = jinja2.Template(template_content)
     return template.render(**context)
 
@@ -1265,10 +1326,10 @@ def render(
 ) -> str:
     """加载指定模板并渲染完整 HTML。
 
-    工作流程：
-      1. 定位 ``src/templates/{template_name}/dashboard.html``
-      2. 先用 Jinja2 替换 ``{{ }}`` 占位符
-      3. 将分析数据和图表配置注入为 ``window.__ANALYSIS_DATA__`` 全局变量
+    支持两种模板架构：
+      - **共享基座（新）**: 从 ``base/`` 目录加载 HTML 骨架 + CSS，
+        从 ``{template_name}/`` 加载主题 CSS 和 meta.json。
+      - **独立模板（旧）**: 直接读取 ``{template_name}/dashboard.html``。
 
     Args:
         template_name: 模板目录名称，如 ``"premium-gold"``
@@ -1283,21 +1344,63 @@ def render(
         RuntimeError: jinja2 未安装
     """
     template_dir = _TEMPLATES_ROOT / template_name
-    template_file = template_dir / "dashboard.html"
 
-    if not template_file.exists():
-        raise FileNotFoundError(f"模板文件不存在: {template_file}")
+    # ---- 检测模板架构 ----
+    theme_css_path = template_dir / "theme.css"
+    base_html_path = _TEMPLATES_ROOT / "base" / "dashboard_base.html"
 
-    logger.info("加载模板: %s", template_file)
+    if theme_css_path.exists() and base_html_path.exists():
+        # ===== 新架构：共享基座 + 主题 CSS =====
+        logger.info("加载模板（共享基座）: %s", template_name)
 
-    # 1. 读取模板内容
-    with open(template_file, "r", encoding="utf-8") as f:
-        html_content = f.read()
+        # 1. 读取基座 HTML
+        with open(base_html_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
 
-    # 2. Jinja2 渲染
-    html_content = _jinja2_render(html_content, analysis_data, chart_configs)
+        # 2. 读取基座 CSS
+        base_css_path = _TEMPLATES_ROOT / "base" / "dashboard_base.css"
+        with open(base_css_path, "r", encoding="utf-8") as f:
+            base_css = f.read()
 
-    # 3. 数据注入
+        # 3. 读取主题 CSS
+        with open(theme_css_path, "r", encoding="utf-8") as f:
+            theme_css = f.read()
+
+        # 4. 读取主题 meta.json
+        meta = _load_theme_meta(template_dir)
+        theme_fonts_link = meta.get("fonts_url", "")
+        chart_theme = meta.get("chart_theme", {})
+
+        # 5. Jinja2 渲染（注入 base_css / theme_css / chart_theme 等变量）
+        html_content = _jinja2_render(
+            html_content, analysis_data, chart_configs,
+            extra_context={
+                "base_css": base_css,
+                "theme_css": theme_css,
+                "theme_fonts_link": theme_fonts_link,
+                "chart_theme": chart_theme,
+            },
+        )
+
+    else:
+        # ===== 旧架构：独立 dashboard.html =====
+        template_file = template_dir / "dashboard.html"
+
+        if not template_file.exists():
+            raise FileNotFoundError(
+                f"模板文件不存在: {template_file} "
+                f"（也未找到 theme.css 共享基座）"
+            )
+
+        logger.info("加载模板（独立模式）: %s", template_file)
+
+        with open(template_file, "r", encoding="utf-8") as f:
+            html_content = f.read()
+
+        # Jinja2 渲染
+        html_content = _jinja2_render(html_content, analysis_data, chart_configs)
+
+    # 数据注入（向后兼容）
     injection_script = _build_injection_script(analysis_data, chart_configs, template_name)
     html_content = _inject_data_into_html(html_content, injection_script)
 

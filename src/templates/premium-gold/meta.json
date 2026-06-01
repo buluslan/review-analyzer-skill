@@ -1,21 +1,51 @@
 {
   "name": "premium-gold",
-  "version": "2.0",
+  "version": "3.0",
   "description": "金色奢华暗色主题 — 品牌展示、高管汇报，四象限决策摘要 + 数据遥测矩阵",
   "author": "Buluu@新西楼",
   "sections": [
     "洞察总览",
     "情感分布",
+    "核心用户画像",
     "数据遥测矩阵",
-    "Brand Moat / Vulnerability",
-    "Market Resonance",
-    "改进与行动",
-    "机会与竞品"
+    "核心卖点 & 痛点",
+    "典型用户深度解析",
+    "改进建议",
+    "机会与差异化",
+    "行动决策仪表盘",
+    "精选评论样本",
+    "深度内容"
   ],
   "features": [
     "dark-theme",
     "chartjs",
     "jinja2-ssr",
-    "responsive"
-  ]
+    "responsive",
+    "shared-base"
+  ],
+  "fonts_url": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">",
+  "chart_theme": {
+    "defaultColor": "#9a9186",
+    "defaultBorderColor": "rgba(255,255,255,0.06)",
+    "legendColor": "#9a9186",
+    "legendFont": "'IBM Plex Mono', monospace",
+    "tooltipBg": "rgba(17,17,17,0.96)",
+    "tooltipTitleColor": "#d4a73a",
+    "tooltipTitleFont": "'IBM Plex Mono', monospace",
+    "tooltipBodyColor": "#ece5d8",
+    "tooltipBodyFont": "'Source Sans 3', sans-serif",
+    "tooltipBorderColor": "rgba(212,167,58,0.3)",
+    "tickColor": "#6b6560",
+    "tickFont": "'IBM Plex Mono', monospace",
+    "gridColor": "rgba(255,255,255,0.04)",
+    "palette": [
+      "#d4a73a",
+      "#5f9a4e",
+      "#c94444",
+      "#6a9bc7",
+      "#c4883a",
+      "#8a8278",
+      "#a33030"
+    ]
+  }
 }
