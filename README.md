@@ -2,6 +2,8 @@
 
 <div align="center">
 
+![Review Analyzer](assets/banner.png)
+
 # Review Analyzer Skill
 
 **一款适用于多场景评论内容的AI深度分析工具**
