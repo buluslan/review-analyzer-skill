@@ -81,8 +81,8 @@ python3 main.py --source sorftime --asin B001OAXE0S --site US --max-reviews 100 
 |------|------|---------|
 | premium-gold | 金色奢华风 | 品牌展示、高管汇报 |
 | posthog-analytics | 暖色分析风 | 数据分析、团队内部分享 |
-| stripe-executive | 紫色商务风 | 高管汇报、客户展示 |
-| linear-minimal | 极简靛蓝风 | 工程团队、数据驱动决策 |
+| stripe-executive | 翡翠企业风 | 金融企业、投资决策 |
+| linear-minimal | 极简蓝白风 | 产品评审、简洁汇报 |
 | dark-tech | 暗色科技风 | 技术评审、数据密集场景 |
 | warm-editorial | 暖纸编辑风 | 阅读分享、团队协作文档 |
 
