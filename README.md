@@ -195,7 +195,11 @@ python3 replay_phase2to5.py output/B09XYZ123-评论分析项目-6.1/评论采集
 
 ## 输出示例
 
-运行完成后，将在 `output/` 目录生成三种报告，也支持自定义文件夹：
+> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)**
+>
+> 包含 14 章完整内容：洞察总览 → 用户画像 → 卖点痛点 → 改进建议 → 行动决策仪表盘，以及飞书白板 mermaid 图表。
+
+运行完成后，将在 `output/` 目录生成以下文件：
 
 ### 1. CSV标签数据
 ```csv
