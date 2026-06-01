@@ -1,47 +1,39 @@
 # 输出示例说明
 
-本目录包含了运行 `review-analyzer-skill` 后生成的完整输出示例。
+本目录包含了运行 `review-analyzer-skill V2.0` 后生成的输出示例。
 
 ## 📁 输出文件说明
 
-运行分析后会生成以下三种格式的输出文件:
+| 文件 | 格式 | 说明 |
+|------|------|------|
+| `reviews_labeled_sample.csv` | CSV | 原始评论 + 22维度 AI 标签 + 评分 |
+| `insights_report_sample.md` | Markdown | 14章深度洞察报告（V1 格式，仅供参考） |
+| `visual_report_sample.html` | HTML | V2.0 可视化看板（premium-gold 主题，11板块） |
 
-### 1. CSV数据文件 (`reviews_labeled_sample.csv`)
-- **用途**: 包含原始评论数据及AI分析的标签和评分
-- **内容**:
-  - 原始评论字段
-  - AI提取的主题标签
-  - 情感评分
-  - 其他分析字段
-- **场景**: 适用于数据分析和二次处理
+> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 14 章完整内容 + 飞书白板 mermaid 图表
 
-### 2. Markdown洞察报告 (`insights_report_sample.md`)
-- **用途**: 文本格式的详细分析报告
-- **内容**:
-  - 评论概览统计
-  - 主题分析
-  - 情感分析
-  - 改进建议
-  - 关键洞察
-- **场景**: 适用于阅读、分享和文档管理
+## 🎨 可视化看板主题
 
-### 3. HTML可视化报告 (`visual_report_sample.html`)
-- **用途**: 交互式网页报告
-- **内容**:
-  - 图表可视化
-  - 数据仪表盘
-  - 交互式分析界面
-  - 美观的排版设计
-- **场景**: 适用于演示、汇报和深入探索
+V2.0 提供 6 套主题，可直接在浏览器打开 `visual_report_sample.html` 查看 premium-gold 效果：
+
+| 主题 | 风格 |
+|------|------|
+| premium-gold | 黑金奢华（默认） |
+| dark-tech | 赛博朋克 |
+| linear-minimal | 极简蓝白 |
+| posthog-analytics | 暖橙分析 |
+| stripe-executive | 翡翠企业 |
+| warm-editorial | 报纸编辑 |
 
 ## 🚀 如何生成自己的输出
 
-1. 准备你的评论数据CSV文件
-2. 运行主程序: `python main.py --csv your_reviews.csv`
-3. 在 `output/` 目录中查看生成的结果
+```bash
+# 基本用法
+python3 main.py your_reviews.csv
 
-## 📊 示例数据来源
+# 指定模板
+python3 main.py your_reviews.csv --template dark-tech
 
-本示例使用 `../reviews_sample.csv` (10条测试评论) 生成。
-
-你可以直接在浏览器中打开 `visual_report_sample.html` 查看可视化效果。
+# Sorftime 数据源
+python3 main.py --source sorftime --asin B09XYZ123 --site US
+```

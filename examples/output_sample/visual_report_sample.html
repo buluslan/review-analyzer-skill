@@ -3,650 +3,2606 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST_10 - Boardroom Executive View</title>
-    
-    <!-- Fonts -->
+    <title>KitchenAid Stand Mixer - 评论深度洞察</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        playfair: ['Playfair Display', 'serif'],
-                    },
-                    colors: {
-                        anker: {
-                            gold: '#BF953F',
-                            goldLight: '#FCF6BA',
-                            dark: '#050505',
-                            card: 'rgba(22, 22, 22, 0.7)',
-                            danger: '#ef4444'
-                        },
-                        brand: {
-                            gold: '#BF953F',
-                            goldLight: '#FCF6BA',
-                            dark: '#050505',
-                            card: 'rgba(22, 22, 22, 0.7)',
-                            danger: '#ef4444'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Chart.js -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Visual DNA CSS -->
     <style>
+        /* ============================================
+           PREMIUM GOLD v3 — Editorial Dark
+           Anti-AI Slop · 4-Layer Depth · Playfair Display
+           ============================================ */
+
+        :root {
+            /* --- Typography --- */
+            --font-display: 'Playfair Display', 'Georgia', 'Noto Serif SC', serif;
+            --font-body: 'Source Sans 3', 'Segoe UI', 'Noto Sans SC', sans-serif;
+            --font-mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+
+            /* --- Surfaces (warm black, not GitHub blue-black) --- */
+            --bg: #070707;
+            --surface: #111111;
+            --surface-hero: #15130f;
+            --surface-elevated: #1a1816;
+            --surface-recessed: #0c0b0a;
+
+            /* --- Borders --- */
+            --border: rgba(255, 255, 255, 0.06);
+            --border-bright: rgba(255, 255, 255, 0.12);
+            --border-gold: rgba(212, 167, 58, 0.22);
+            --border-gold-strong: rgba(212, 167, 58, 0.45);
+
+            /* --- Text --- */
+            --text: #ece5d8;
+            --text-dim: #9a9186;
+            --text-muted: #6b6560;
+
+            /* --- Accent: Gold --- */
+            --gold: #d4a73a;
+            --gold-bright: #f0c850;
+            --gold-dim: rgba(212, 167, 58, 0.07);
+            --gold-text: linear-gradient(135deg, #d4a73a 0%, #f0c850 50%, #d4a73a 100%);
+
+            /* --- Semantic --- */
+            --green: #5f9a4e;
+            --green-bg: rgba(95, 154, 78, 0.10);
+            --red: #c94444;
+            --red-bg: rgba(201, 68, 68, 0.10);
+            --blue: #6a9bc7;
+            --blue-bg: rgba(106, 155, 199, 0.10);
+            --orange: #c4883a;
+
+            /* --- Sentiment --- */
+            --sentiment-strong-positive: #5f9a4e;
+            --sentiment-positive: #7fb86e;
+            --sentiment-neutral: #8a8278;
+            --sentiment-negative: #c94444;
+            --sentiment-strong-negative: #a33030;
+
+            /* --- Priority --- */
+            --priority-p0: #c94444;
+            --priority-p1: #d4a73a;
+            --priority-p2: #6a9bc7;
+
+            /* --- Spacing --- */
+            --sp-xs: 0.25rem;
+            --sp-sm: 0.5rem;
+            --sp-md: 1rem;
+            --sp-lg: 1.5rem;
+            --sp-xl: 2rem;
+            --sp-2xl: 3rem;
+            --sp-3xl: 4rem;
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            text-wrap: pretty;
+        }
+
         body {
-            background-color: #050505;
-            color: #e5e7eb;
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
-        
-        /* 核心滚动条样式 */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #BF953F; }
 
-        .gold-shine {
-            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            color: transparent;
-            background-size: 200% auto; 
-            animation: shine 4s linear infinite;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
-        
-        .glass-card { 
-            background: rgba(22, 22, 22, 0.7); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(230,194,93,0.1); 
-        }
-        
-        .card-glow { transition: all 0.3s ease; }
-        .card-glow:hover { 
-            border-color: rgba(230,194,93,0.5); 
-            box-shadow: 0 0 40px rgba(230,194,93,0.1); 
-            transform: translateY(-4px); 
-            z-index: 10;
+        /* Subtle warm grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(212, 167, 58, 0.025) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 80%, rgba(212, 167, 58, 0.015) 0%, transparent 45%);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* 市场洞察结构化排版 */
-        .insight-list { @apply space-y-3 mt-4; }
-        .insight-list li { @apply flex items-start text-sm text-gray-300 leading-relaxed; }
-        .insight-list li::before { content: "•"; @apply text-anker-gold mr-3 text-lg leading-none pt-0.5 font-bold; }
-        .insight-list li::before { content: "•"; @apply text-brand-gold mr-3 text-lg leading-none pt-0.5 font-bold; }
-        
-        .text-glow { text-shadow: 0 0 10px rgba(191, 149, 63, 0.3); }
+        /* --- Container --- */
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 var(--sp-xl);
+            position: relative;
+            z-index: 1;
+        }
+
+
+        /* ============================================
+           4-LAYER DEPTH SYSTEM
+           ============================================ */
+        .depth-hero {
+            background: linear-gradient(145deg, rgba(212, 167, 58, 0.08) 0%, var(--surface) 55%);
+            border: 1px solid var(--border-gold);
+            box-shadow:
+                0 4px 32px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(212, 167, 58, 0.06);
+        }
+
+        .depth-elevated {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .depth-default {
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .depth-recessed {
+            background: var(--surface-recessed);
+            border: 1px solid var(--border);
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* ============================================
+           HEADER — Editorial masthead
+           ============================================ */
+        .header {
+            padding: var(--sp-3xl) 0 var(--sp-2xl);
+            border-bottom: 1px solid var(--border-gold);
+            margin-bottom: var(--sp-2xl);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-lg);
+            margin-bottom: var(--sp-lg);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-muted);
+        }
+
+        .header-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-sm);
+        }
+
+        .header-meta-item::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--gold);
+            opacity: 0.6;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: var(--sp-md);
+            color: var(--text);
+            text-wrap: balance;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            color: var(--text-dim);
+            line-height: 1.75;
+            max-width: 640px;
+        }
+
+
+        /* ============================================
+           SECTION SHARED
+           ============================================ */
+        .section {
+            margin-bottom: var(--sp-3xl);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-md);
+            margin-bottom: var(--sp-xl);
+            padding-bottom: var(--sp-md);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-number {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: var(--gold);
+            opacity: 0.2;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: var(--sp-xs);
+        }
+
+
+        /* ============================================
+           KPI STRIP — 4 summary cards
+           ============================================ */
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: var(--sp-3xl);
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            padding: var(--sp-lg) var(--sp-xl);
+            position: relative;
+        }
+
+        .kpi-card:first-child {
+            background: var(--surface-hero);
+        }
+
+        .kpi-card:first-child::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .kpi-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .kpi-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .kpi-unit {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-dim);
+            margin-left: 2px;
+        }
+
+
+        /* ============================================
+           EDITORIAL HERO — Judgement + Tension
+           ============================================ */
+        .editorial-hero {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: var(--sp-lg);
+            margin-bottom: var(--sp-2xl);
+        }
+
+        .judgement-panel {
+            border-radius: 10px;
+            padding: var(--sp-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .judgement-panel::after {
+            content: '';
+            position: absolute;
+            right: -100px;
+            top: -100px;
+            width: 240px;
+            height: 240px;
+            border: 1px solid rgba(212, 167, 58, 0.12);
+            border-radius: 50%;
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        .kicker {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: var(--sp-md);
+        }
+
+        .judgement-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+            line-height: 1.08;
+            font-weight: 700;
+            max-width: 860px;
+            color: var(--text);
+            margin-bottom: var(--sp-lg);
+        }
+
+        .judgement-detail {
+            max-width: 780px;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .tension-panel {
+            background: var(--surface);
+            border: 1px solid rgba(201, 68, 68, 0.2);
+            border-radius: 10px;
+            padding: var(--sp-xl);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tension-title {
+            font-family: var(--font-display);
+            color: var(--text);
+            font-size: 1.3rem;
+            line-height: 1.2;
+            margin-bottom: var(--sp-md);
+        }
+
+        .tension-text {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            line-height: 1.75;
+        }
+
+        .tension-metrics {
+            margin-top: auto;
+            padding-top: var(--sp-lg);
+        }
+
+        .tension-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--sp-sm) 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tension-metric:last-child { border-bottom: none; }
+
+        .tension-metric span {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        .tension-metric strong {
+            font-family: var(--font-mono);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+
+        /* ============================================
+           QUADRANT GRID — Asymmetric 2x2
+           ============================================ */
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            grid-template-rows: auto auto;
+            gap: var(--sp-md);
+            margin-bottom: var(--sp-2xl);
+        }
+
+        .quadrant-card {
+            border-radius: 8px;
+            padding: var(--sp-lg) var(--sp-xl);
+            min-height: 180px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .quadrant-card:hover {
+            border-color: var(--border-bright);
+        }
+
+        .quadrant-card[data-accent="gold"] { border-top: 2px solid var(--gold); }
+        .quadrant-card[data-accent="green"] { border-top: 2px solid var(--green); }
+        .quadrant-card[data-accent="red"] { border-top: 2px solid var(--red); }
+        .quadrant-card[data-accent="blue"] { border-top: 2px solid var(--blue); }
+
+        .quadrant-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-xs);
+        }
+
+        .quadrant-card[data-accent="gold"] .quadrant-eyebrow { color: var(--gold); }
+        .quadrant-card[data-accent="green"] .quadrant-eyebrow { color: var(--green); }
+        .quadrant-card[data-accent="red"] .quadrant-eyebrow { color: var(--red); }
+        .quadrant-card[data-accent="blue"] .quadrant-eyebrow { color: var(--blue); }
+
+        .quadrant-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .quadrant-text {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            line-height: 1.7;
+        }
+
+
+        /* ============================================
+           SENTIMENT BARS
+           ============================================ */
+        .sentiment-chart {
+            border-radius: 10px;
+            padding: var(--sp-xl);
+        }
+
+        .sentiment-bars {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-md);
+        }
+
+        .sentiment-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-lg);
+        }
+
+        .sentiment-label {
+            min-width: 90px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: right;
+        }
+
+        .sentiment-track {
+            flex: 1;
+            height: 28px;
+            background: var(--surface-recessed);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sentiment-fill {
+            height: 100%;
+            background: var(--sentiment-color);
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .sentiment-fill::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 50%);
+        }
+
+        .sentiment-value {
+            min-width: 90px;
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+        }
+
+
+        /* ============================================
+           CHART MATRIX
+           ============================================ */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: var(--sp-lg);
+        }
+
+        .chart-card {
+            border-radius: 10px;
+            padding: var(--sp-xl);
+            min-height: 340px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gold);
+            margin-bottom: var(--sp-md);
+            text-align: center;
+        }
+
+        .chart-frame {
+            position: relative;
+            flex: 1;
+            min-height: 260px;
+        }
+
+
+        /* ============================================
+           BRAND MOAT / VULNERABILITY
+           ============================================ */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--sp-xl);
+        }
+
+        .strategy-column {
+            border-radius: 10px;
+            padding: var(--sp-xl);
+        }
+
+        .strategy-column.moat {
+            border-top: 3px solid var(--gold);
+        }
+
+        .strategy-column.risk {
+            border-top: 3px solid var(--red);
+        }
+
+        .strategy-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-lg);
+        }
+
+        .strategy-item {
+            padding: var(--sp-lg);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            margin-bottom: var(--sp-md);
+            transition: border-color 0.2s ease;
+        }
+
+        .strategy-item:last-child { margin-bottom: 0; }
+
+        .strategy-item:hover { border-color: var(--border-bright); }
+
+        .strategy-item h4 {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: var(--sp-xs);
+        }
+
+        .strategy-column.moat .strategy-item h4 { color: var(--gold); }
+        .strategy-column.risk .strategy-item h4 { color: var(--red); }
+
+        .strategy-item p {
+            color: var(--text-dim);
+            font-size: 0.88rem;
+            line-height: 1.7;
+        }
+
+        .strategy-metric {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--blue);
+            margin-top: var(--sp-sm);
+        }
+
+
+        /* ============================================
+           VOC CARDS
+           ============================================ */
+        .voc-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--sp-lg);
+        }
+
+        .voc-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .voc-card.negative { border: 1px solid rgba(201, 68, 68, 0.2); }
+        .voc-card.positive { border: 1px solid var(--border-gold); }
+        .voc-card.mixed { border: 1px solid var(--border); }
+
+        .voc-main { padding: var(--sp-lg); }
+
+        .voc-header {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--sp-md);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .voc-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .voc-status {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .voc-need {
+            color: var(--text-dim);
+            font-size: 0.82rem;
+            margin-bottom: var(--sp-md);
+        }
+
+        .voc-quote {
+            color: var(--text);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            font-style: italic;
+            padding-left: var(--sp-md);
+            border-left: 2px solid var(--gold);
+        }
+
+        .voc-analysis {
+            padding: var(--sp-md) var(--sp-lg);
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.82rem;
+            line-height: 1.65;
+        }
+
+
+        /* ============================================
+           IMPROVEMENTS
+           ============================================ */
+        .improvements-groups {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--sp-xl);
+            margin-bottom: var(--sp-xl);
+        }
+
+        .improvement-group { min-width: 0; }
+
+        .improvement-group-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: var(--sp-md);
+            padding-bottom: var(--sp-sm);
+            border-bottom: 1px solid var(--border-gold);
+        }
+
+        .improvement-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-md);
+            padding: var(--sp-md);
+            border-radius: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: var(--sp-sm);
+            transition: border-color 0.2s ease;
+        }
+
+        .improvement-item:hover { border-color: var(--border-bright); }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .priority-badge.p0 { background: var(--red-bg); color: var(--priority-p0); border: 1px solid rgba(201,68,68,0.25); }
+        .priority-badge.p1 { background: var(--gold-dim); color: var(--priority-p1); border: 1px solid rgba(212,167,58,0.25); }
+        .priority-badge.p2 { background: var(--blue-bg); color: var(--priority-p2); border: 1px solid rgba(106,155,199,0.25); }
+
+        .improvement-content { flex: 1; }
+
+        .improvement-title {
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: var(--sp-xs);
+        }
+
+        .improvement-desc {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+
+        /* --- Action Table --- */
+        .subsection-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-lg);
+            padding-bottom: var(--sp-sm);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .action-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: var(--sp-xl);
+            border-radius: 8px;
+        }
+
+        .action-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .action-table thead th {
+            background: var(--surface-hero);
+            color: var(--gold);
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-align: left;
+            padding: var(--sp-md) var(--sp-lg);
+            border-bottom: 2px solid var(--border-gold);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+        }
+
+        .action-table tbody td {
+            padding: var(--sp-md) var(--sp-lg);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .action-table tbody tr { background: var(--surface); }
+        .action-table tbody tr:nth-child(even) { background: var(--surface-elevated); }
+        .action-table tbody tr:hover { background: var(--surface-hero); }
+
+        .action-table .col-action { min-width: 250px; }
+        .action-table .col-impact { min-width: 100px; }
+        .action-table .col-source { min-width: 80px; }
+
+
+        /* --- Quick Wins --- */
+        .quick-wins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--sp-md);
+        }
+
+        .quick-win-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 8px 8px 0;
+            padding: var(--sp-lg);
+            transition: border-color 0.3s ease;
+        }
+
+        .quick-win-card:hover { border-color: var(--border-bright); }
+
+        .quick-win-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .quick-win-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+        }
+
+
+        /* ============================================
+           OPPORTUNITIES
+           ============================================ */
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: var(--sp-md);
+        }
+
+        .opportunity-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--sp-lg);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .opportunity-card:hover {
+            transform: translateY(-1px);
+            border-color: var(--border-bright);
+        }
+
+        .opportunity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--blue);
+        }
+
+        .opportunity-card-title,
+        .selling-card-title,
+        .pain-card-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .opportunity-card-finding,
+        .selling-card-finding,
+        .pain-card-finding {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-bottom: var(--sp-sm);
+        }
+
+        .opportunity-card-data,
+        .selling-card-data,
+        .pain-card-data {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--blue);
+            margin-bottom: var(--sp-md);
+        }
+
+        .user-quote {
+            border-left: 2px solid var(--gold);
+            padding-left: var(--sp-md);
+            margin-top: var(--sp-sm);
+            color: var(--text-dim);
+            font-style: italic;
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+
+
+        /* ============================================
+           VALUE / PAIN GRID
+           ============================================ */
+        .value-pain-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--sp-xl);
+        }
+
+        .value-pain-column-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-lg);
+            padding-bottom: var(--sp-sm);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-sm);
+        }
+
+        .icon-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-md);
+        }
+
+        .selling-card, .pain-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--sp-lg);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .selling-card:hover, .pain-card:hover { border-color: var(--border-bright); }
+
+        .selling-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--green);
+        }
+
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--pain-severity-color, var(--text-muted));
+        }
+
+        .pain-card.severity-critical::before { background: var(--red); }
+        .pain-card.severity-major::before { background: var(--orange); }
+        .pain-card.severity-minor::before { background: var(--text-muted); }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: var(--sp-sm);
+        }
+
+        .severity-badge.critical { background: var(--red-bg); color: var(--red); border: 1px solid rgba(201,68,68,0.25); }
+        .severity-badge.major { background: var(--gold-dim); color: var(--orange); border: 1px solid rgba(212,167,58,0.25); }
+        .severity-badge.minor { background: rgba(107,101,96,0.12); color: var(--text-muted); border: 1px solid rgba(107,101,96,0.2); }
+
+
+        /* ============================================
+           USER STORIES
+           ============================================ */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: var(--sp-lg);
+        }
+
+        .story-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .story-card:hover { border-color: var(--border-bright); }
+
+        .story-sentiment-bar { height: 3px; width: 100%; }
+        .story-sentiment-bar.positive { background: var(--green); }
+        .story-sentiment-bar.negative { background: var(--red); }
+        .story-sentiment-bar.mixed { background: var(--blue); }
+
+        .story-content { padding: var(--sp-lg); }
+
+        .story-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-xs);
+        }
+
+        .story-profile {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--gold);
+            margin-bottom: var(--sp-md);
+        }
+
+        .story-need {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-bottom: var(--sp-md);
+        }
+
+        .story-quotes { display: flex; flex-direction: column; gap: var(--sp-sm); }
+
+        .story-quote {
+            border-left: 2px solid rgba(212, 167, 58, 0.35);
+            padding-left: var(--sp-md);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            font-style: italic;
+            line-height: 1.65;
+        }
+
+
+        /* ============================================
+           GOLDEN SAMPLES
+           ============================================ */
+        .samples-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-md);
+        }
+
+        .sample-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .sample-header {
+            padding: var(--sp-md) var(--sp-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
+            transition: background 0.2s ease;
+        }
+
+        .sample-header:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .sample-sentiment {
+            padding: 4px 12px;
+            border-radius: 3px;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sample-sentiment.strong-positive { background: rgba(95,154,78,0.12); color: var(--sentiment-strong-positive); }
+        .sample-sentiment.positive { background: rgba(127,184,110,0.12); color: var(--sentiment-positive); }
+        .sample-sentiment.neutral { background: rgba(138,130,120,0.12); color: var(--sentiment-neutral); }
+        .sample-sentiment.negative { background: var(--red-bg); color: var(--sentiment-negative); }
+        .sample-sentiment.strong-negative { background: rgba(163,48,48,0.12); color: var(--sentiment-strong-negative); }
+
+        .sample-rating { display: flex; gap: 2px; color: var(--gold); }
+
+        .sample-body {
+            padding: 0 var(--sp-lg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .sample-card.expanded .sample-body {
+            padding: var(--sp-md) var(--sp-lg) var(--sp-lg);
+            max-height: 500px;
+        }
+
+        .sample-text {
+            font-size: 0.92rem;
+            color: var(--text-dim);
+            line-height: 1.75;
+            margin-bottom: var(--sp-md);
+        }
+
+        .sample-tags { display: flex; flex-wrap: wrap; gap: var(--sp-xs); }
+
+        .sample-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            background: var(--blue-bg);
+            border: 1px solid rgba(106,155,199,0.2);
+            border-radius: 10px;
+            color: var(--blue);
+        }
+
+
+        /* ============================================
+           INSIGHT CARDS
+           ============================================ */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--sp-md);
+            margin-bottom: var(--sp-xl);
+        }
+
+        .insight-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--sp-lg);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .insight-card:hover {
+            border-color: var(--border-bright);
+            transform: translateY(-1px);
+        }
+
+        .insight-card-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            color: var(--gold);
+            font-family: var(--font-display);
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: var(--sp-md);
+            border: 1px solid var(--border-gold);
+        }
+
+        .insight-card-title {
+            font-family: var(--font-display);
+            font-size: 1.02rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: var(--sp-xs);
+        }
+
+        .insight-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        /* Positioning block */
+        .positioning-block {
+            background: var(--surface-hero);
+            border: 1px solid var(--border-gold);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 8px 8px 0;
+            padding: var(--sp-lg) var(--sp-xl);
+        }
+
+        .positioning-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--gold);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .positioning-text {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+
+        /* ============================================
+           PERSONAS
+           ============================================ */
+        .personas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--sp-lg);
+        }
+
+        .persona-card {
+            border-radius: 8px;
+            padding: var(--sp-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle at corner, var(--gold) 0%, transparent 70%);
+            opacity: 0.06;
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--sp-md);
+        }
+
+        .persona-name {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .persona-count {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--gold);
+            padding: 4px 8px;
+            background: var(--gold-dim);
+            border-radius: 3px;
+        }
+
+        .segment-need, .story-need, .positioning-text {
+            white-space: normal;
+        }
+
+        .persona-tags { display: flex; flex-wrap: wrap; gap: var(--sp-sm); }
+
+        .persona-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-dim);
+        }
+
+        .persona-tag-value { color: var(--text); font-weight: 500; }
+
+
+        /* ============================================
+           DEEP CONTENT (Remaining chapters)
+           ============================================ */
+        .deep-content {
+            font-family: var(--font-body);
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .deep-content h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: var(--sp-xl);
+            margin-bottom: var(--sp-lg);
+            padding-bottom: var(--sp-sm);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .deep-content h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: var(--sp-xl);
+            margin-bottom: var(--sp-md);
+        }
+
+        .deep-content h3 {
+            font-size: 1.06rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: var(--sp-lg);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .deep-content p { margin-bottom: var(--sp-md); }
+        .deep-content ul, .deep-content ol { margin-left: var(--sp-lg); margin-bottom: var(--sp-md); }
+        .deep-content li { margin-bottom: var(--sp-sm); }
+
+        .deep-content blockquote {
+            border-left: 2px solid var(--gold);
+            padding-left: var(--sp-md);
+            margin: var(--sp-md) 0;
+            color: var(--text);
+            font-style: italic;
+        }
+
+        .deep-content code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            background: var(--surface-recessed);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .deep-content strong { color: var(--text); }
+
+        .deep-content pre {
+            background: var(--surface-recessed);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: var(--sp-md);
+            overflow-x: auto;
+            margin: var(--sp-md) 0;
+        }
+
+        .deep-content pre code { background: none; padding: 0; }
+        .deep-content pre code.language-mermaid, pre code.language-mermaid { display: none; }
+
+        /* Data tables inside deep content */
+        .deep-content table, .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--sp-lg) 0;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .deep-content table thead th, .data-table thead th {
+            background: var(--surface-hero);
+            color: var(--gold);
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-align: left;
+            padding: var(--sp-sm) var(--sp-md);
+            border-bottom: 2px solid var(--border-gold);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .deep-content table tbody td, .data-table tbody td {
+            padding: var(--sp-sm) var(--sp-md);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .deep-content table tbody tr:nth-child(even), .data-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .deep-content table tbody tr:hover, .data-table tbody tr:hover {
+            background: var(--surface-elevated);
+        }
+
+
+        /* ============================================
+           COLLAPSIBLE
+           ============================================ */
+        .collapsible-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--sp-lg) var(--sp-xl);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
+            transition: background 0.2s ease;
+            user-select: none;
+        }
+
+        .collapsible-header:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .collapsible-header-text {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .collapsible-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-dim);
+            transition: transform 0.3s ease;
+            font-size: 0.72rem;
+        }
+
+        .collapsible-section.expanded .collapsible-arrow { transform: rotate(180deg); }
+
+        .collapsible-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .collapsible-section.expanded .collapsible-body { max-height: 8000px; }
+
+        .collapsible-body-inner { padding: 0 var(--sp-xl) var(--sp-xl); }
+
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            margin-top: var(--sp-3xl);
+            padding: var(--sp-xl) 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: var(--sp-sm);
+        }
+
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kpi-card,
+        .quadrant-card,
+        .insight-card,
+        .strategy-item,
+        .voc-card,
+        .story-card,
+        .opportunity-card,
+        .quick-win-card,
+        .improvement-item {
+            animation: fadeUp 0.45s ease-out both;
+            animation-delay: calc(var(--i, 0) * 0.06s);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .editorial-hero { grid-template-columns: 1fr; }
+            .strategy-grid { grid-template-columns: 1fr; }
+            .value-pain-grid { grid-template-columns: 1fr; }
+            .quadrant-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 var(--sp-md); }
+
+            .header { padding: var(--sp-xl) 0; }
+            .header-title { font-size: 1.6rem; }
+
+            .section-header { flex-direction: column; gap: var(--sp-sm); }
+            .section-number { font-size: 2rem; }
+
+            .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+
+            .personas-grid,
+            .insights-grid,
+            .charts-grid,
+            .quadrant-grid,
+            .voc-grid,
+            .improvements-groups,
+            .quick-wins-grid,
+            .opportunities-grid,
+            .stories-grid { grid-template-columns: 1fr; }
+
+            .improvements-groups { gap: var(--sp-lg); }
+
+            .sentiment-label { min-width: 70px; font-size: 0.75rem; }
+            .action-table-wrapper { font-size: 0.8rem; }
+            .action-table thead th, .action-table tbody td { padding: var(--sp-sm) var(--sp-md); }
+        }
+
+
+        /* ============================================
+           UTILITIES
+           ============================================ */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+        .mb-sm { margin-bottom: var(--sp-sm); }
+        .mb-md { margin-bottom: var(--sp-md); }
+        .mb-lg { margin-bottom: var(--sp-lg); }
+        .mb-xl { margin-bottom: var(--sp-xl); }
     </style>
+<script>
+window.__ANALYSIS_DATA__ = {
+  "meta": {
+    "template": "premium-gold",
+    "asin": "B001OAXE0S",
+    "analysis_date": "2026-06-01"
+  },
+  "charts": [
+    {
+      "title": "价格感知分布",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "物超所值",
+          "价格合理",
+          "偏贵"
+        ],
+        "values": [
+          340,
+          280,
+          120
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    },
+    {
+      "title": "易用性评价",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "简单易用",
+          "需要学习",
+          "复杂"
+        ],
+        "values": [
+          450,
+          180,
+          80
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    },
+    {
+      "title": "做工认知",
+      "chart_type": "bar",
+      "data": {
+        "labels": [
+          "做工精细",
+          "做工一般",
+          "做工粗糙"
+        ],
+        "values": [
+          380,
+          200,
+          60
+        ]
+      },
+      "config": {
+        "colors": [
+          "#d4a73a",
+          "#6a9bc7",
+          "#9a9186"
+        ]
+      }
+    }
+  ]
+};
+</script>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
-
-    <!-- Background Decoration -->
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#BF953F] opacity-[0.03] rounded-full blur-[120px] pointer-events-none z-0"></div>
-
-    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-        
-        <!-- 1. Header Section (Anti-Overlap Strategy: pb-20) -->
-        <header class="flex flex-col items-center justify-center pb-20 pt-8">
-            <div class="mb-6 card-glow rounded-full p-4 bg-black/50 border border-anker-gold/20 backdrop-blur-md">
-                <i class="fa-solid fa-bolt text-3xl text-anker-gold text-glow"></i>
+<body>
+    <div class="container">
+        <!-- ============================================
+             HEADER
+             ============================================ -->
+        <header class="header">
+            <div class="header-meta">
+                <div class="header-meta-item">ASIN: B001OAXE0S</div>
+                <div class="header-meta-item">2026-06-01</div>
+                <div class="header-meta-item">Amazon Review Analysis</div>
             </div>
-            <h1 class="font-playfair text-5xl md:text-7xl text-white text-center font-bold tracking-tight mb-4 drop-shadow-2xl">
-                <span class="gold-shine">TEST_10</span>
-            </h1>
-            <h2 class="text-xl md:text-2xl text-gray-400 text-center tracking-[0.2em] font-light uppercase mb-8">
-                评论深度分析洞察
-            </h2>
-            <div class="text-center">
-                <span class="gold-shine text-xs md:text-sm font-semibold tracking-widest uppercase border-y border-anker-gold/30 py-2 px-8 inline-block">
-                    Created By Gemini-3.1-V46
-                </span>
-            </div>
+            <h1 class="header-title">KitchenAid Stand Mixer<br>评论深度洞察报告</h1>
+            <p class="header-subtitle">
+                共分析 1284 条评论，完成 1146 条有效打标；正面评价 68.2%，负面风险 12.3%，平均评分 4.3/5
+            </p>
         </header>
 
-        <!-- 2. KPI Meta Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 relative z-20">
-            <!-- KPI 1 -->
-            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-anker-gold/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Total Reviews</h3>
-                <div class="text-5xl font-playfair font-bold text-anker-gold mb-2 text-glow">10</div>
-                <p class="text-gray-300 text-sm font-semibold">总评论数</p>
-                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">样本量极低</p>
+        <!-- ============================================
+             KPI STRIP
+             ============================================ -->
+        <div class="kpi-strip">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Reviews</div>
+                <div class="kpi-value">1284<span class="kpi-unit">条</span></div>
             </div>
-            <!-- KPI 2 -->
-            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Average Rating</h3>
-                <div class="text-5xl font-playfair font-bold text-anker-danger mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">3.4</div>
-                <p class="text-gray-300 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-anker-danger"></i> 平均评分
-                </p>
-                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">行业基准线以下</p>
+            <div class="kpi-card">
+                <div class="kpi-label">Positive Rate</div>
+                <div class="kpi-value">68.2<span class="kpi-unit">%</span></div>
             </div>
-            <!-- KPI 3 -->
-            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Data Silence Rate</h3>
-                <div class="text-5xl font-playfair font-bold text-anker-danger mb-2 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">100<span class="text-2xl">%</span></div>
-                <p class="text-gray-300 text-sm font-semibold flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-anker-danger"></i> 数据沉默率
-                </p>
-                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">解析失败/无有效内容</p>
+            <div class="kpi-card">
+                <div class="kpi-label">Negative Risk</div>
+                <div class="kpi-value">12.3<span class="kpi-unit">%</span></div>
             </div>
-            <!-- KPI 4 -->
-            <div class="glass-card card-glow p-8 rounded-2xl flex flex-col items-center justify-center text-center relative group overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-anker-gold/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <h3 class="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Tagged Reviews</h3>
-                <div class="text-5xl font-playfair font-bold text-gray-500 mb-2">0</div>
-                <p class="text-gray-300 text-sm font-semibold">已打标评论</p>
-                <p class="text-gray-500 text-xs mt-2 border-t border-gray-800 pt-2 w-full">成功率 0%</p>
+            <div class="kpi-card">
+                <div class="kpi-label">Avg Rating</div>
+                <div class="kpi-value">4.3<span class="kpi-unit">/5</span></div>
             </div>
-        </section>
+        </div>
 
-        <!-- 3. Market Demographics (4格栅格 - 深度提炼版) -->
-        <section class="mb-20">
-            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
-                <i class="fa-solid fa-microscope text-anker-gold"></i> 市场深度洞察与归因
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-20">
-                <!-- Grid 1 -->
-                <div class="glass-card card-glow p-8 rounded-2xl">
-                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
-                        <div class="w-10 h-10 rounded-full bg-anker-gold/10 flex items-center justify-center">
-                            <i class="fa-solid fa-users text-anker-gold text-xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white tracking-wide">核心受众画像</h3>
-                    </div>
-                    <ul class="insight-list">
-                        <li><span class="text-white font-semibold mr-2">标签缺失信号:</span> 100% 性别、年龄、职业未知，呈现典型的电商冷启动与用户认知盲区。</li>
-                        <li><span class="text-white font-semibold mr-2">核心场景推断:</span> 集中于基础日常家庭环境，产品被定性为低介入度的易耗替代品。</li>
-                        <li><span class="text-white font-semibold mr-2">典型画像素描:</span> 实用主义至上的沉默型消费者，无品牌忠诚度，决策受价格绝对驱动。</li>
-                    </ul>
-                </div>
-                <!-- Grid 2 -->
-                <div class="glass-card card-glow p-8 rounded-2xl">
-                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
-                        <div class="w-10 h-10 rounded-full bg-anker-gold/10 flex items-center justify-center">
-                            <i class="fa-solid fa-bullseye text-anker-gold text-xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white tracking-wide">核心卖点与验证</h3>
-                    </div>
-                    <ul class="insight-list">
-                        <li><span class="text-white font-semibold mr-2">底层价值触达:</span> 唯一正面归因指向“基本功能的完整性”，缺乏溢价支撑点。</li>
-                        <li><span class="text-white font-semibold mr-2">情绪平淡反馈:</span> 用户高频使用“OK”、“Fine”等词汇，表明缺乏打动人心的细节体验。</li>
-                        <li><span class="text-white font-semibold mr-2">底线交易逻辑:</span> 产品仅完成了品类最底线任务，用户反馈仅为完成交易后的礼貌性中立。</li>
-                    </ul>
-                </div>
-                <!-- Grid 3 -->
-                <div class="glass-card card-glow p-8 rounded-2xl">
-                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
-                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-heart-crack text-anker-danger text-xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white tracking-wide">主要痛点与负面归因</h3>
-                    </div>
-                    <ul class="insight-list">
-                        <li><span class="text-anker-danger font-semibold mr-2">致命数据静默:</span> 90% 解析失败，在电商心理学中，无话可说比明确差评更为致命。</li>
-                        <li><span class="text-white font-semibold mr-2">货币属性缺失:</span> 拆箱与使用过程毫无惊喜感，产品陷入“极度平庸”的危险区。</li>
-                        <li><span class="text-white font-semibold mr-2">复购流失预警:</span> 品牌存在感透明，下次购买时用户极大概率转向低价或高颜值竞品。</li>
-                    </ul>
-                </div>
-                <!-- Grid 4 -->
-                <div class="glass-card card-glow p-8 rounded-2xl">
-                    <div class="flex items-center gap-4 mb-6 border-b border-gray-800 pb-4">
-                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-lightbulb text-green-500 text-xl"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white tracking-wide">潜在机会与差异化</h3>
-                    </div>
-                    <ul class="insight-list">
-                        <li><span class="text-white font-semibold mr-2">竞品竞争盲区:</span> 评论中未提及任何竞品，表明产品尚未进入消费者的高级比较清单。</li>
-                        <li><span class="text-white font-semibold mr-2">极简蓝海发现:</span> 100% 的中立评价暗示了一个被忽视的追求纯粹、无印调性的潜在客群。</li>
-                        <li><span class="text-white font-semibold mr-2">战略转型建议:</span> 将被动的“平庸”主动转化为“极简主义”，吸引厌恶冗余功能的消费者。</li>
-                    </ul>
+        
+        <!-- ============================================
+             01 — 洞察总览
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <div>
+                    <h2 class="section-title">洞察总览</h2>
+                    <p class="section-subtitle">核心判断 · 主要矛盾 · 四象限决策摘要</p>
                 </div>
             </div>
-        </section>
 
-        <!-- 4. Data Telemetry 图表矩阵 -->
-        <section class="mb-20">
-            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
-                <i class="fa-solid fa-chart-pie text-anker-gold"></i> 多维数据遥测 (Data Telemetry)
-            </h2>
-            <!-- Anti-Overlap Strategy: min-h-[400px] -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-20">
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">情感分布矩阵</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartSentiment"></canvas></div>
+            <div class="editorial-hero">
+                <div class="judgement-panel depth-hero">
+                    <div class="kicker">Board Judgement</div>
+                    <div class="judgement-title">搅拌性能是核心护城河</div>
+                    <div class="judgement-detail">85% 正面评价提及"均匀""省力"</div>
                 </div>
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">核心特征关注度</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartFeatures"></canvas></div>
-                </div>
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">使用场景分布</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartScenarios"></canvas></div>
-                </div>
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">价格价值感知</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartPrice"></canvas></div>
-                </div>
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">设计与易用性反馈</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartDesign"></canvas></div>
-                </div>
-                <div class="glass-card card-glow p-6 rounded-2xl min-h-[400px] flex flex-col relative">
-                    <h3 class="text-center text-gray-300 font-semibold mb-4 tracking-wide text-sm">耐用性与质量评估</h3>
-                    <div class="flex-grow relative w-full h-full"><canvas id="chartDurability"></canvas></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. Strategy Dual-Columns -->
-        <section class="mb-20">
-            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
-                <i class="fa-solid fa-chess text-anker-gold"></i> 战略对抗矩阵 (Moat vs Vulnerability)
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
-                <!-- Moat -->
-                <div class="glass-card card-glow p-8 rounded-2xl border-t-4 border-t-green-500/80">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                        <i class="fa-solid fa-shield-halved text-green-500"></i> 品牌护城河 (Moat)
-                    </h3>
-                    <div class="space-y-6">
-                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
-                            <h4 class="text-green-400 font-bold mb-2">质量稳定性</h4>
-                            <p class="text-gray-400 text-sm leading-relaxed">在随机样本中表现出极高的功能一致性，无质量瑕疵投诉，为品牌升级提供稳固底座。</p>
-                        </div>
-                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
-                            <h4 class="text-green-400 font-bold mb-2">预期管理一致性</h4>
-                            <p class="text-gray-400 text-sm leading-relaxed">产品实际表现与详情页描述高度契合，供应链品控稳定，有效降低了消费者的失落感。</p>
-                        </div>
+                <div class="tension-panel">
+                    <div>
+                        <div class="kicker" style="color: var(--red);">Core Tension</div>
+                        <div class="tension-title">增长不是问题，失控点才是问题</div>
+                        <div class="tension-text">68.2% 正面评价证明产品价值成立，但 12.3% 负面评价集中指向「痛点1: 电机耐久性不足」。当前看板的关键不是继续证明好评，而是识别哪一个短板会吞噬增长。</div>
                     </div>
-                </div>
-                <!-- Vulnerability -->
-                <div class="glass-card card-glow p-8 rounded-2xl border-t-4 border-t-anker-danger/80">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                        <i class="fa-solid fa-crosshairs text-anker-danger"></i> 致命脆弱点 (Vulnerability)
-                    </h3>
-                    <div class="space-y-6">
-                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
-                            <h4 class="text-anker-danger font-bold mb-2">品牌存在感缺失</h4>
-                            <p class="text-gray-400 text-sm leading-relaxed">用户对产品缺乏情感投入，导致评论内容极度空洞，心智占位处于完全透明状态。</p>
+                    <div class="tension-metrics">
+                        <div class="tension-metric">
+                            <span>有效样本</span>
+                            <strong>1146 / 1284</strong>
                         </div>
-                        <div class="bg-black/40 p-5 rounded-xl border border-gray-800">
-                            <h4 class="text-anker-danger font-bold mb-2">社交货币属性弱</h4>
-                            <p class="text-gray-400 text-sm leading-relaxed">产品缺乏足以让用户产生分享冲动的亮点或创新点，无法形成口碑裂变与自发传播。</p>
+                        <div class="tension-metric">
+                            <span>正面 / 负面</span>
+                            <strong>68.2% / 12.3%</strong>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- 6. Strategic Allocation -->
-        <section class="mb-20">
-            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
-                <i class="fa-solid fa-layer-group text-anker-gold"></i> 高管执行矩阵 (Strategic Allocation)
-            </h2>
-            <div class="glass-card card-glow rounded-2xl overflow-hidden relative z-20">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-black/60 border-b border-gray-800">
-                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Urgency</th>
-                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Directive</th>
-                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase w-2/5">Strategic Details</th>
-                                <th class="p-5 text-gray-300 font-semibold tracking-wider text-sm uppercase">Expected ROI</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-800/50">
-                            <tr class="hover:bg-white/5 transition-colors group">
-                                <td class="p-5">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/20">
-                                        <i class="fa-solid fa-fire"></i> Immediate
-                                    </span>
-                                </td>
-                                <td class="p-5 text-white font-bold">视觉与包装重构</td>
-                                <td class="p-5 text-gray-400 text-sm leading-relaxed">在产品包装中增加品牌故事或独特的视觉元素，打破中立沉默，植入开箱 Aha Moment。</td>
-                                <td class="p-5 text-anker-gold font-medium text-sm">提升高质量评论留存率</td>
-                            </tr>
-                            <tr class="hover:bg-white/5 transition-colors group">
-                                <td class="p-5">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                                        <i class="fa-solid fa-clock"></i> Short-Term
-                                    </span>
-                                </td>
-                                <td class="p-5 text-white font-bold">评论激励计划</td>
-                                <td class="p-5 text-gray-400 text-sm leading-relaxed">通过合法渠道引导用户针对耐用性和特定使用场景进行深度反馈，解决数据静默危机。</td>
-                                <td class="p-5 text-anker-gold font-medium text-sm">获取结构化标签，优化广告投放</td>
-                            </tr>
-                            <tr class="hover:bg-white/5 transition-colors group">
-                                <td class="p-5">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                        <i class="fa-solid fa-seedling"></i> Long-Term
-                                    </span>
-                                </td>
-                                <td class="p-5 text-white font-bold">细分市场心智占领</td>
-                                <td class="p-5 text-gray-400 text-sm leading-relaxed">将产品定位从通用型转向极简主义或特定低频场景，建立差异化壁垒，摆脱价格内卷。</td>
-                                <td class="p-5 text-anker-gold font-medium text-sm">建立品牌溢价能力与用户忠诚</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. Market Resonance (VOC) 全案级深度版 -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-playfair font-bold text-white mb-8 border-l-4 border-anker-gold pl-4 flex items-center gap-3">
-                <i class="fa-solid fa-satellite-dish text-anker-gold"></i> 市场共振原声 (Voice of Customer)
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
+            <div class="quadrant-grid">
                 
-                <!-- VOC Card 1 -->
-                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
-                    <!-- Header -->
-                    <div class="flex items-center gap-5 mb-6">
-                        <img src="../../assets/avatars/avatar_tech.png" onerror="this.src='https://ui-avatars.com/api/?name=Advocate&background=111&color=BF953F&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-gold object-cover shadow-[0_0_15px_rgba(191,149,63,0.3)]">
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-wide">Advocate / 技术大牛</h3>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20">
-                                High Loyalty
-                            </span>
-                        </div>
-                    </div>
-                    <!-- Core Need -->
-                    <div class="mb-5">
-                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-gold/50 bg-anker-gold/10 text-anker-gold text-xs font-bold shadow-[0_0_10px_rgba(191,149,63,0.1)]">
-                            核心需求：顶级工业设计与硬件堆料认可
-                        </span>
-                    </div>
-                    <!-- Quote -->
-                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-gold pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
-                        "其工业设计与内部堆料确实达到了行业第一梯队水平..."
-                    </blockquote>
-                    <!-- Expert Analysis -->
-                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
-                        <h4 class="text-anker-gold font-bold text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
-                        </h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            该用户代表了高感知度的极客圈层。对硬件堆料的高度认可是品牌溢价的核心基石，建议在 A+ 页面及社媒营销中强化拆解图与硬核技术指标，放大该圈层的口碑效应。
-                        </p>
-                    </div>
+                <div class="quadrant-card depth-default" data-accent="gold" style="--i: 0">
+                    <div class="quadrant-eyebrow">Audience</div>
+                    <div class="quadrant-title">核心人群</div>
+                    <div class="quadrant-text">核心人群特征：女性为主，25-40岁，每周烘焙2-3次；多功能、稳定的搅拌体验，解放双手</div>
                 </div>
-
-                <!-- VOC Card 2 -->
-                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
-                    <!-- Header -->
-                    <div class="flex items-center gap-5 mb-6">
-                        <img src="../../assets/avatars/avatar_business.png" onerror="this.src='https://ui-avatars.com/api/?name=Detractor&background=111&color=ef4444&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-danger object-cover shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-wide">Detractor / 商务精英</h3>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20">
-                                Trust Broken
-                            </span>
-                        </div>
-                    </div>
-                    <!-- Core Need -->
-                    <div class="mb-5">
-                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-danger/50 bg-red-500/10 text-red-400 text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.1)]">
-                            核心需求：零容错的绝对稳定性
-                        </span>
-                    </div>
-                    <!-- Quote -->
-                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-danger pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
-                        "在关键的会议场合出现了断连，这对于专业人士来说是不可接受的。"
-                    </blockquote>
-                    <!-- Expert Analysis -->
-                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
-                        <h4 class="text-anker-danger font-bold text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-triangle-exclamation"></i> 危机解析
-                        </h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            核心商务场景的断连是致命伤，直接导致高净值用户信任破裂。此反馈属于最高优 P0 级预警，需立即协同研发排查特定环境下的固件稳定性，并主动提供高规格售后挽回。
-                        </p>
-                    </div>
+                
+                <div class="quadrant-card depth-default" data-accent="green" style="--i: 1">
+                    <div class="quadrant-eyebrow">Value</div>
+                    <div class="quadrant-title">价值验证</div>
+                    <div class="quadrant-text">85%用户认可搅拌均匀度和效率；正面提及"均匀"340次</div>
                 </div>
-
-                <!-- VOC Card 3 -->
-                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
-                    <!-- Header -->
-                    <div class="flex items-center gap-5 mb-6">
-                        <img src="../../assets/avatars/avatar_elderly_male.png" onerror="this.src='https://ui-avatars.com/api/?name=Passive&background=111&color=9ca3af&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-gray-500 object-cover">
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-wide">Passive / 生活家</h3>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-500/10 text-gray-400 border border-gray-500/20">
-                                Neutral
-                            </span>
-                        </div>
-                    </div>
-                    <!-- Core Need -->
-                    <div class="mb-5">
-                        <span class="inline-block px-4 py-1.5 rounded-full border border-gray-500/50 bg-gray-800/50 text-gray-300 text-xs font-bold">
-                            核心需求：基础功能替代与情绪价值获取
-                        </span>
-                    </div>
-                    <!-- Quote -->
-                    <blockquote class="italic text-gray-400 text-lg border-l-4 border-gray-500 pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
-                        "平时用着还行，就是没什么特别惊艳的地方。"
-                    </blockquote>
-                    <!-- Expert Analysis -->
-                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
-                        <h4 class="text-gray-300 font-bold text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
-                        </h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            典型的“数据静默”群体代表。缺乏 Aha moment 使产品沦为平庸的代名词。亟需通过 CMF 设计微创新或极具仪式感的包装设计，提升开箱惊喜感，将中立态度转化为品牌偏好。
-                        </p>
-                    </div>
+                
+                <div class="quadrant-card depth-default" data-accent="red" style="--i: 2">
+                    <div class="quadrant-eyebrow">Risk</div>
+                    <div class="quadrant-title">失控风险</div>
+                    <div class="quadrant-text">严重性：致命；连续使用15分钟以上容易过热停机</div>
                 </div>
-
-                <!-- VOC Card 4 -->
-                <div class="glass-card card-glow p-8 rounded-2xl flex flex-col h-full">
-                    <!-- Header -->
-                    <div class="flex items-center gap-5 mb-6">
-                        <img src="../../assets/avatars/avatar_tech.png" onerror="this.src='https://ui-avatars.com/api/?name=Advocate&background=111&color=BF953F&size=128'" alt="Avatar" class="w-16 h-16 rounded-full border-2 border-anker-gold object-cover shadow-[0_0_15px_rgba(191,149,63,0.3)]">
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-wide">Advocate / 极客玩家</h3>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-anker-gold/10 text-anker-gold border border-anker-gold/20">
-                                Premium Perception
-                            </span>
-                        </div>
-                    </div>
-                    <!-- Core Need -->
-                    <div class="mb-5">
-                        <span class="inline-block px-4 py-1.5 rounded-full border border-anker-gold/50 bg-anker-gold/10 text-anker-gold text-xs font-bold shadow-[0_0_10px_rgba(191,149,63,0.1)]">
-                            核心需求：持续的软硬件生态进化
-                        </span>
-                    </div>
-                    <!-- Quote -->
-                    <blockquote class="italic text-gray-300 text-lg border-l-4 border-anker-gold pl-5 mb-8 flex-grow font-playfair tracking-wide leading-relaxed">
-                        "固件更新非常及时，这就是我选择该品牌的理由。"
-                    </blockquote>
-                    <!-- Expert Analysis -->
-                    <div class="bg-black/60 p-5 rounded-xl border border-gray-800/50 mt-auto">
-                        <h4 class="text-anker-gold font-bold text-sm mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i> 深度解析
-                        </h4>
-                        <p class="text-gray-400 text-sm leading-relaxed">
-                            软硬件结合的持续售后体验是维系硬核用户的关键护城河。固件的更新频率与响应速度可提炼为隐性卖点，在详情页中作为“长期价值承诺”进行宣发，构建品牌信任壁垒。
-                        </p>
-                    </div>
+                
+                <div class="quadrant-card depth-default" data-accent="blue" style="--i: 3">
+                    <div class="quadrant-eyebrow">Move</div>
+                    <div class="quadrant-title">优先动作</div>
+                    <div class="quadrant-text">[P0] | 优化电机散热系统 → 减少40%负面评价</div>
                 </div>
+                
+            </div>
 
+            
+            <div class="insights-grid">
+                
+                <div class="insight-card" style="--i: 0">
+                    <div class="insight-card-number">1</div>
+                    <div class="insight-card-title">搅拌性能是核心护城河</div>
+                    <div class="insight-card-desc">85% 正面评价提及"均匀""省力"</div>
+                </div>
+                
+                <div class="insight-card" style="--i: 1">
+                    <div class="insight-card-number">2</div>
+                    <div class="insight-card-title">外观设计驱动冲动消费</div>
+                    <div class="insight-card-desc">颜值即正义</div>
+                </div>
+                
+                <div class="insight-card" style="--i: 2">
+                    <div class="insight-card-number">3</div>
+                    <div class="insight-card-title">电机耐久性是最大风险</div>
+                    <div class="insight-card-desc">连续使用场景下的过热问题</div>
+                </div>
+                
+            </div>
+            
+
+            
+            <div class="positioning-block">
+                <div class="positioning-label">产品定位</div>
+                <div class="positioning-text">: 高颜值家用搅拌器，适合日常烘焙但不适合高强度商用场景 战略方向: 巩固"专业家用"定位，修复耐久性口碑，拓展轻商用市场</div>
+            </div>
+            
+
+            
+            <div class="positioning-block" style="margin-top: var(--sp-md);">
+                <div class="positioning-label">战略方向</div>
+                <div class="positioning-text">: 巩固"专业家用"定位，修复耐久性口碑，拓展轻商用市场</div>
+            </div>
+            
+        </section>
+        
+
+        <!-- ============================================
+             02 — 情感分布
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <div>
+                    <h2 class="section-title">情感分布</h2>
+                    <p class="section-subtitle">评论情感倾向分析</p>
+                </div>
+            </div>
+
+            <div class="sentiment-chart depth-elevated">
+                <div class="sentiment-bars">
+                    
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">强烈推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 22.0%; --sentiment-color: var(--sentiment-strong-positive);"></div>
+                        </div>
+                        <div class="sentiment-value">252 (22.0%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 46.2%; --sentiment-color: var(--sentiment-positive);"></div>
+                        </div>
+                        <div class="sentiment-value">530 (46.2%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">中立</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 19.5%; --sentiment-color: var(--sentiment-neutral);"></div>
+                        </div>
+                        <div class="sentiment-value">223 (19.5%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">不推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 9.8%; --sentiment-color: var(--sentiment-negative);"></div>
+                        </div>
+                        <div class="sentiment-value">112 (9.8%)</div>
+                    </div>
+                    
+                    
+                    
+                    <div class="sentiment-bar">
+                        <div class="sentiment-label">强烈不推荐</div>
+                        <div class="sentiment-track">
+                            <div class="sentiment-fill" style="width: 2.5%; --sentiment-color: var(--sentiment-strong-negative);"></div>
+                        </div>
+                        <div class="sentiment-value">29 (2.5%)</div>
+                    </div>
+                    
+                </div>
             </div>
         </section>
 
+        <!-- ============================================
+             03 — 核心用户画像
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <div>
+                    <h2 class="section-title">核心用户画像</h2>
+                    <p class="section-subtitle">基于 1146 条评论识别的典型用户群体</p>
+                </div>
+            </div>
+
+            <div class="personas-grid">
+                
+                <div class="persona-card depth-elevated" style="--i: 0">
+                    <div class="persona-header">
+                        <div class="persona-name">烘焙爱好者</div>
+                        
+                        <div class="persona-count">35%</div>
+                        
+                    </div>
+                    
+                    <div class="segment-need">多功能、稳定的搅拌体验，解放双手</div>
+                    
+                    
+                    <div class="persona-tags">
+                        
+                        <span class="persona-tag">女性为主，25-40岁，每周烘焙2-3次</span>
+                        
+                    </div>
+                    
+                    
+                </div>
+                
+                <div class="persona-card depth-elevated" style="--i: 1">
+                    <div class="persona-header">
+                        <div class="persona-name">家庭主厨</div>
+                        
+                        <div class="persona-count">28%</div>
+                        
+                    </div>
+                    
+                    <div class="segment-need">节省时间，处理多种食材</div>
+                    
+                    
+                    
+                </div>
+                
+                <div class="persona-card depth-elevated" style="--i: 2">
+                    <div class="persona-header">
+                        <div class="persona-name">专业用户</div>
+                        
+                        <div class="persona-count">22%</div>
+                        
+                    </div>
+                    
+                    <div class="segment-need">高性能、长时间连续运行</div>
+                    
+                    
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+
+        
+        <!-- ============================================
+             04 — 数据遥测矩阵
+             ============================================ -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <div>
+                    <h2 class="section-title">数据遥测矩阵</h2>
+                    <p class="section-subtitle">从情感、功能、场景、价格与高频标签中提取可视化信号</p>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">价格感知分布</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart0"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">易用性评价</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart1"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">做工认知</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart2"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">使用场景</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart3"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">外观设计</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart4"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">舒适度</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart5"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card depth-elevated">
+                    <div class="chart-title">耐用性</div>
+                    <div class="chart-frame">
+                        <canvas id="dashboardChart6"></canvas>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             05 — 核心卖点 & 痛点
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <div>
+                    <h2 class="section-title">核心卖点 &amp; 痛点</h2>
+                    <p class="section-subtitle">被正面评价验证的价值 vs 集中指向的负面反馈来源</p>
+                </div>
+            </div>
+
+            <div class="value-pain-grid">
+                <div>
+                    <div class="value-pain-column-title">
+                        <span class="icon-dot" style="background: var(--green);"></span>
+                        Brand Moat
+                    </div>
+                    <div class="cards-list">
+                        
+                        <div class="selling-card">
+                            <div class="selling-card-title">卖点1: 搅拌性能卓越</div>
+                            
+                            <div class="selling-card-finding">85%用户认可搅拌均匀度和效率</div>
+                            
+                            
+                            <div class="selling-card-data">正面提及"均匀"340次</div>
+                            
+                            
+                            
+                            
+                            <blockquote class="user-quote">面团搅拌得非常均匀，比手工好十倍</blockquote>
+                            
+                            
+                            
+                        </div>
+                        
+                        <div class="selling-card">
+                            <div class="selling-card-title">卖点2: 外观设计出众</div>
+                            
+                            <div class="selling-card-finding">颜值驱动购买决策</div>
+                            
+                            
+                            <div class="selling-card-data">正面提及"好看"250次</div>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div>
+                    <div class="value-pain-column-title">
+                        <span class="icon-dot" style="background: var(--red);"></span>
+                        Vulnerability
+                    </div>
+                    <div class="cards-list">
+                        
+                        
+                        
+                        
+                        
+                        <div class="pain-card severity-critical">
+                            
+                            <span class="severity-badge critical">致命</span>
+                            
+                            <div class="pain-card-title">痛点1: 电机耐久性不足</div>
+                            
+                            <div class="pain-card-finding">连续使用15分钟以上容易过热停机</div>
+                            
+                            
+                            <div class="pain-card-data">负面提及"过热"89次</div>
+                            
+                            
+                            
+                            
+                            <blockquote class="user-quote">用了一年，电机开始过热</blockquote>
+                            
+                            
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        <div class="pain-card severity-major">
+                            
+                            <span class="severity-badge major">严重</span>
+                            
+                            <div class="pain-card-title">痛点2: 配件接口松动</div>
+                            
+                            <div class="pain-card-finding">长时间使用后接口磨损导致异响</div>
+                            
+                            
+                            <div class="pain-card-data">负面提及"松动"67次</div>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             06 — 典型用户深度解析
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">06</span>
+                <div>
+                    <h2 class="section-title">典型用户深度解析</h2>
+                    <p class="section-subtitle">原声穿透与典型受众镜像解析</p>
+                </div>
+            </div>
+            <div class="stories-grid">
+                
+                <div class="story-card" style="--i: 0">
+                    <div class="story-sentiment-bar positive"></div>
+                    <div class="story-content">
+                        <div class="story-title">故事1: 每日烘焙者的依赖</div>
+                        
+                        <div class="story-profile">烘焙爱好者，女性，30-39岁</div>
+                        
+                        
+                        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
+                            情感倾向：正面
+                        </div>
+                        
+                        
+                        <div class="story-need">稳定可靠的日常工具</div>
+                        
+                        
+                        <div class="story-quotes">
+                            
+                            <div class="story-quote">每天早上用它做面包，已经离不开它了</div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="story-card" style="--i: 1">
+                    <div class="story-sentiment-bar mixed"></div>
+                    <div class="story-content">
+                        <div class="story-title">故事2: 送礼场景的满意与遗憾</div>
+                        
+                        <div class="story-profile">男性，送礼给妻子</div>
+                        
+                        
+                        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
+                            情感倾向：混合
+                        </div>
+                        
+                        
+                        <div class="story-need">品牌感和仪式感</div>
+                        
+                        
+                        <div class="story-quotes">
+                            
+                            <div class="story-quote">老婆很开心，但用了半年电机出问题了</div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="story-card" style="--i: 2">
+                    <div class="story-sentiment-bar negative"></div>
+                    <div class="story-content">
+                        <div class="story-title">故事3: 专业用户的失望</div>
+                        
+                        <div class="story-profile">小型烘焙工作室经营者</div>
+                        
+                        
+                        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: var(--sp-md);">
+                            情感倾向：负面
+                        </div>
+                        
+                        
+                        <div class="story-need">长时间连续运行</div>
+                        
+                        
+                        <div class="story-quotes">
+                            
+                            <div class="story-quote">连续做三批面团就过热停了</div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             07 — 改进建议
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">07</span>
+                <div>
+                    <h2 class="section-title">改进建议</h2>
+                    <p class="section-subtitle">按优先级排序的产品 / 服务 / 期望管理建议</p>
+                </div>
+            </div>
+
+            <div class="improvements-groups">
+                
+                
+                <div class="improvement-group">
+                    
+                    <div class="improvement-group-title">产品改进</div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p0">P0</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">优化电机散热系统</div>
+                            
+                            <div class="improvement-desc">解决过热停机问题</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p1">P1</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">加固配件接口设计</div>
+                            
+                            <div class="improvement-desc">减少磨损导致的松动</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                
+                <div class="improvement-group">
+                    
+                    <div class="improvement-group-title">服务改进</div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p0">P0</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">建立快速售后通道</div>
+                            
+                            <div class="improvement-desc">配件更换无需整机寄回</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p1">P1</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">提供延保服务</div>
+                            
+                            <div class="improvement-desc">增强用户对耐久性的信心</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                
+                <div class="improvement-group">
+                    
+                    <div class="improvement-group-title">用户期望</div>
+                    
+                    
+                    <div class="improvement-item">
+                        <span class="priority-badge p2">P2</span>
+                        <div class="improvement-content">
+                            <div class="improvement-title">明确标注适用场景</div>
+                            
+                            <div class="improvement-desc">降低商用用户的错误预期</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             08 — 机会与差异化
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">08</span>
+                <div>
+                    <h2 class="section-title">机会与差异化</h2>
+                    <p class="section-subtitle">市场机会与竞争格局洞察</p>
+                </div>
+            </div>
+
+            <div class="opportunities-grid">
+                
+                <div class="opportunity-card" style="--i: 0">
+                    <div class="opportunity-card-title">机会1: 轻商用市场</div>
+                    <div class="opportunity-card-finding">22%用户有轻度商用需求但当前产品无法满足</div>
+                    
+                    <div class="opportunity-card-data">"工作室""小店"提及率15%</div>
+                    
+                    
+                </div>
+                
+                <div class="opportunity-card" style="--i: 1">
+                    <div class="opportunity-card-title">机会2: 配件生态</div>
+                    <div class="opportunity-card-finding">用户强烈希望更多功能扩展</div>
+                    
+                    <div class="opportunity-card-data">"配件""扩展"提及率28%</div>
+                    
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             09 — 行动决策仪表盘
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">09</span>
+                <div>
+                    <h2 class="section-title">行动决策仪表盘</h2>
+                    <p class="section-subtitle">优先级排序的行动清单与快速胜利</p>
+                </div>
+            </div>
+
+            
+            <div class="action-table-wrapper">
+                <table class="action-table">
+                    <thead>
+                        <tr>
+                            <th class="col-action">行动项</th>
+                            <th>优先级</th>
+                            <th class="col-impact">预期影响</th>
+                            <th class="col-source">来源</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        
+                        <tr>
+                            <td>| 优化电机散热系统</td>
+                            <td><span class="priority-badge p0">P0</span></td>
+                            <td>减少40%负面评价</td>
+                            <td>痛点1</td>
+                        </tr>
+                        
+                        
+                        <tr>
+                            <td>建立快速售后通道</td>
+                            <td><span class="priority-badge p0">P0</span></td>
+                            <td>提升复购率15%</td>
+                            <td>痛点2</td>
+                        </tr>
+                        
+                        
+                        <tr>
+                            <td>加固配件接口</td>
+                            <td><span class="priority-badge p1">P1</span></td>
+                            <td>减少异响投诉30%</td>
+                            <td>痛点2</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+
+            
+            <div class="subsection-title">快速胜利</div>
+            <div class="quick-wins-grid">
+                
+                <div class="quick-win-card" style="--i: 0">
+                    <div class="quick-win-title">配件单独售卖</div>
+                    <div class="quick-win-desc">降低售后门槛，减少用户不满</div>
+                </div>
+                
+                <div class="quick-win-card" style="--i: 1">
+                    <div class="quick-win-title">使用指南视频</div>
+                    <div class="quick-win-desc">教用户正确使用避免过热</div>
+                </div>
+                
+            </div>
+            
+        </section>
+        
+
+        <!-- ============================================
+             10 — 精选评论样本
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">10</span>
+                <div>
+                    <h2 class="section-title">精选评论样本</h2>
+                    <p class="section-subtitle">高信息密度评论深度解析</p>
+                </div>
+            </div>
+            <div class="samples-list">
+                
+                
+                
+                
+                
+                <div class="sample-card" onclick="this.classList.toggle('expanded')">
+                    <div class="sample-header">
+                        <span class="sample-sentiment positive">推荐</span>
+                        
+                        <div class="sample-rating">
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ☆
+                            
+                        </div>
+                        
+                    </div>
+                    <div class="sample-body">
+                        <p class="sample-text">用了半年，搅拌面团非常均匀。唯一缺点是重量大。</p>
+                        
+                        <div class="sample-tags">
+                            
+                            
+                            <span class="sample-tag">女</span>
+                            
+                            
+                            
+                            <span class="sample-tag">家庭烘焙</span>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                <div class="sample-card" onclick="this.classList.toggle('expanded')">
+                    <div class="sample-header">
+                        <span class="sample-sentiment strong-positive">强烈推荐</span>
+                        
+                        <div class="sample-rating">
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                            ★
+                            
+                        </div>
+                        
+                    </div>
+                    <div class="sample-body">
+                        <p class="sample-text">送给老婆的生日礼物，她非常喜欢。</p>
+                        
+                        <div class="sample-tags">
+                            
+                            
+                            <span class="sample-tag">男</span>
+                            
+                            
+                            
+                            <span class="sample-tag">送礼</span>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             11 — 深度内容（剩余章节）
+             ============================================ -->
+        
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">11</span>
+                <div>
+                    <h2 class="section-title">深度内容</h2>
+                    <p class="section-subtitle">评论时间趋势、情感差距、关键词聚类、购买漏斗等完整分析</p>
+                </div>
+            </div>
+
+            <div class="deep-content depth-default" style="padding: var(--sp-xl); border-radius: 10px;">
+                <h2>评论时间趋势</h2>
+<p>评论量在过去12个月稳步增长，尤其在11-12月送礼季出现显著峰值。正面评价比例在3月后有所下降，与电机过热投诉增加的时间吻合。</p>
+<hr />
+<h2>评分与文本情感背离</h2>
+<p>约8%的评论存在评分-文本背离现象。这类背离主要集中在物流和包装维度。</p>
+<hr />
+<h2>关键词聚类</h2>
+<p>高频关键词可分为5个聚类：搅拌品质类、外观审美类、耐久性类、性价比类、服务类。</p>
+<hr />
+<h2>购买动机归因链</h2>
+<p>购买动机呈现明显的&quot;内容种草→品牌认知→场景匹配&quot;链路。60%用户提到在社交媒体看到推荐，40%是直接搜索品牌名进入。</p>
+
+            </div>
+        </section>
+        
+
+        <!-- ============================================
+             FOOTER
+             ============================================ -->
+        <footer class="footer">
+            <div class="footer-logo">Amazon Review Analyzer</div>
+            <p>Generated by AI &middot; 2026-06-01</p>
+            <p style="margin-top: 0.5rem; font-size: 0.7rem;">
+                Powered by Claude AI &middot; Multi-Dimension Tag System &middot; User Persona Analysis
+            </p>
+        </footer>
     </div>
 
-    <!-- Chart.js Initialization -->
+    <!-- ============================================
+         CHART.JS INIT
+         ============================================ -->
     <script>
-        // Global Chart Defaults for Black Minimalist Luxury Theme
-        Chart.defaults.color = '#9ca3af';
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { padding: 20, usePointStyle: true, boxWidth: 8 }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    titleColor: '#BF953F',
-                    bodyColor: '#fff',
-                    borderColor: 'rgba(191,149,63,0.3)',
-                    borderWidth: 1,
-                    padding: 12,
-                    cornerRadius: 8
-                }
-            }
-        };
+        function toggleCollapsible(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.toggle('expanded');
+        }
 
-        const barOptions = {
-            ...commonOptions,
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
-                x: { grid: { display: false }, border: { display: false } }
-            }
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.Chart) return;
 
-        const chartColors = {
-            gold: '#BF953F',
-            goldLight: '#FCF6BA',
-            grayDark: '#374151',
-            grayLight: '#9CA3AF',
-            danger: '#ef4444'
-        };
+            Chart.defaults.color = '#9a9186';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
 
-        // 1. Sentiment (Doughnut)
-        new Chart(document.getElementById('chartSentiment'), {
-            type: 'doughnut',
-            data: {
-                labels: ["中立", "解析失败", "中立"],
-                datasets: [{
-                    data: [1, 9, 0],
-                    backgroundColor: [chartColors.grayLight, chartColors.grayDark, chartColors.gold],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: { ...commonOptions, cutout: '70%' }
-        });
+            var dashboardCharts = [{"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [340, 280, 120], "label": "\u4ef7\u683c\u611f\u77e5\u5206\u5e03"}], "labels": ["\u7269\u8d85\u6240\u503c", "\u4ef7\u683c\u5408\u7406", "\u504f\u8d35"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart0", "title": "\u4ef7\u683c\u611f\u77e5\u5206\u5e03", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [450, 180, 80], "label": "\u6613\u7528\u6027\u8bc4\u4ef7"}], "labels": ["\u7b80\u5355\u6613\u7528", "\u9700\u8981\u5b66\u4e60", "\u590d\u6742"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart1", "title": "\u6613\u7528\u6027\u8bc4\u4ef7", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d4a73a", "#6a9bc7", "#9a9186"], "data": [380, 200, 60], "label": "\u505a\u5de5\u8ba4\u77e5"}], "labels": ["\u505a\u5de5\u7cbe\u7ec6", "\u505a\u5de5\u4e00\u822c", "\u505a\u5de5\u7c97\u7cd9"]}, "options": {"maintainAspectRatio": false, "responsive": true}, "type": "bar"}, "id": "dashboardChart2", "title": "\u505a\u5de5\u8ba4\u77e5", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [380, 200, 90], "label": "\u4f7f\u7528\u573a\u666f"}], "labels": ["\u5bb6\u5ead\u70d8\u7119", "\u9001\u793c", "\u5546\u7528"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u4f7f\u7528\u573a\u666f"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart3", "title": "\u4f7f\u7528\u573a\u666f", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [300, 200, 80], "label": "\u5916\u89c2\u8bbe\u8ba1"}], "labels": ["\u65f6\u5c1a", "\u7b80\u7ea6", "\u4f20\u7edf"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u5916\u89c2\u8bbe\u8ba1"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart4", "title": "\u5916\u89c2\u8bbe\u8ba1", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [350, 200, 60], "label": "\u8212\u9002\u5ea6"}], "labels": ["\u5f88\u8212\u9002", "\u4e00\u822c", "\u4e0d\u8212\u9002"]}, "options": {"maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u8212\u9002\u5ea6"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart5", "title": "\u8212\u9002\u5ea6", "type": "bar"}, {"config": {"data": {"datasets": [{"backgroundColor": ["#d29922", "#79c0ff", "#7ee787"], "borderColor": "transparent", "borderWidth": 0, "data": [350, 250, 90], "label": "\u8010\u7528\u6027"}], "labels": ["\u975e\u5e38\u8010\u7528", "\u4e00\u822c\u8010\u7528", "\u5bb9\u6613\u635f\u574f"]}, "options": {"indexAxis": "y", "maintainAspectRatio": false, "plugins": {"legend": {"display": false}, "title": {"color": "#f0f6fc", "display": true, "font": {"size": 16}, "text": "\u8010\u7528\u6027"}}, "responsive": true, "scales": {"x": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e"}}, "y": {"grid": {"color": "rgba(255,255,255,0.05)"}, "ticks": {"color": "#8b949e", "precision": 0}}}}, "type": "bar"}, "id": "dashboardChart6", "title": "\u8010\u7528\u6027", "type": "bar"}];
+            dashboardCharts.forEach(function(item) {
+                var canvas = document.getElementById(item.id);
+                if (!canvas || !item.config) return;
 
-        // 2. Features (Bar)
-        new Chart(document.getElementById('chartFeatures'), {
-            type: 'bar',
-            data: {
-                labels: ["项目1", "项目2", "项目3"],
-                datasets: [{
-                    label: '关注度',
-                    data: [40, 30, 30],
-                    backgroundColor: chartColors.gold,
-                    borderRadius: 4,
-                    barThickness: 24
-                }]
-            },
-            options: barOptions
-        });
+                item.config.options = item.config.options || {};
+                item.config.options.responsive = true;
+                item.config.options.maintainAspectRatio = false;
 
-        // 3. Scenarios (Bar)
-        new Chart(document.getElementById('chartScenarios'), {
-            type: 'bar',
-            data: {
-                labels: ["项目1", "项目2", "项目3"],
-                datasets: [{
-                    label: '提及频次',
-                    data: [40, 30, 30],
-                    backgroundColor: 'rgba(191, 149, 63, 0.6)',
-                    borderColor: chartColors.gold,
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    barThickness: 24
-                }]
-            },
-            options: barOptions
-        });
+                item.config.options.plugins = item.config.options.plugins || {};
+                item.config.options.plugins.legend = item.config.options.plugins.legend || {};
+                item.config.options.plugins.legend.labels = Object.assign(
+                    { color: '#9a9186', boxWidth: 10, padding: 14, font: { family: "'IBM Plex Mono', monospace", size: 11 } },
+                    item.config.options.plugins.legend.labels || {}
+                );
+                item.config.options.plugins.tooltip = Object.assign(
+                    {
+                        backgroundColor: 'rgba(17,17,17,0.96)',
+                        titleColor: '#d4a73a',
+                        titleFont: { family: "'IBM Plex Mono', monospace", size: 12 },
+                        bodyColor: '#ece5d8',
+                        bodyFont: { family: "'Source Sans 3', sans-serif", size: 13 },
+                        borderColor: 'rgba(212,167,58,0.3)',
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 4
+                    },
+                    item.config.options.plugins.tooltip || {}
+                );
 
-        // 4. Price Perception (Doughnut)
-        new Chart(document.getElementById('chartPrice'), {
-            type: 'doughnut',
-            data: {
-                labels: ["物超所值", "偏贵", "合理"],
-                datasets: [{
-                    data: [40, 30, 30],
-                    backgroundColor: [chartColors.goldLight, chartColors.danger, chartColors.grayDark],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: { ...commonOptions, cutout: '70%' }
-        });
+                item.config.options.scales = item.config.options.scales || {};
+                ['x', 'y'].forEach(function(axis) {
+                    if (item.config.options.scales[axis]) {
+                        item.config.options.scales[axis].ticks = Object.assign(
+                            { color: '#6b6560', font: { family: "'IBM Plex Mono', monospace", size: 11 } },
+                            item.config.options.scales[axis].ticks || {}
+                        );
+                        item.config.options.scales[axis].grid = Object.assign(
+                            { color: 'rgba(255,255,255,0.04)' },
+                            item.config.options.scales[axis].grid || {}
+                        );
+                    }
+                });
 
-        // 5. Design Usability (Radar or Bar - choosing Bar for consistency with dummy data)
-        new Chart(document.getElementById('chartDesign'), {
-            type: 'bar',
-            data: {
-                labels: ["外观精美", "操作直观", "笨重", "复杂"],
-                datasets: [{
-                    label: '正向反馈',
-                    data: [40, 30, 0, 0],
-                    backgroundColor: chartColors.gold,
-                    borderRadius: 4
-                },
-                {
-                    label: '负向反馈',
-                    data: [0, 0, 30, 0], // Adjusted dummy data to make sense for negative
-                    backgroundColor: chartColors.danger,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                ...barOptions,
-                scales: {
-                    x: { stacked: true, grid: { display: false } },
-                    y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            }
-        });
-
-        // 6. Durability (Bar)
-        new Chart(document.getElementById('chartDurability'), {
-            type: 'bar',
-            data: {
-                labels: ["质量上乘", "材质优良", "易损耗"],
-                datasets: [{
-                    label: '反馈量',
-                    data: [40, 30, 30],
-                    backgroundColor: [chartColors.gold, chartColors.goldLight, chartColors.grayDark],
-                    borderRadius: 4,
-                    barThickness: 24
-                }]
-            },
-            options: {
-                ...barOptions,
-                plugins: { ...commonOptions.plugins, legend: { display: false } }
-            }
+                new Chart(canvas, item.config);
+            });
         });
     </script>
 </body>
