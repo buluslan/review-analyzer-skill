@@ -99,7 +99,7 @@ def calculate_stats_summary(tagged_reviews: List[Dict]) -> Dict:
     # 取 Top 30 标签 (供本地和旧看板逻辑使用)
     top_tags = dict(tag_counter.most_common(30))
     
-    # 将 Counter 转换为普通 dict (供 Gemini 使用全面数据)
+    # 将 Counter 转换为普通 dict (供全面数据使用)
     for dim in dimensional_stats:
         dimensional_stats[dim] = dict(dimensional_stats[dim].most_common(50)) # 取每个维度前50防止过大
 

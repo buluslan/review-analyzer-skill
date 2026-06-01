@@ -202,10 +202,10 @@ python -c "import google.generativeai; print(google.generativeai.__version__)"
 python -c "import pandas; print(pandas.__version__)"
 ```
 
-### 3. 运行环境检查脚本
+### 3. 验证安装
 
 ```bash
-python scripts/check_environment.py
+python3 -c "import jinja2, pandas, requests; print('依赖安装成功')"
 ```
 
 ### 4. 测试项目功能
@@ -269,11 +269,8 @@ pip install -r requirements.txt
 
 **解决方案**:
 ```bash
-# 更新到最新兼容版本
-python -m pip install --upgrade google-generativeai
-
-# 或指定兼容版本
-python -m pip install google-generativeai==0.8.4
+# 更新项目依赖
+pip install --upgrade -r requirements.txt
 ```
 
 ### Q5: 权限错误（Linux/macOS）
@@ -323,7 +320,7 @@ arch -x86_64 brew install python@3.11
 所有 `requirements.txt` 中的依赖均支持 Python 3.10+：
 
 ```
-✅ google-generativeai  - 支持 3.8+
+✅ jinja2              - 支持 3.7+
 ✅ pandas              - 支持 3.9+
 ✅ requests            - 支持 3.7+
 ✅ beautifulsoup4      - 支持 3.7+
@@ -379,7 +376,7 @@ deactivate                # 退出
 - [ ] 验证 Python 版本 (`python --version`)
 - [ ] 创建/更新虚拟环境
 - [ ] 安装项目依赖 (`pip install -r requirements.txt`)
-- [ ] 运行环境检查脚本 (`python scripts/check_environment.py`)
+- [ ] 安装项目依赖 (`pip install -r requirements.txt`)
 - [ ] 测试项目功能 (`python main.py examples/reviews_sample.csv`)
 - [ ] 更新 IDE/编辑器配置（如果需要）
 - [ ] 更新 CI/CD 配置（如果适用）
