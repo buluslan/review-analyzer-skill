@@ -13,7 +13,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.1.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
+[![Version](https://img.shields.io/badge/version-2.2.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
 **15章深度洞察报告 · 6套主题可视化看板 · 飞书文档同步 · Agent原生架构**
 
@@ -26,6 +26,8 @@
 ## 项目简介
 
 Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、Codex、Cursor、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
+
+> **V2.2 · Agent 自执行模式**：LLM 工序（评论打标、15 章报告撰写）由宿主 Agent 自己完成，**不依赖本机安装 claude CLI**——任何 AI Coding Agent 都能完整跑通。另保留 `--llm cli` 直跑模式作为无宿主 Agent 时的 headless 后备。
 
 ### V2.0 核心升级
 
@@ -49,6 +51,8 @@ Phase 2: 用户画像识别（3-4个画像，3正+3负黄金样本）
 Phase 3: 洞察报告生成（15章结构化报告）
 Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 ```
+
+> V2.2 起 Phase 1/3 的 LLM 工序默认由**宿主 Agent 自执行**（`--llm agent`，prepare → Agent 打标 → `--resume` → Agent 撰写报告 → `--resume` 收尾）；上图 CLI 并发路径保留为 headless 后备（`--llm cli`）。
 
 > 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 15 章完整内容（V2.1 版，含异常信号卡）+ 飞书白板 mermaid 图表
 
@@ -148,7 +152,7 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 |------|------|
 | **操作系统** | macOS / Linux / Windows |
 | **Python** | **3.10 或更高版本**（推荐 3.11.x） |
-| **Agent CLI** | Claude Code CLI、Codex CLI、Cursor、OpenCode CLI 等任一 AI Coding Agent |
+| **Agent CLI** | 任一 AI Coding Agent（Claude Code、Codex、Cursor、OpenCode 等）。Agent 自执行模式零 CLI 依赖；仅 headless 直跑（`--llm cli`）需 claude/opencode |
 | **内存** | 建议 4GB+ |
 | **飞书同步（可选）** | 需安装 [lark-cli](https://github.com/germalli/lark-cli) 并完成认证登录 |
 
@@ -193,11 +197,18 @@ python3 main.py your_reviews.csv --max-reviews 200
 # 方式2：卖家精灵平台数据（可选增强，需配置 SELLERSPRITE_SECRET_KEY）
 python3 main.py --source sellersprite --asin B09XYZ123 --site US --max-reviews 200
 
+# === LLM 执行模式（V2.2） ===
+# agent（推荐，宿主 Agent 自执行打标与报告，零 CLI 依赖）:
+python3 main.py your_reviews.csv --llm agent --max-reviews 200 --creator "Your Name"
+#   → prepare 退出后，宿主 Agent 按 prompt 打标/撰写报告，用 --resume <workdir> 推进
+# cli（默认，headless 后备，subprocess 调 claude/opencode 一次跑完）:
+python3 main.py your_reviews.csv --max-reviews 200 --creator "Your Name"
+
 # === 完整参数 ===
 python3 main.py your_reviews.csv \
   --asin B09XYZ123 \
   --template premium-gold \
-  --feishu-sync auto \
+  --feishu-sync \
   --concurrent 4 \
   --creator "Your Name"
 
@@ -282,6 +293,8 @@ review-analyzer-skill/
 │   ├── template_engine.py       # 统一模板引擎（Jinja2 SSR + 共享基座）
 │   ├── chart_engine.py          # Chart.js 图表配置生成
 │   ├── insights_generator.py    # 15章洞察报告生成（CLI subprocess）
+│   ├── agent_pipeline.py        # Agent 自执行模式（prepare/resume 状态机）
+│   ├── pipeline_common.py       # 共享输出阶段（打标CSV + MD + HTML + 飞书）
 │   ├── output_manager.py        # 输出管理（MD + HTML + 飞书同步）
 │   ├── feishu_sync.py           # 飞书文档 + 白板同步
 │   ├── report_generator.py      # 报告生成（兼容层）
@@ -322,7 +335,7 @@ review-analyzer-skill/
 <details>
 <summary><b>Q2: 需要什么 API Key？</b></summary>
 
-**A**: V2.0 **无需任何 API Key**。全程使用 Claude Code / OpenCode 内置模型，消耗你的 Claude 配额。
+**A**: **无需任何 API Key**。`--llm agent` 模式下 LLM 工序由宿主 Agent 自执行（任何 AI Coding Agent 均可，消耗宿主配额）；`--llm cli` 后备模式使用 Claude Code / OpenCode CLI，消耗对应配额。
 </details>
 
 <details>
@@ -363,7 +376,7 @@ review-analyzer-skill/
 | 特性 | Review Analyzer Skill V2.0 | 其他工具 |
 |------|---------------------------|---------|
 | **架构** | Agent 原生 Skill | 通常为独立脚本 |
-| **API Key** | 零（纯 CLI） | 多数需要 API Key |
+| **API Key** | 零（宿主 Agent 自执行 / CLI 后备） | 多数需要 API Key |
 | **洞察报告** | 15章深度分析 | 基础统计 |
 | **可视化** | 6套主题 + 玻璃拟态 | 单一模板或无 |
 | **飞书集成** | 文档 + 白板自动同步 | 多不支持 |
@@ -377,7 +390,8 @@ review-analyzer-skill/
 - [x] **v1.0.0** - 首个正式发布（22维度标签 + 双模式 + HTML看板）
 - [x] **v2.0.0** - Agent 原生版（14章报告 + 6套主题 + 飞书同步 + 共享基座架构）
 - [x] **v2.1.0** - 异常信号卡 + 卖家精灵数据源 + 测试套件（52 用例）
-- [ ] **v2.2.0** - Web 端增强（前端模板选择器 + 截图导出）
+- [x] **v2.2.0** - Agent 自执行模式（打标与报告由宿主 Agent 完成，零 CLI 依赖；测试 59 用例）
+- [ ] **v2.3.0** - Web 端增强（前端模板选择器 + 截图导出）
 - [ ] **v3.0.0** - 多平台分析（批量 ASIN + 竞品对比报告）
 
 ---

@@ -2,7 +2,8 @@
 配置管理模块 V2.0 — Agent 原生版
 
 重大变更：
-- 打标阶段改为 Prompt Router，宿主 Agent 直接执行，不再依赖 subprocess CLI
+- LLM 工序支持两种执行模式：cli=subprocess 调宿主 CLI 引擎（headless 后备）；
+  agent=宿主 Agent 自执行（见 src/agent_pipeline.py）
 - 新增数据接入层配置（卖家精灵平台）
 - 新增可视化模板系统配置
 - 新增飞书同步配置
@@ -33,8 +34,9 @@ class Config:
     # claude  → subprocess: claude --print --dangerously-skip-permissions <prompt>
     # opencode → subprocess: opencode run <prompt>
     # 未指定时自动探测: 优先 claude，其次 opencode
-    # V2.0 备注：打标阶段不再使用 CLI，由宿主 Agent 直接执行
-    #            CLI 引擎仅用于洞察报告和 HTML 看板的生成
+    # V2.1 备注：LLM 工序（打标、报告撰写）有两种执行模式：
+    #   - cli（main.py --llm cli）: subprocess 调 CLI 引擎，headless 后备
+    #   - agent（main.py --llm agent）: 宿主 Agent 自执行，见 src/agent_pipeline.py
     CLI_ENGINE: str = ""  # 可选: claude / opencode / 留空自动探测
     CLAUDE_CLI_CMD: str = "claude"
     OPENCODE_CLI_CMD: str = "opencode"
@@ -100,8 +102,8 @@ class Config:
             print(f"⚠️  并发数 {self.MAX_CONCURRENT_AGENTS} 超过上限 {MAX_CONCURRENT_CAP}，已自动调整为 {MAX_CONCURRENT_CAP}")
             self.MAX_CONCURRENT_AGENTS = MAX_CONCURRENT_CAP
 
-        # V2.0: CLI 引擎不再是必须的（打标由宿主 Agent 执行）
-        # 仅在洞察报告和 HTML 看板生成时才需要 CLI
+        # V2.1: CLI 引擎仅 --llm cli 模式需要（打标+报告均走 subprocess）
+        # --llm agent 模式不依赖 CLI，由宿主 Agent 自执行 LLM 工序
         import shutil
         env_engine = os.getenv("CLI_ENGINE", "").lower()
         if env_engine in ("claude", "opencode"):
@@ -114,7 +116,7 @@ class Config:
             elif shutil.which(self.OPENCODE_CLI_CMD):
                 self.CLI_ENGINE = "opencode"
             else:
-                # V2.0: 不再强制要求 CLI，但记录警告
+                # V2.1: 不强制要求 CLI（agent 模式无需 CLI；cli 模式由 main.py 显式报错）
                 self.CLI_ENGINE = "none"
 
     @property
@@ -126,7 +128,8 @@ class Config:
         """构建 CLI 调用命令（统一入口）
 
         自动解析绝对路径并根据当前引擎类型构建正确的命令参数。
-        V2.0: 当引擎为 "none" 时抛出 RuntimeError（仅洞察报告/看板生成需要 CLI）
+        V2.1: 当引擎为 "none" 时抛出 RuntimeError（--llm cli 模式的打标与报告均需要 CLI；
+        --llm agent 模式不会调用本方法）
 
         Args:
             prompt: 要传递给 CLI 的提示词

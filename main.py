@@ -6,11 +6,8 @@ Amazon 商品评论 AI 深度分析工具 - 主入口 V2.0 (Agent 原生版)
 
 import sys
 import argparse
-import re
 import os
 from pathlib import Path
-from datetime import datetime
-import pandas as pd
 from dotenv import load_dotenv
 
 # 加载 .env 环境变量
@@ -22,6 +19,11 @@ from src.review_analyzer import analyze_all
 from src.user_persona_analyzer import analyze_user_personas
 from src.insights_generator import calculate_stats_summary, generate_insights
 from src.config import config
+from src.pipeline_common import (
+    extract_asin_from_file,
+    run_output_phase,
+)
+from src import agent_pipeline
 
 # V2.0 新模块
 from src.data_fetchers import get_fetcher, list_fetchers
@@ -91,35 +93,6 @@ def config_wizard(total_available: int,
     return (max_rev, creator)
 
 
-def save_tagged_reviews_to_csv(tagged_reviews: list, asin: str) -> Path:
-    """将打标后的评论数据保存为 CSV 文件"""
-    flattened_reviews = []
-    for review in tagged_reviews:
-        original_data = review.get("_original_data", {})
-        flat_row = dict(original_data)
-        tags = review.get("tags", {})
-        for tag_key, tag_value in tags.items():
-            if tag_key != "情感_总体评价":
-                flat_row[tag_key] = tag_value
-        flat_row["情感_总体评价"] = tags.get("情感_总体评价", "")
-        flat_row["评论价值打分"] = review.get("info_score", 0)
-        flat_row["打标时间"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        flattened_reviews.append(flat_row)
-
-    df = pd.DataFrame(flattened_reviews)
-    csv_path = config.get_csv_path(asin)
-    df.to_csv(csv_path, index=False, encoding=config.CSV_ENCODING)
-    return csv_path
-
-
-def extract_asin_from_file(file_path: str) -> str:
-    """从文件名提取 ASIN"""
-    filename = Path(file_path).stem
-    asin_pattern = r'[A-Z0-9]{10}'
-    matches = re.findall(asin_pattern, filename.upper())
-    return matches[0] if matches else filename.upper()[:10]
-
-
 def is_interactive_environment():
     """检测是否在交互式终端环境中运行"""
     return sys.stdin.isatty()
@@ -144,7 +117,13 @@ def main():
                         help="同步结果到飞书文档（需要 lark-cli）")
     # 原有参数
     parser.add_argument("--engine", choices=["claude", "opencode"], default=None,
-                        help="CLI 引擎: claude (默认) 或 opencode")
+                        help="CLI 引擎: claude (默认) 或 opencode（仅 --llm cli 模式生效）")
+    parser.add_argument("--llm", choices=["cli", "agent"], default="cli",
+                        help="LLM 执行模式: cli(默认, subprocess 调宿主 CLI 引擎) 或 "
+                             "agent(宿主 Agent 自执行打标与报告撰写, 见 src/agent_pipeline.py)")
+    parser.add_argument("--resume", default=None, metavar="WORKDIR",
+                        help="Agent 模式推进: 恢复 --llm agent 准备的工作目录"
+                             "（此模式下忽略其它参数，可重复调用）")
     parser.add_argument("--max-reviews", type=int, help="分析评论上限", default=None)
     parser.add_argument("--batch-size", type=int, default=20, help="批次大小")
     parser.add_argument("--concurrent", type=int, default=None,
@@ -152,6 +131,11 @@ def main():
     parser.add_argument("--creator", help="报告署名/品牌", default=None)
     parser.add_argument("--output-dir", help="自定义输出目录")
     args = parser.parse_args()
+
+    # --resume 模式：Agent 自执行流水线推进状态机（忽略其它参数）
+    if args.resume:
+        agent_pipeline.resume(args.resume)
+        return
 
     # 参数校验
     if args.source == "sellersprite" and not args.asin:
@@ -256,10 +240,28 @@ def main():
     if args.concurrent:
         config.MAX_CONCURRENT_AGENTS = args.concurrent
 
-    # 模式固定为 CLI 本地模式
-    engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
-    print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
-    print(f"🔧 并发线程数: {config.MAX_CONCURRENT_AGENTS}")
+    # 运行模式提示（cli=subprocess 调 CLI 引擎 / agent=宿主 Agent 自执行）
+    if args.llm == "agent":
+        print(f"💡 模式：Agent 自执行模式 (打标与报告由宿主 Agent 完成，不依赖 CLI 引擎)")
+    else:
+        if config.CLI_ENGINE == "none":
+            print("=" * 70)
+            print("❌ 当前无可用的 CLI 引擎（未检测到 claude / opencode），--llm cli 模式无法执行")
+            print("=" * 70)
+            print()
+            print("  💡 两种解决方案：")
+            print("     1. 安装 Claude Code 或 OpenCode 并加入 PATH 后重试")
+            print("     2. 改用 Agent 自执行模式，由宿主 Agent 完成打标与报告撰写：")
+            if args.input_file:
+                print(f"        python3 main.py '{args.input_file}' --llm agent \\")
+            else:
+                print(f"        python3 main.py --source sellersprite --asin {args.asin} --llm agent \\")
+            print("          --max-reviews 100 --creator '你的署名'")
+            print("=" * 70)
+            sys.exit(1)
+        engine_label = "OpenCode" if config.CLI_ENGINE == "opencode" else "Claude CLI"
+        print(f"💡 模式：{engine_label} 本地模式 (全本地方案)")
+        print(f"🔧 并发线程数: {config.MAX_CONCURRENT_AGENTS}")
 
     # 应用自定义输出目录
     if args.output_dir:
@@ -278,6 +280,20 @@ def main():
     if len(reviews) > config.MAX_REVIEWS:
         print(f"✂️  评论总数 {len(reviews)} 超过上限，截取前 {config.MAX_REVIEWS} 条")
         reviews = reviews[:config.MAX_REVIEWS]
+
+    # Agent 自执行模式：参数校验/数据获取/加载/截断已完成，
+    # 到此为止 Python 侧工作结束，打标与报告由宿主 Agent 完成
+    if args.llm == "agent":
+        agent_pipeline.prepare(
+            reviews=reviews,
+            asin=asin,
+            source=args.source,
+            original_file=str(resolved_file),
+            batch_size=args.batch_size,
+            template=args.template,
+            feishu_sync=args.feishu_sync,
+        )
+        return
 
     try:
         # ========== 执行全流程 ==========
@@ -331,99 +347,18 @@ def main():
             with open(md_path, 'w', encoding='utf-8') as f:
                 f.write(insights_md)
 
-        # 保存 CSV
-        csv_path = save_tagged_reviews_to_csv(tagged_reviews, asin)
-
-        # Phase 4 (V2.0): 输出管理 — 统一生成 MD + HTML看板 + 飞书同步
-        print(f"📦 [Phase 4/4] 生成完整输出包...")
-        from src.output_manager import generate_outputs, select_template
-
-        # 选择模板（none 表示跳过 HTML 生成）
-        template_name = args.template
-        if template_name.lower() == "none":
-            template_name = None  # 跳过 HTML 看板
-        else:
-            # 如果模板不存在，使用默认
-            try:
-                from src.template_engine import list_templates as _lt
-                available = [t["name"] for t in _lt()]
-                if template_name not in available:
-                    print(f"   ⚠️ 模板 '{template_name}' 不存在，使用默认模板")
-                    template_name = available[0] if available else "premium-gold"
-            except Exception:
-                pass
-
-        # 构建统计摘要
-        summary = {
-            "total": len(tagged_reviews),
-            "tagged": stats["tagged"],
-            "persona_count": len(personas),
-            "avg_rating": stats.get("avg_rating", 0),
-            "sentiment": stats.get("sentiment", {}),
-            "top_tags": stats.get("top_tags", {})
-        }
-
-        # 准备分析数据给 OutputManager
-        analysis_data_for_output = {
-            "asin": asin,
-            "product_name": asin,
-            "total_reviews": len(tagged_reviews),
-            "avg_rating": stats.get("avg_rating", 0),
-            "summary": summary,
-            "sentiment": stats.get("sentiment", {}),
-            "sentiment_distribution": stats.get("sentiment", {}),
-            "tag_statistics": stats.get("top_tags", {}),
-            "top_tags": stats.get("top_tags", {}),
-            "dimensional_stats": stats.get("dimensional_stats", {}),
-            "personas": [{"name": p.get("name", ""), "count": p.get("count", 0), "tags": p.get("tags", {})} for p in personas],
-            "golden_samples": golden_samples,
-            "insights_md": insights_md,
-            "statistics": stats,
-        }
-
-        output_config = {
-            "template_name": template_name,
-            "sync_feishu": args.feishu_sync,
-            "output_dir": str(config.OUTPUT_DIR),
-            "asin": asin,
-            "creator": config.HTML_CREATOR_NAME,
-        }
-
-        output_results = generate_outputs(analysis_data_for_output, output_config)
-
-        # 飞书同步结果
-        feishu_result = output_results.get("feishu_result", {})
-        if args.feishu_sync:
-            if feishu_result and feishu_result.get("success"):
-                print(f"   ✅ 飞书同步成功！")
-                if feishu_result.get("doc_url"):
-                    print(f"   📄 文档: {feishu_result['doc_url']}")
-                wb_count = feishu_result.get("whiteboard_count", 0)
-                if wb_count > 0:
-                    print(f"   📊 白板图表: {wb_count} 个已渲染")
-            else:
-                error = feishu_result.get("error", "未知错误") if feishu_result else "同步失败"
-                print(f"   ⚠️ 飞书同步失败: {error}")
-                print(f"   💡 本地文件已安全生成，不影响使用")
-
-        # 最终输出结果
-        final_md = output_results.get("md_path", str(md_path))
-        final_html = output_results.get("html_path", "")
-
-        print("\n" + "✨" * 30)
-        print("🎉 分析任务圆满完成！")
-        print(f"  - 洞察报告: {Path(final_md).name}")
-        print(f"  - 结构数据: {csv_path.name}")
-        if final_html:
-            print(f"  - 可视化看板: {Path(final_html).name} (模板: {template_name})")
-        else:
-            print(f"  - 可视化看板: 已跳过")
-        if args.feishu_sync and feishu_result and feishu_result.get("doc_url"):
-            print(f"  - 飞书文档: {feishu_result['doc_url']}")
-            wb_count = feishu_result.get("whiteboard_count", 0)
-            if wb_count > 0:
-                print(f"  - 白板图表: {wb_count} 个")
-        print("✨" * 30 + "\n")
+        # Phase 4 (V2.0): 输出管理 — 统一生成 CSV + MD + HTML看板 + 飞书同步
+        # （共享函数，agent 自执行模式收尾阶段复用同一实现）
+        run_output_phase(
+            tagged_reviews=tagged_reviews,
+            stats=stats,
+            personas=personas,
+            golden_samples=golden_samples,
+            insights_md=insights_md or "",
+            asin=asin,
+            template_name=args.template,
+            feishu_sync=args.feishu_sync,
+        )
 
     except Exception as e:
         print(f"\n❌ 引擎崩溃: {e}")

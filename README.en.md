@@ -11,7 +11,7 @@ English | [简体中文](README.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.1.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
+[![Version](https://img.shields.io/badge/version-2.2.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
 **15-Chapter Deep Insight Report · 6 Themed Visualization Dashboards · Feishu Document Sync · Agent-Native Architecture**
 
@@ -24,6 +24,8 @@ English | [简体中文](README.md)
 ## Project Overview
 
 Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code, Codex, Cursor, and OpenCode. It supports local CSV data import and [SellerSprite](https://www.sellersprite.com/) platform integration (optional), and runs with zero API keys.
+
+> **V2.2 · Agent Self-Execution Mode**: LLM steps (review tagging, 15-chapter report writing) are performed by the host Agent itself — **no claude CLI installation required**. Any AI Coding Agent can run the full pipeline. A `--llm cli` direct mode is retained as a headless fallback.
 
 ### V2.0 Core Upgrades
 
@@ -47,6 +49,8 @@ Phase 2: User Persona identification (3-4 personas, 3 positive + 3 negative Gold
 Phase 3: Insight Report generation (15-chapter structured report)
 Phase 4: Unified output (MD + HTML Dashboard + Feishu sync)
 ```
+
+> Since V2.2, the LLM steps in Phase 1/3 are performed by the **host Agent itself** (`--llm agent`: prepare → Agent tags → `--resume` → Agent writes report → `--resume` to finalize); the CLI concurrent path above is retained as a headless fallback (`--llm cli`).
 
 > 📄 **[View the full Insight Report example online (Feishu document)](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — includes 14 complete chapters (legacy example; current version has 15) + Feishu whiteboard mermaid diagrams
 
@@ -146,7 +150,7 @@ When signing up for the SellerSprite MCP data source, use these exclusive discou
 |-------------|---------|
 | **Operating System** | macOS / Linux / Windows |
 | **Python** | **3.10 or higher** (3.11.x recommended) |
-| **Agent CLI** | Any AI Coding Agent such as Claude Code CLI, Codex CLI, Cursor, or OpenCode CLI |
+| **Agent CLI** | Any AI Coding Agent (Claude Code, Codex, Cursor, OpenCode, etc.). Agent self-execution mode has zero CLI dependency; only headless direct runs (`--llm cli`) require claude/opencode |
 | **Memory** | 4GB+ recommended |
 | **Feishu Sync (optional)** | Requires [lark-cli](https://github.com/germalli/lark-cli) installed and authenticated |
 
@@ -191,11 +195,18 @@ python3 main.py your_reviews.csv --max-reviews 200
 # Method 2: SellerSprite platform data (optional, requires SELLERSPRITE_SECRET_KEY configuration)
 python3 main.py --source sellersprite --asin B09XYZ123 --site US --max-reviews 200
 
+# === LLM Execution Mode (V2.2) ===
+# agent (recommended — host Agent self-executes tagging & report, zero CLI dependency):
+python3 main.py your_reviews.csv --llm agent --max-reviews 200 --creator "Your Name"
+#   → after prepare exits, the host Agent tags/writes per prompts, advancing via --resume <workdir>
+# cli (default — headless fallback, subprocess to claude/opencode in one run):
+python3 main.py your_reviews.csv --max-reviews 200 --creator "Your Name"
+
 # === Full Parameters ===
 python3 main.py your_reviews.csv \
   --asin B09XYZ123 \
   --template premium-gold \
-  --feishu-sync auto \
+  --feishu-sync \
   --concurrent 4 \
   --creator "Your Name"
 
@@ -280,6 +291,8 @@ review-analyzer-skill/
 │   ├── template_engine.py       # Unified template engine (Jinja2 SSR + Shared Base)
 │   ├── chart_engine.py          # Chart.js chart configuration generation
 │   ├── insights_generator.py    # 15-chapter Insight Report generation (CLI subprocess)
+│   ├── agent_pipeline.py        # Agent self-execution mode (prepare/resume state machine)
+│   ├── pipeline_common.py       # Shared output phase (tagged CSV + MD + HTML + Feishu)
 │   ├── output_manager.py        # Output management (MD + HTML + Feishu sync)
 │   ├── feishu_sync.py           # Feishu document + whiteboard sync
 │   ├── report_generator.py      # Report generation (compatibility layer)
@@ -320,7 +333,7 @@ review-analyzer-skill/
 <details>
 <summary><b>Q2: Do I need any API Key?</b></summary>
 
-**A**: V2.0 **requires no API Key whatsoever**. It uses the built-in models of Claude Code / OpenCode throughout, consuming your Claude quota.
+**A**: **No API Key is required**. In `--llm agent` mode, LLM steps are self-executed by the host Agent (any AI Coding Agent works, consuming the host quota); the `--llm cli` fallback uses the Claude Code / OpenCode CLI, consuming the corresponding quota.
 </details>
 
 <details>
@@ -361,7 +374,7 @@ Use `--template none` to skip dashboard generation.
 | Feature | Review Analyzer Skill V2.0 | Other Tools |
 |---------|---------------------------|-------------|
 | **Architecture** | Agent-native Skill | Typically standalone scripts |
-| **API Key** | Zero (pure CLI) | Most require API keys |
+| **API Key** | Zero (host Agent self-execution / CLI fallback) | Most require API keys |
 | **Insight Report** | 15-chapter deep analysis | Basic statistics |
 | **Visualization** | 6 themes + Glassmorphism | Single template or none |
 | **Feishu Integration** | Document + whiteboard auto-sync | Mostly unsupported |
@@ -375,7 +388,8 @@ Use `--template none` to skip dashboard generation.
 - [x] **v1.0.0** - First official release (22-dimension tags + dual mode + HTML dashboard)
 - [x] **v2.0.0** - Agent-native version (14-chapter report + 6 themes + Feishu sync + Shared Base architecture)
 - [x] **v2.1.0** - Anomaly signal cards + SellerSprite data source + test suite (52 cases)
-- [ ] **v2.2.0** - Web enhancements (frontend template selector + screenshot export)
+- [x] **v2.2.0** - Agent self-execution mode (tagging & report by host Agent, zero CLI dependency; 59 test cases)
+- [ ] **v2.3.0** - Web enhancements (frontend template selector + screenshot export)
 - [ ] **v3.0.0** - Multi-platform analysis (batch ASIN + competitive comparison reports)
 
 ---
