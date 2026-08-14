@@ -50,7 +50,7 @@ Phase 3: 洞察报告生成（15章结构化报告）
 Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 ```
 
-> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 14 章完整内容（旧版示例，当前版本为 15 章）+ 飞书白板 mermaid 图表
+> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 15 章完整内容（V2.1 版，含异常信号卡）+ 飞书白板 mermaid 图表
 
 ---
 
