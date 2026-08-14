@@ -88,6 +88,40 @@
                 </div>
             </div>
 
+            {% if anomaly_cards %}
+            <!-- 异常信号预警（确定性规则引擎检测，hero 下方置顶展示） -->
+            <div class="subsection-title" style="margin-top: var(--sp-xl);">
+                <span class="icon-dot" style="background: var(--red);"></span>
+                异常信号预警
+            </div>
+            <div class="anomaly-grid">
+                {% for card in anomaly_cards %}
+                {% set sev_class = 'minor' %}
+                {% set sev_emoji = '🟢' %}
+                {% if card.severity == '高' %}
+                {% set sev_class = 'critical' %}
+                {% set sev_emoji = '🔴' %}
+                {% elif card.severity == '中' %}
+                {% set sev_class = 'major' %}
+                {% set sev_emoji = '🟡' %}
+                {% endif %}
+                <div class="anomaly-card sev-{{ sev_class }}">
+                    <div class="anomaly-card-header">
+                        <span class="anomaly-severity-badge {{ sev_class }}">{{ sev_emoji }} {{ card.severity }}风险</span>
+                        <span class="anomaly-pct">命中 {{ card.affected_count }} 条 · {{ card.affected_pct|round(1) }}%</span>
+                    </div>
+                    <div class="anomaly-card-title">{{ card.signal_type }}</div>
+                    {% if card.representative_quotes %}
+                    <blockquote class="user-quote">{{ card.representative_quotes[0] }}</blockquote>
+                    {% endif %}
+                    {% if card.suggested_action %}
+                    <div class="anomaly-card-action">{{ card.suggested_action[:110] }}{% if card.suggested_action|length > 110 %}…{% endif %}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="quadrant-grid">
                 {% for item in premium_dashboard.quadrants %}
                 <div class="quadrant-card depth-default" data-accent="{{ item.accent }}" style="--i: {{ loop.index0 }}">

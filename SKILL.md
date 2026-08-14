@@ -1,7 +1,6 @@
 ---
 name: review-analyzer-skill
-version: 2.1.0
-author: Buluu@新西楼
+author: Buluu@新西楼.AI
 description: |
   Agent 原生的电商评论深度分析工具 V2.1。
   支持22维度智能标签、15章深度洞察报告（含数据附录+异常信号卡）、6套主题可视化看板（共享基座+玻璃拟态）、多数据源（CSV主源+卖家精灵可选）、飞书文档同步。
@@ -15,7 +14,12 @@ description: |
   - 将分析结果同步到飞书文档
 
   触发关键词：电商评论分析、评论分析、竞品分析、用户洞察、VOC分析、产品优化、市场调研、评论数据挖掘、卖家精灵、sellersprite
+
+  NOT for 关键词调研/选品雷达类任务（那些有专门工具）。
 license: MIT
+metadata:
+  category: ecommerce
+  version: 2.1.0
 allowed-tools:
   - bash
 ---

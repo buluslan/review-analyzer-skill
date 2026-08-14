@@ -1,23 +1,21 @@
-# 评论深度分析Skill
+English | [简体中文](README.md)
 
 <div align="center">
 
-# Review Analyzer Skill
+# 📊 Review Analyzer Skill
 
 **An AI-powered deep analysis tool for multi-scenario review content**
 
-**For the latest AI industry trends, AI + e-commerce/advertising practices, and thoughts on human-AI collaboration, follow the WeChat Official Account: 【新西楼】**
+**For the latest AI industry trends, AI + e-commerce/advertising practices, and thoughts on human-AI collaboration, follow the WeChat Official Account: 【新西楼.AI】**
 ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.0.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README_EN.md)
-[![中文](https://img.shields.io/badge/lang-中文-red.svg)](README.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
-**15-Chapter Deep Insight Report | 6 Themed Visualization Dashboards | Feishu Document Sync | Agent-Native Architecture**
+**15-Chapter Deep Insight Report · 6 Themed Visualization Dashboards · Feishu Document Sync · Agent-Native Architecture**
 
-**Created By Buluu@新西楼**
+**Created By Buluu@新西楼.AI**
 
 </div>
 
@@ -25,7 +23,7 @@
 
 ## Project Overview
 
-Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code and OpenCode. It supports local CSV data import and [SellerSprite](https://www.sellersprite.com/) platform integration (optional), and runs with zero API keys.
+Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code, Codex, Cursor, and OpenCode. It supports local CSV data import and [SellerSprite](https://www.sellersprite.com/) platform integration (optional), and runs with zero API keys.
 
 ### V2.0 Core Upgrades
 
@@ -50,7 +48,7 @@ Phase 3: Insight Report generation (15-chapter structured report)
 Phase 4: Unified output (MD + HTML Dashboard + Feishu sync)
 ```
 
-> 📄 **[View the full Insight Report example online (Feishu document)](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — includes 14 complete chapters + Feishu whiteboard mermaid diagrams
+> 📄 **[View the full Insight Report example online (Feishu document)](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — includes 14 complete chapters (legacy example; current version has 15) + Feishu whiteboard mermaid diagrams
 
 ---
 
@@ -84,7 +82,7 @@ HTML reports **ready for work presentations**, with a Shared Base architecture e
 | stripe-executive | Emerald Green + Emerald Glass | Finance & enterprise, investment decisions |
 | warm-editorial | Paper & Copper + Paper Glass | Brand reports, editorial style |
 
-Each dashboard includes: 11 sections, interactive Chart.js charts (themed color palettes), responsive design, and Glassmorphism card effects.
+Each dashboard includes: 11 sections + anomaly signal card area, interactive Chart.js charts (themed color palettes), responsive design, and Glassmorphism card effects.
 
 ### 📋 15-Chapter Deep Insight Report
 
@@ -96,8 +94,9 @@ Each dashboard includes: 11 sections, interactive Chart.js charts (themed color 
 6. Potential Opportunities & Differentiation (data + suggestions)
 7. Typical User Deep Analysis
 8-12. In-depth content chapters
-13. Action Decision Dashboard
-14. Data Appendix
+13. Anomaly Signal Cards (severity-graded decision cards + representative quotes + suggested actions)
+14. Action Decision Dashboard
+15. Data Appendix
 
 ### 📦 Multi-format Output + Feishu Sync
 
@@ -116,7 +115,7 @@ Each dashboard includes: 11 sections, interactive Chart.js charts (themed color 
 |-------------|---------|
 | **Operating System** | macOS / Linux / Windows |
 | **Python** | **3.10 or higher** (3.11.x recommended) |
-| **Agent CLI** | Any AI Coding Agent such as Claude Code CLI or OpenCode CLI |
+| **Agent CLI** | Any AI Coding Agent such as Claude Code CLI, Codex CLI, Cursor, or OpenCode CLI |
 | **Memory** | 4GB+ recommended |
 | **Feishu Sync (optional)** | Requires [lark-cli](https://github.com/germalli/lark-cli) installed and authenticated |
 
@@ -344,7 +343,8 @@ Use `--template none` to skip dashboard generation.
 
 - [x] **v1.0.0** - First official release (22-dimension tags + dual mode + HTML dashboard)
 - [x] **v2.0.0** - Agent-native version (14-chapter report + 6 themes + Feishu sync + Shared Base architecture)
-- [ ] **v2.1.0** - Web enhancements (frontend template selector + screenshot export)
+- [x] **v2.1.0** - Anomaly signal cards + SellerSprite data source + test suite (52 cases)
+- [ ] **v2.2.0** - Web enhancements (frontend template selector + screenshot export)
 - [ ] **v3.0.0** - Multi-platform analysis (batch ASIN + competitive comparison reports)
 
 ---
@@ -381,14 +381,10 @@ Thanks to the following community contributors for their contributions to this p
 
 ---
 
+## 📖 Final Words
+
 <div align="center">
 
-**If this project helps you, please give it a ⭐️**
-
-Made with ❤️ by Buluu@新西楼
-
-**Built for cross-border e-commerce professionals ❤️**
-
-[⬆ Back to Top](#review-analyzer-skill)
+**If this tool helps you, please consider giving it a ⭐ Star. For more AI × cross-border e-commerce hands-on practices, follow the WeChat Official Account 「新西楼.AI」.**
 
 </div>

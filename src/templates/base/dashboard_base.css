@@ -859,6 +859,75 @@ body {
 
 
 /* ============================================
+   ANOMALY SIGNALS — 异常信号预警卡（hero 下方）
+   ============================================ */
+.anomaly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--sp-md);
+}
+
+.anomaly-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--text-muted);
+    border-radius: 8px;
+    padding: var(--sp-lg);
+    transition: border-color 0.3s ease;
+}
+
+.anomaly-card:hover { border-color: var(--border-bright); }
+.anomaly-card.sev-critical { border-left-color: var(--red); }
+.anomaly-card.sev-major { border-left-color: var(--orange); }
+.anomaly-card.sev-minor { border-left-color: var(--green); }
+
+.anomaly-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-sm);
+    margin-bottom: var(--sp-sm);
+}
+
+.anomaly-severity-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.anomaly-severity-badge.critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--border-p0, rgba(201,68,68,0.25)); }
+.anomaly-severity-badge.major { background: var(--gold-dim); color: var(--orange); border: 1px solid var(--border-p1, rgba(212,167,58,0.25)); }
+.anomaly-severity-badge.minor { background: var(--green-bg, rgba(95,154,78,0.10)); color: var(--green); border: 1px solid var(--border-muted, rgba(107,101,96,0.2)); }
+
+.anomaly-pct {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.anomaly-card-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: var(--sp-sm);
+}
+
+.anomaly-card-action {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin-top: var(--sp-sm);
+}
+
+
+/* ============================================
    USER STORIES
    ============================================ */
 .stories-grid {

@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict
 
 from src.config import config
-from src.prompts.templates import get_tagging_prompt_batch
+from src.prompts.manager import build_tagging_prompt
 
 # 配置日志
 logging.basicConfig(
@@ -240,7 +240,7 @@ def analyze_batch(batch: List[Dict], batch_idx: int = -1) -> List[Dict]:
         try:
             # 构造提示词
             logger.debug(f"🔨 构造提示词 (尝试 {attempt + 1}/{max_retries})...")
-            prompt = get_tagging_prompt_batch(batch)
+            prompt = build_tagging_prompt(batch)
 
             # 🔥 核心：调用 Claude Code CLI
             logger.info(f"📞 调用 Claude Code CLI (尝试 {attempt + 1}/{max_retries})...")

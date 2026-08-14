@@ -86,7 +86,6 @@ class Config:
     QUICK_MODE_MAX_REVIEWS: int = 30  # 快速模式默认获取评论数
 
     # ==================== 报告生成配置 ====================
-    INSIGHTS_FORMAT: str = "txt"  # 可选: md / txt
     HTML_CREATOR_NAME: str = os.getenv("HTML_CREATOR_NAME", "Buluu@新西楼")
 
     def __post_init__(self):

@@ -17,7 +17,7 @@ from datetime import datetime
 _last_strategic_data: Dict = {}
 
 from src.config import config
-from src.prompts.templates import get_insights_prompt_md, get_insights_prompt_txt
+from src.prompts.manager import build_insights_prompt
 
 # 配置日志
 logger = logging.getLogger(__name__)
@@ -150,50 +150,29 @@ def generate_insights(
         >>> "评论深度洞察报告" in report
         True
     """
-    # V2.0 优先使用新的 Prompt 管理器（数据预处理 + 14 章结构）
-    try:
-        from src.prompts.manager import build_insights_prompt as _build_v2_prompt
+    # V2.1 Prompt 管理器（15 章结构 + 数据预处理 + 异常信号卡）
+    # 加载失败时直接抛错（PromptLoadError），不做 V1 降级：
+    # V1 降级 prompt 仍是 7 章旧结构，静默降级会产出格式过期的报告
+    context = {}
+    # 检查是否有日期数据 → 启用时间趋势章节
+    has_date = any(
+        r.get("date") and r.get("date") not in ("", "nan", "None")
+        for r in golden_samples
+    )
+    if has_date:
+        context["has_review_date"] = True
+        context["time_distribution_text"] = "用户评论包含日期信息，可进行时间趋势分析"
 
-        # 构建 V2 prompt（含数据预处理、噪声过滤、分层注入）
-        context = {}
-        # 检查是否有日期数据 → 启用时间趋势章节
-        has_date = any(
-            r.get("date") and r.get("date") not in ("", "nan", "None")
-            for r in golden_samples
-        )
-        if has_date:
-            context["has_review_date"] = True
-            context["time_distribution_text"] = "用户评论包含日期信息，可进行时间趋势分析"
-
-        prompt = _build_v2_prompt(
-            stats=stats,
-            personas=personas,
-            samples=golden_samples,
-            asin=asin,
-            product_name=product_name,
-            context=context,
-            anomaly_signals=anomaly_signals,
-        )
-        logger.info("使用 V2.1 Prompt 管理器（15 章结构 + 数据预处理 + 异常信号卡）")
-    except Exception as exc:
-        # 降级到 V1 prompt
-        logger.warning("V2 Prompt 加载失败，降级到 V1: %s", exc)
-        if config.INSIGHTS_FORMAT == "md":
-            prompt = get_insights_prompt_md(
-                stats=stats,
-                personas=personas,
-                samples=golden_samples,
-                asin=asin,
-                product_name=product_name
-            )
-        else:
-            prompt = get_insights_prompt_txt(
-                stats=stats,
-                personas=personas,
-                samples=golden_samples,
-                asin=asin,
-                product_name=product_name
-            )
+    prompt = build_insights_prompt(
+        stats=stats,
+        personas=personas,
+        samples=golden_samples,
+        asin=asin,
+        product_name=product_name,
+        context=context,
+        anomaly_signals=anomaly_signals,
+    )
+    logger.info("使用 V2.1 Prompt 管理器（15 章结构 + 数据预处理 + 异常信号卡）")
 
     # 统一使用 CLI 引擎生成
     report_text = _generate_via_cli(prompt, asin)

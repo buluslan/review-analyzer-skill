@@ -1,25 +1,23 @@
-# 评论深度分析Skill
+[English](README.en.md) | 简体中文
 
 <div align="center">
 
 ![Review Analyzer](assets/banner.png)
 
-# Review Analyzer Skill
+# 📊 Review Analyzer Skill
 
 **一款适用于多场景评论内容的AI深度分析工具**
 
-**想了解更多最新AI行业动态，AI+电商/广告的行业实践方法，人与AI如何协作共生的思考，请关注公众号：【新西楼】**
+**想了解更多最新AI行业动态,AI+电商/广告的行业实践方法,人与AI如何协作共生的思考,请关注公众号:【新西楼.AI】**
 ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.0.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README_EN.md)
-[![中文](https://img.shields.io/badge/lang-中文-red.svg)](README.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
-**15章深度洞察报告 | 6套主题可视化看板 | 飞书文档同步 | Agent原生架构**
+**15章深度洞察报告 · 6套主题可视化看板 · 飞书文档同步 · Agent原生架构**
 
-**Created By Buluu@新西楼**
+**Created By Buluu@新西楼.AI**
 
 </div>
 
@@ -27,7 +25,7 @@
 
 ## 项目简介
 
-Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
+Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、Codex、Cursor、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
 
 ### V2.0 核心升级
 
@@ -52,7 +50,7 @@ Phase 3: 洞察报告生成（15章结构化报告）
 Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 ```
 
-> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 14 章完整内容 + 飞书白板 mermaid 图表
+> 📄 **[在线查看完整洞察报告示例（飞书文档）](https://my.feishu.cn/docx/GMv7dBzlXo5wblxVaWGclEernib)** — 包含 14 章完整内容（旧版示例，当前版本为 15 章）+ 飞书白板 mermaid 图表
 
 ---
 
@@ -86,7 +84,7 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 | stripe-executive | 翡翠绿 + 翡翠玻璃 | 金融企业、投资决策 |
 | warm-editorial | 纸色铜色 + 纸感玻璃 | 品牌报告、编辑风格 |
 
-每个看板包含：11个板块、交互式 Chart.js 图表（主题色板）、响应式设计、玻璃拟态卡片效果。
+每个看板包含：11个板块 + 异常信号卡区、交互式 Chart.js 图表（主题色板）、响应式设计、玻璃拟态卡片效果。
 
 ### 📋 15章深度洞察报告
 
@@ -98,8 +96,9 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 6. 潜在机会与差异化（数据 + 建议）
 7. 典型用户深度解析
 8-12. 深度内容章节
-13. 行动决策仪表盘
-14. 数据附录
+13. 异常信号卡（严重度分级决策卡 + 代表原话引用 + 建议动作）
+14. 行动决策仪表盘
+15. 数据附录
 
 ### 📦 多格式输出 + 飞书同步
 
@@ -118,7 +117,7 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 |------|------|
 | **操作系统** | macOS / Linux / Windows |
 | **Python** | **3.10 或更高版本**（推荐 3.11.x） |
-| **Agent CLI** | Claude Code CLI、OpenCode CLI 等任一 AI Coding Agent |
+| **Agent CLI** | Claude Code CLI、Codex CLI、Cursor、OpenCode CLI 等任一 AI Coding Agent |
 | **内存** | 建议 4GB+ |
 | **飞书同步（可选）** | 需安装 [lark-cli](https://github.com/germalli/lark-cli) 并完成认证登录 |
 
@@ -346,7 +345,8 @@ review-analyzer-skill/
 
 - [x] **v1.0.0** - 首个正式发布（22维度标签 + 双模式 + HTML看板）
 - [x] **v2.0.0** - Agent 原生版（14章报告 + 6套主题 + 飞书同步 + 共享基座架构）
-- [ ] **v2.1.0** - Web 端增强（前端模板选择器 + 截图导出）
+- [x] **v2.1.0** - 异常信号卡 + 卖家精灵数据源 + 测试套件（52 用例）
+- [ ] **v2.2.0** - Web 端增强（前端模板选择器 + 截图导出）
 - [ ] **v3.0.0** - 多平台分析（批量 ASIN + 竞品对比报告）
 
 ---
@@ -383,14 +383,10 @@ review-analyzer-skill/
 
 ---
 
+## 📖 写在最后
+
 <div align="center">
 
-**如果这个项目对您有帮助，请给一个 ⭐️**
-
-Made with ❤️ by Buluu@新西楼
-
-**专为跨境电商从业者打造 ❤️**
-
-[⬆ 返回顶部](#review-analyzer-skill)
+**如果这个工具帮到了你,欢迎 ⭐ Star 支持。更多 AI × 跨境电商实操内容,关注公众号「新西楼.AI」。**
 
 </div>
