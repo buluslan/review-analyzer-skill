@@ -236,6 +236,37 @@ Deeply understand your target user groups, build precise User Personas, and opti
 
 ---
 
+## 🎁 Exclusive Deals
+
+When signing up for the SellerSprite MCP data source, use these exclusive discount codes from buluslan (WeChat: 新西楼.AI) — paste the code at checkout under "Discount Coupon":
+
+| Tool | Code | Discount | Purchase Link |
+|------|------|----------|---------------|
+| SellerSprite · MCP | `XXL` | 10% off | [open.sellersprite.com/pricing/mcp](https://open.sellersprite.com/pricing/mcp) |
+| SellerSprite · Membership | `XXL90` (monthly) / `XXL72` (personal yearly) / `XXL78` (standard/advanced/VIP yearly) | See official pricing | [sellersprite.com/cn/price](https://www.sellersprite.com/cn/price) |
+
+<div align="center">
+
+<img src="https://github.com/user-attachments/assets/c46f6725-4ebd-49a0-a6be-a4fc910465be" alt="SellerSprite deal" width="280">
+
+**SellerSprite**
+
+</div>
+
+## 🏠 Community
+
+<div align="center">
+
+🎯 **More AI实战 tutorials and exclusive benefits in our "MBG 跨境AI实战圈" — 50+ cross-border sellers and AI experts already inside**
+
+—— Join us to explore the real boundary of AI + business, go from 0 to 1 in cross-border AI, outpace your colleagues, and outgrow your boss.
+
+**Community intro: [mp.weixin.qq.com/s/dOz4fLmRnaFR7sD_TQm00Q](https://mp.weixin.qq.com/s/dOz4fLmRnaFR7sD_TQm00Q)**
+
+<img width="1125" height="618" alt="image" src="https://github.com/user-attachments/assets/20f47cd6-e33c-4f3e-9362-3846c11135fd" />
+
+</div>
+
 ## Project Structure
 
 ```

@@ -238,6 +238,37 @@ python3 main.py your_reviews.csv \
 
 ---
 
+## 🎁 接入福利
+
+接入卖家精灵 MCP 数据源时,用以下 buluslan(公众号:新西楼.AI)专属优惠码享折扣(下单时在「折扣券」处粘贴对应码):
+
+| 工具 | 优惠码 | 折扣 | 购买链接 |
+|------|--------|------|----------|
+| 卖家精灵 · MCP | `XXL` | 9 折 | [open.sellersprite.com/pricing/mcp](https://open.sellersprite.com/pricing/mcp) |
+| 卖家精灵 · 会员 | `XXL90`(包月) / `XXL72`(单人包年) / `XXL78`(标准/高级/VIP 包年) | 见官网对应套餐 | [sellersprite.com/cn/price](https://www.sellersprite.com/cn/price) |
+
+<div align="center">
+
+<img src="https://github.com/user-attachments/assets/c46f6725-4ebd-49a0-a6be-a4fc910465be" alt="卖家精灵优惠" width="280">
+
+**卖家精灵**
+
+</div>
+
+## 🏠 交流社区
+
+<div align="center">
+
+🎯 **更多 AI 实战教程和专属福利尽在我们「MBG 跨境AI实战圈」,已有 50+ 跨境大卖、AI 专家热聊中**
+
+—— 欢迎跨境电商从业者加入我们,一起探索 AI+商业的最佳实践和真实边界,跑通【跨境AI】的从 0 到 1,打败你的同事,干掉你的老板。
+
+**社区介绍:[mp.weixin.qq.com/s/dOz4fLmRnaFR7sD_TQm00Q](https://mp.weixin.qq.com/s/dOz4fLmRnaFR7sD_TQm00Q)**
+
+<img width="1125" height="618" alt="image" src="https://github.com/user-attachments/assets/20f47cd6-e33c-4f3e-9362-3846c11135fd" />
+
+</div>
+
 ## 项目结构
 
 ```
