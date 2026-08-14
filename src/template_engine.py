@@ -271,6 +271,24 @@ def _chart_to_js_config(chart: Any) -> Optional[dict]:
 _DEFAULT_PALETTE = ["#d29922", "#79c0ff", "#7ee787", "#ff7b72", "#d2a8ff", "#ffa657"]
 
 
+def _get_anomaly_cards() -> list:
+    """从 insights_generator 侧通道获取异常信号卡数据。
+
+    异常信号卡由确定性规则引擎预计算（src.anomaly_detector），
+    不依赖 AI 在 strategic_json 中回填，确保看板渲染的确定性。
+
+    Returns:
+        异常信号卡字典列表，每项含 type/severity/count/pct/action 等字段。
+        无数据时返回空列表。
+    """
+    try:
+        from src.insights_generator import get_last_strategic_data
+        cached = get_last_strategic_data()
+        return cached.get("anomaly_cards", [])
+    except Exception:
+        return []
+
+
 def _dimension_bar_chart(title: str, dim_data: dict, horizontal: bool = False,
                          palette: list = None) -> Optional[dict]:
     """Build a compact Chart.js bar config from dimensional statistics."""
@@ -732,9 +750,9 @@ def _transform_for_js_templates(
         values = list(sentiment.values())
         charts_data["sentiment"] = {"labels": labels, "data": values}
 
-    # strategy + execution_matrix
+    # strategy + execution_matrix + anomaly_cards
     # 优先从 insights_generator 的侧通道获取（generate_insights 剥离前缓存）
-    strategy, execution_matrix = {}, []
+    strategy, execution_matrix, anomaly_cards = {}, [], []
     try:
         from src.insights_generator import get_last_strategic_data
         cached = get_last_strategic_data()
@@ -749,6 +767,8 @@ def _transform_for_js_templates(
             ]
             strategy = {"moat_pros": moat_pros, "vulnerability_cons": vuln_cons}
             execution_matrix = cached.get("execution_matrix", [])
+            # 异常信号卡：从 Python 侧通道确定性获取，不依赖 AI 回填
+            anomaly_cards = cached.get("anomaly_cards", [])
     except Exception:
         logger.debug("strategic_json 解析失败，将尝试从 insights_md 降级解析", exc_info=True)
     if not strategy and insights_md:
@@ -772,6 +792,8 @@ def _transform_for_js_templates(
         "voc_quotes": voc_quotes,
         "market_insights": market_insights,
         "chapters": chapters,
+        # 异常信号卡（确定性检测，Python 侧通道直取）
+        "anomaly_cards": anomaly_cards,
         # 扁平字段供 header 读取
         "asin": asin,
         "total_reviews": total,
@@ -870,9 +892,9 @@ def _md_to_html(text: str) -> str:
 
 
 def _split_insights_for_template(insights_md: str) -> dict:
-    """将 V2.0 的 13 章 insights_md 拆分为模板可直接渲染的结构化数据。
+    """将 V2.0 的 15 章 insights_md 拆分为模板可直接渲染的结构化数据。
 
-    不做过度解析 — 只提取结构清晰的章节（Ch1/Ch4/Ch5/Ch6/Ch7/Ch8/Ch13），
+    不做过度解析 — 只提取结构清晰的章节（Ch1/Ch4/Ch5/Ch6/Ch7/Ch8/Ch14），
     其余章节保留为 HTML 直接渲染。
     """
     if not insights_md:
@@ -1103,7 +1125,7 @@ def _split_insights_for_template(insights_md: str) -> dict:
                 })
             break
 
-    # --- Ch13: 行动仪表盘 → 提取行动表格 + 快速胜利 ---
+    # --- Ch14: 行动仪表盘 → 提取行动表格 + 快速胜利 ---
     action_table = []
     quick_wins = []
     for key, content in chapters.items():
@@ -1302,6 +1324,8 @@ def _jinja2_render(
         "insights_md": insights_md,
         "dashboard_charts": dashboard_charts,
         "premium_dashboard": _build_premium_dashboard(insights_sections, summary_context),
+        # 异常信号卡（优先从侧通道取，降级从 analysis_data 取）
+        "anomaly_cards": _get_anomaly_cards(),
         # V2.0 结构化章节
         "overview_insights": insights_sections["overview_insights"],
         "overview_lead": insights_sections["overview_lead"],

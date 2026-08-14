@@ -46,8 +46,9 @@ CHAPTER_CONFIG: Dict[int, Dict[str, Any]] = {
     10: {"file": "chapter_10_sentiment_gap.md", "conditional": False, "key": "sentiment_gap"},
     11: {"file": "chapter_11_keyword_clustering.md", "conditional": False, "key": "keyword_clustering"},
     12: {"file": "chapter_12_purchase_funnel.md", "conditional": False, "key": "purchase_funnel"},
-    13: {"file": "chapter_13_action_dashboard.md", "conditional": False, "key": "action_dashboard"},
-    14: {"file": "chapter_appendix_data.md", "conditional": False, "key": "data_appendix"},
+    13: {"file": "chapter_13_anomaly_signals.md", "conditional": False, "key": "anomaly_signals"},
+    14: {"file": "chapter_14_action_dashboard.md", "conditional": False, "key": "action_dashboard"},
+    15: {"file": "chapter_15_appendix_data.md", "conditional": False, "key": "data_appendix"},
 }
 
 
@@ -95,17 +96,17 @@ def load_chapter(chapter_num: int) -> str:
     加载指定章节的 prompt 模板。
 
     Args:
-        chapter_num: 章节编号 (1-13)
+        chapter_num: 章节编号 (1-15)
 
     Returns:
         章节 prompt 内容字符串
 
     Raises:
         PromptLoadError: 章节文件不存在或读取失败
-        ValueError: 章节编号不在 1-13 范围内
+        ValueError: 章节编号不在 1-15 范围内
     """
     if chapter_num not in CHAPTER_CONFIG:
-        raise ValueError(f"章节编号必须在 1-13 之间，当前: {chapter_num}")
+        raise ValueError(f"章节编号必须在 1-15 之间，当前: {chapter_num}")
 
     config = CHAPTER_CONFIG[chapter_num]
     file_path = CHAPTERS_DIR / config["file"]
@@ -530,6 +531,7 @@ def build_insights_prompt(
     product_name: Optional[str] = None,
     chapters: Optional[List[int]] = None,
     context: Optional[Dict[str, Any]] = None,
+    anomaly_signals: Optional[List[Any]] = None,
 ) -> str:
     """
     构建洞察报告 V2 prompt。
@@ -547,6 +549,8 @@ def build_insights_prompt(
         context: 条件上下文（可选），用于控制条件章节：
             - has_review_date (bool): 是否有评论日期数据，控制章节9
             - time_distribution_text (str): 时间分布数据文本
+        anomaly_signals: 异常信号列表（可选，AnomalySignal 对象或字典），
+            供第十三章异常信号卡章节消费。None 或空列表时注入"未检测到异常"占位。
 
     Returns:
         构建完成的 prompt 字符串
@@ -610,8 +614,21 @@ def build_insights_prompt(
     # ---- 时间分布数据 ----
     time_distribution = context.get("time_distribution_text", "无时间分布数据")
 
+    # ---- 异常信号预计算数据 ----
+    anomaly_signals_text = "本次未检测到异常信号（所有规则阈值未触发，数据健康）。"
+    if anomaly_signals:
+        try:
+            from src.anomaly_detector import render_anomaly_signals_for_prompt
+            anomaly_signals_text = render_anomaly_signals_for_prompt(anomaly_signals)
+        except ImportError:
+            logger.warning("anomaly_detector 模块不可用，异常信号降级为占位文本")
+
     # ---- 分层组装变量 ----
+    # 注意：CHAPTER_PROMPTS 必须先注入，因为章节文件内含
+    # {{ANOMALY_SIGNALS}}、{{DIMENSIONAL_APPENDIX}} 等占位符，
+    # 需要后续变量替换覆盖到注入后的章节文本
     variables: Dict[str, str] = {
+        "CHAPTER_PROMPTS": chapter_prompts_text,
         "TOTAL": str(stats.get("total", 0)),
         "TAGGED": str(stats.get("tagged", 0)),
         "ASIN": asin,
@@ -624,7 +641,7 @@ def build_insights_prompt(
         "SAMPLES_COUNT": str(len(samples)),
         "GOLDEN_SAMPLES": golden_samples,
         "TIME_DISTRIBUTION": time_distribution,
-        "CHAPTER_PROMPTS": chapter_prompts_text,
+        "ANOMALY_SIGNALS": anomaly_signals_text,
     }
 
     prompt = _render_template(template, variables)

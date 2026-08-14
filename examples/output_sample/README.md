@@ -34,6 +34,6 @@ python3 main.py your_reviews.csv
 # 指定模板
 python3 main.py your_reviews.csv --template dark-tech
 
-# Sorftime 数据源
-python3 main.py --source sorftime --asin B09XYZ123 --site US
+# 卖家精灵 数据源
+python3 main.py --source sellersprite --asin B09XYZ123 --site US
 ```

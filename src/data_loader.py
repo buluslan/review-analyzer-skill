@@ -101,10 +101,10 @@ def load_reviews_from_file(file_path: str) -> Tuple[List[Dict], pd.DataFrame]:
     # 支持多种格式读取
     if file_path.endswith('.csv'):
         try:
-            df = pd.read_csv(file_path, encoding='utf-8')
+            df = pd.read_csv(file_path, encoding='utf-8-sig')
         except UnicodeDecodeError:
             try:
-                df = pd.read_csv(file_path, encoding='utf-8-sig')
+                df = pd.read_csv(file_path, encoding='utf-8')
             except UnicodeDecodeError:
                 df = pd.read_csv(file_path, encoding='gbk')
     elif file_path.endswith(('.xls', '.xlsx')):
@@ -128,7 +128,9 @@ def load_reviews_from_file(file_path: str) -> Tuple[List[Dict], pd.DataFrame]:
         print(f"   💡 提示: 检测到评论正文内含有换行符，系统已自动合并处理。")
 
     # 模糊列名映射字典
-    body_keywords = ['内容', '评价', '正文', 'review', 'body', 'text', 'content']
+    # 注意：不含泛词 'review'（会误匹配 review_id/review_title/review_date 等非正文列）
+    body_keywords = ['review_body', 'review_content', 'review_text',
+                     '内容', '评价', '正文', 'body', 'text', 'content']
     rating_keywords = ['星级', '打分', '评分', 'rating', 'star', 'score']
     date_keywords = ['时间', '日期', 'date', 'time']
 

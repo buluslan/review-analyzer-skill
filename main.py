@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Amazon 商品评论 AI 深度分析工具 - 主入口 V2.0 (Agent 原生版)
-功能：支持交互式向导 + 全参数驱动 + Sorftime数据对接 + 多模板看板 + 飞书同步
+功能：支持交互式向导 + 全参数驱动 + 卖家精灵数据对接 + 多模板看板 + 飞书同步
 """
 
 import sys
@@ -34,8 +34,8 @@ def print_intro():
     print("""
 🚀 多场景评论内容 AI 深度分析工具 V2.0 — Agent 原生版 Created By Buluu@新西楼
 ======================================================================
-核心功能: 22维度智能标签 · 13章深度洞察报告 · 多风格可视化看板
-数据来源: 本地CSV / Sorftime平台
+核心功能: 22维度智能标签 · 15章深度洞察报告 · 多风格可视化看板
+数据来源: 本地CSV(主源) / 卖家精灵(可选增强)
 输出方式: MD报告 + HTML看板(多模板) + 飞书同步(可选)
 ======================================================================
     """)
@@ -130,11 +130,11 @@ def main():
 
     parser = argparse.ArgumentParser(description="Amazon Review Analyzer V2.0 — Agent 原生版")
     parser.add_argument("input_file", nargs="?", default=None,
-                        help="输入 CSV/Excel 文件路径或 URL（使用 --source sorftime 时可省略）")
+                        help="输入 CSV/Excel 文件路径或 URL（使用 --source sellersprite 时可省略）")
     # V2.0: 数据来源
-    parser.add_argument("--source", choices=["csv", "sorftime"], default="csv",
-                        help="数据来源: csv(默认) 或 sorftime")
-    parser.add_argument("--asin", help="产品 ASIN（--source sorftime 时必填）")
+    parser.add_argument("--source", choices=["csv", "sellersprite"], default="csv",
+                        help="数据来源: csv(默认) 或 sellersprite")
+    parser.add_argument("--asin", help="产品 ASIN（--source sellersprite 时必填）")
     parser.add_argument("--site", default="US",
                         help="站点代码（默认 US，可选 UK/DE/JP 等）")
     # V2.0: 模板与输出
@@ -154,8 +154,8 @@ def main():
     args = parser.parse_args()
 
     # 参数校验
-    if args.source == "sorftime" and not args.asin:
-        parser.error("--source sorftime 需要 --asin 参数")
+    if args.source == "sellersprite" and not args.asin:
+        parser.error("--source sellersprite 需要 --asin 参数")
     if args.source == "csv" and not args.input_file:
         parser.error("CSV 模式需要提供输入文件路径")
 
@@ -194,20 +194,21 @@ def main():
         config.CLI_ENGINE = args.engine
         print(f"🔧 CLI 引擎: {config.CLI_ENGINE}")
 
-    # V2.0: 数据获取（支持 Sorftime 或本地 CSV）
-    if args.source == "sorftime":
-        print(f"\n📡 [数据获取] 从 Sorftime 获取评论数据...")
+    # V2.0: 数据获取（CSV 主源 或 卖家精灵可选增强）
+    if args.source == "sellersprite":
+        print(f"\n📡 [数据获取] 从卖家精灵获取评论数据...")
         print(f"   ASIN: {args.asin}, 站点: {args.site}")
-        fetcher = get_fetcher("sorftime")
+        print(f"   ⚠️  卖家精灵为可选增强源：覆盖量有限、部分评论正文可能缺失，深度分析建议用 CSV")
+        fetcher = get_fetcher("sellersprite")
         if not fetcher.validate_config():
-            print("❌ Sorftime 配置无效。请设置 SORFTIME_API_KEY 环境变量。")
+            print("❌ 卖家精灵配置无效。请设置 SELLERSPRITE_SECRET_KEY 环境变量。")
             sys.exit(1)
         try:
             csv_path_str = fetcher.fetch(args.asin, fields=None, site=args.site)
             resolved_file = csv_path_str
             print(f"✅ 数据获取完成: {csv_path_str}")
         except Exception as e:
-            print(f"❌ Sorftime 数据获取失败: {e}")
+            print(f"❌ 卖家精灵数据获取失败: {e}")
             sys.exit(1)
     else:
         # 原有 CSV 路径
@@ -271,7 +272,7 @@ def main():
         config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         print(f"📁 自定义输出目录: {config.OUTPUT_DIR}")
 
-    asin = args.asin if args.source == "sorftime" else extract_asin_from_file(resolved_file)
+    asin = args.asin if args.source == "sellersprite" else extract_asin_from_file(resolved_file)
 
     # 截断评论
     if len(reviews) > config.MAX_REVIEWS:
@@ -298,11 +299,26 @@ def main():
         print(f"   - 正在生成 {len(personas)} 个用户画像分析...")
         print(f"   - 使用引擎: {engine_label}")
         stats = calculate_stats_summary(tagged_reviews)
+
+        # 异常信号检测（确定性规则引擎，零 LLM 成本）
+        from src.anomaly_detector import detect_anomalies
+        anomaly_context = {
+            "has_review_date": any(
+                r.get("date") and str(r.get("date")).strip() not in ("", "nan", "None", "null")
+                for r in tagged_reviews
+            )
+        }
+        anomaly_signals = detect_anomalies(tagged_reviews, stats, anomaly_context)
+        if anomaly_signals:
+            print(f"   ⚠️  检测到 {len(anomaly_signals)} 条异常信号: "
+                  f"{', '.join(f'{s.signal_type}[{s.severity}]' for s in anomaly_signals)}")
+
         insights_md = generate_insights(
             stats=stats,
             personas=personas,
             golden_samples=golden_samples,
-            asin=asin
+            asin=asin,
+            anomaly_signals=anomaly_signals,
         )
         if insights_md:
             print(f"✅ [Phase 3/4] 洞察报告已生成！字数约 {len(insights_md):,} 字\n")

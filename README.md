@@ -17,7 +17,7 @@
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README_EN.md)
 [![中文](https://img.shields.io/badge/lang-中文-red.svg)](README.md)
 
-**14章深度洞察报告 | 6套主题可视化看板 | 飞书文档同步 | Agent原生架构**
+**15章深度洞察报告 | 6套主题可视化看板 | 飞书文档同步 | Agent原生架构**
 
 **Created By Buluu@新西楼**
 
@@ -27,15 +27,15 @@
 
 ## 项目简介
 
-Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [Sorftime](https://www.sorftime.com/) 平台数据对接，零 API Key 即可运行。
+Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
 
 ### V2.0 核心升级
 
 | 特性 | V1.0 | V2.0 |
 |------|------|------|
 | 分析引擎 | Gemini API + CLI 双模式 | **CLI 单一模式**（零 API Key） |
-| 数据源 | 本地 CSV | **本地 CSV + Sorftime 平台** |
-| 洞察报告 | 7 章基础分析 | **14 章深度洞察**（含行动决策仪表盘） |
+| 数据源 | 本地 CSV | **本地 CSV（主源）+ 卖家精灵（可选）** |
+| 洞察报告 | 7 章基础分析 | **15 章深度洞察**（含行动决策仪表盘 + 异常信号卡） |
 | 可视化看板 | 1 套黑金模板 | **6 套主题模板**（玻璃拟态 + Chart.js 主题化） |
 | 飞书集成 | 无 | **完整同步**（文档 + 白板 + mermaid 图表） |
 | 架构 | Python 脚本 | **Agent 原生 Skill**（SKILL.md 指令驱动） |
@@ -44,11 +44,11 @@ Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度�
 ### 工作流程
 
 ```
-数据输入: 本地 CSV 或 Sorftime 平台
+数据输入: 本地 CSV（主源）或 卖家精灵（可选）
      ↓
 Phase 1: AI 深度打标（并发4，22维度标签）
 Phase 2: 用户画像识别（3-4个画像，3正+3负黄金样本）
-Phase 3: 洞察报告生成（14章结构化报告）
+Phase 3: 洞察报告生成（15章结构化报告）
 Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 ```
 
@@ -88,7 +88,7 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 
 每个看板包含：11个板块、交互式 Chart.js 图表（主题色板）、响应式设计、玻璃拟态卡片效果。
 
-### 📋 14章深度洞察报告
+### 📋 15章深度洞察报告
 
 1. 洞察总览（核心判断 + 战略方向 + 市场定位）
 2. 核心用户画像（多维度画像 + 核心诉求 + 原声引用）
@@ -106,7 +106,7 @@ Phase 4: 统一输出（MD + HTML看板 + 飞书同步）
 | 输出 | 格式 | 说明 |
 |------|------|------|
 | 打标数据 | CSV | 原始评论 + 22维度标签 |
-| 洞察报告 | Markdown | 14章深度分析 |
+| 洞察报告 | Markdown | 15章深度分析 |
 | 可视化看板 | HTML | 6套主题可选，玻璃拟态 |
 | 飞书文档 | — | 自动同步报告 + mermaid白板 |
 
@@ -160,8 +160,8 @@ pip install -r requirements.txt
 # 方式1：本地 CSV 文件
 python3 main.py your_reviews.csv --max-reviews 200
 
-# 方式2：Sorftime 平台数据（需配置 SORFTIME_API_KEY）
-python3 main.py --source sorftime --asin B09XYZ123 --site US --max-reviews 200
+# 方式2：卖家精灵平台数据（可选增强，需配置 SELLERSPRITE_SECRET_KEY）
+python3 main.py --source sellersprite --asin B09XYZ123 --site US --max-reviews 200
 
 # === 完整参数 ===
 python3 main.py your_reviews.csv \
@@ -176,9 +176,6 @@ python3 main.py your_reviews.csv \
 
 # === 飞书同步（需提前安装 lark-cli 并认证） ===
 --feishu-sync auto|manual|skip
-
-# === 快速重放（跳过打标，从已打标CSV直接执行 Phase 2-5） ===
-python3 replay_phase2to5.py output/B09XYZ123-评论分析项目-6.1/评论采集及打标数据_B09XYZ123.csv
 ```
 
 ---
@@ -248,19 +245,18 @@ python3 replay_phase2to5.py output/B09XYZ123-评论分析项目-6.1/评论采集
 review-analyzer-skill/
 ├── main.py                      # V2.0 主入口（4 Phase 流程）
 ├── SKILL.md                     # Agent 指令文件（Claude Code Skill）
-├── replay_phase2to5.py          # 快速重放脚本（跳过打标）
 ├── requirements.txt             # Python 依赖
 ├── .env.example                 # 环境变量模板
 ├── src/
 │   ├── config.py                # CLI 单一模式配置
 │   ├── template_engine.py       # 统一模板引擎（Jinja2 SSR + 共享基座）
 │   ├── chart_engine.py          # Chart.js 图表配置生成
-│   ├── insights_generator.py    # 14章洞察报告生成（CLI subprocess）
+│   ├── insights_generator.py    # 15章洞察报告生成（CLI subprocess）
 │   ├── output_manager.py        # 输出管理（MD + HTML + 飞书同步）
 │   ├── feishu_sync.py           # 飞书文档 + 白板同步
 │   ├── report_generator.py      # 报告生成（兼容层）
-│   ├── data_fetchers/           # 数据接入层（Sorftime + CSV）
-│   ├── prompts/                 # 14章 Prompt 体系
+│   ├── data_fetchers/           # 数据接入层（CSV + 卖家精灵）
+│   ├── prompts/                 # 15章 Prompt 体系
 │   └── templates/               # 可视化看板模板
 │       ├── base/                # 共享基座
 │       │   ├── dashboard_base.html   # 基座 HTML（Jinja2）
@@ -338,7 +334,7 @@ review-analyzer-skill/
 |------|---------------------------|---------|
 | **架构** | Agent 原生 Skill | 通常为独立脚本 |
 | **API Key** | 零（纯 CLI） | 多数需要 API Key |
-| **洞察报告** | 14章深度分析 | 基础统计 |
+| **洞察报告** | 15章深度分析 | 基础统计 |
 | **可视化** | 6套主题 + 玻璃拟态 | 单一模板或无 |
 | **飞书集成** | 文档 + 白板自动同步 | 多不支持 |
 | **数据隐私** | 本地处理，不上传第三方 | 多为在线服务 |

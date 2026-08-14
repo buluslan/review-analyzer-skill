@@ -122,7 +122,8 @@ def generate_insights(
     personas: List[Dict],
     golden_samples: List[Dict],
     asin: str,
-    product_name: str = None
+    product_name: str = None,
+    anomaly_signals: Optional[List] = None
 ) -> str:
     """生成洞察报告（分发器）
 
@@ -134,6 +135,8 @@ def generate_insights(
         golden_samples: 黄金样本列表，来自 analyze_user_personas()
         asin: 产品ASIN
         product_name: 产品名称（可选）
+        anomaly_signals: 异常信号列表（可选，AnomalySignal 对象或字典），
+            供第十三章异常信号卡章节消费。None 时跳过异常信号注入。
 
     Returns:
         Markdown 格式的洞察报告字符串。
@@ -169,8 +172,9 @@ def generate_insights(
             asin=asin,
             product_name=product_name,
             context=context,
+            anomaly_signals=anomaly_signals,
         )
-        logger.info("使用 V2.1 Prompt 管理器（14 章结构 + 数据预处理）")
+        logger.info("使用 V2.1 Prompt 管理器（15 章结构 + 数据预处理 + 异常信号卡）")
     except Exception as exc:
         # 降级到 V1 prompt
         logger.warning("V2 Prompt 加载失败，降级到 V1: %s", exc)
@@ -215,6 +219,21 @@ def generate_insights(
                 pass
         # 再从报告中移除
         report_text = _re.sub(r'<strategic_json>.*?</strategic_json>', '', report_text, flags=_re.DOTALL).strip()
+
+    # Python 侧通道：将确定性异常检测结果直接注入 strategic_json
+    # 不依赖 AI 回填 anomaly_cards 字段，看板从侧通道确定性渲染
+    if anomaly_signals:
+        try:
+            anomaly_cards_serialized = []
+            for sig in anomaly_signals:
+                if hasattr(sig, "to_dict"):
+                    anomaly_cards_serialized.append(sig.to_dict())
+                elif isinstance(sig, dict):
+                    anomaly_cards_serialized.append(sig)
+            if anomaly_cards_serialized:
+                _last_strategic_data["anomaly_cards"] = anomaly_cards_serialized
+        except Exception as exc:
+            logger.warning("异常信号侧通道注入失败: %s", exc)
 
     return report_text
 
@@ -457,7 +476,7 @@ def _ensure_mermaid_charts(report_text: str, stats: Dict, personas: List[Dict]) 
         },
         {
             "key": "action_matrix",
-            # 匹配第十三章「行动决策仪表盘」的标题
+            # 匹配第十四章「行动决策仪表盘」的标题
             "heading_patterns": [
                 r"#{2,3}\s*.*(?:行动决策|行动.*仪表盘|Action\s*Dashboard|Decision)",
             ],

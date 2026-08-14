@@ -11,6 +11,7 @@ AI 分析引擎模块 V1.0 - CLI 原生版
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -423,20 +424,28 @@ def _parse_batch_response(
     # 清理响应文本（移除可能的 markdown 代码块标记）
     cleaned_text = response_text.strip()
 
-    # 移除各种可能的 markdown 代码块标记
-    if cleaned_text.startswith("```json"):
-        cleaned_text = cleaned_text[7:]
-    elif cleaned_text.startswith("```JSON"):
-        cleaned_text = cleaned_text[7:]
-    if cleaned_text.startswith("```"):
-        cleaned_text = cleaned_text[3:]
-    if cleaned_text.endswith("```"):
-        cleaned_text = cleaned_text[:-3]
-    cleaned_text = cleaned_text.strip()
+    # 移除 markdown 代码块标记（兼容 ```json / ```JSON / ``` 包裹，
+    # 以及模型在 JSON 前后附加说明文字的情况）
+    # 提取 ```json...``` 或 ```...``` 代码块内容（跨行，非贪婪）
+    code_block_match = re.search(r'```(?:json|JSON)?\s*\n(.*?)```', cleaned_text, re.DOTALL)
+    if code_block_match:
+        cleaned_text = code_block_match.group(1).strip()
+    else:
+        # 没有代码块包裹，尝试首尾去 ``` 标记
+        if cleaned_text.startswith("```json"):
+            cleaned_text = cleaned_text[7:]
+        elif cleaned_text.startswith("```JSON"):
+            cleaned_text = cleaned_text[7:]
+        if cleaned_text.startswith("```"):
+            cleaned_text = cleaned_text[3:]
+        if cleaned_text.endswith("```"):
+            cleaned_text = cleaned_text[:-3]
+        cleaned_text = cleaned_text.strip()
 
     # 尝试找到 JSON 数组的起始和结束位置
     start_idx = cleaned_text.find('[')
     if start_idx == -1:
+        logger.error(f"响应中未找到 JSON 数组起始符号 '['。响应前500字符: {cleaned_text[:500]}")
         raise ValueError("响应中未找到 JSON 数组起始符号 '['")
 
     # 尝试找到匹配的结束括号

@@ -80,12 +80,15 @@ TAGGING_PROMPT_BATCH = """你是一个专业电商评论分析AI。请分析以�
 # 标签体系
 {tag_system}
 
-# 输出格式
-返回纯JSON数组，不要markdown代码块：
+# 输出格式（极其重要）
+你的回复必须是一个合法的 JSON 数组，以 `[` 开头、`]` 结尾。
+禁止输出任何说明文字、markdown 标记、代码块包裹。
+即使评论文本较短或信息有限，也必须基于已有信息完成打标，返回 JSON 数组。
+
+正确示例（直接以 [ 开头）：
 [
   {{"review_id": "...", "sentiment": "...", "info_score": 10, "tags": {{...}}}},
-  {{"review_id": "...", "sentiment": "...", "info_score": 8, "tags": {{...}}}},
-  ...
+  {{"review_id": "...", "sentiment": "...", "info_score": 8, "tags": {{...}}}}
 ]
 """
 

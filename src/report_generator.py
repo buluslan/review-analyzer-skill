@@ -75,7 +75,7 @@ def _build_json_data(
     insights_md: Optional[str],
     creator_name: str
 ) -> Dict:
-    """构建符合 prompt_html.json 格式的数据结构"""
+    """构建可视化看板数据结构"""
 
     template = _load_json_template()
     product = product_name or asin

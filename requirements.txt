@@ -31,4 +31,4 @@ tqdm==4.66.4
 # - chart_engine: 纯 Python 实现
 # - template_engine: 基于 Jinja2
 # - feishu_sync: 通过 subprocess 调用 lark-cli
-# - sorftime_fetcher: 通过 requests 调用 API
+# - sellersprite_fetcher: 通过 requests 调用 API

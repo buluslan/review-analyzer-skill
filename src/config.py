@@ -3,7 +3,7 @@
 
 重大变更：
 - 打标阶段改为 Prompt Router，宿主 Agent 直接执行，不再依赖 subprocess CLI
-- 新增数据接入层配置（Sorftime 平台）
+- 新增数据接入层配置（卖家精灵平台）
 - 新增可视化模板系统配置
 - 新增飞书同步配置
 - 新增图表引擎配置
@@ -42,11 +42,10 @@ class Config:
     CLI_TIMEOUT: int = int(os.getenv("CLI_TIMEOUT", "600"))
 
     # ==================== V2.0: 数据接入配置 ====================
-    DATA_SOURCE: str = "csv"  # 可选: csv / sorftime
-    SORFTIME_API_KEY: str = os.getenv("SORFTIME_API_KEY", "")
-    SORFTIME_MODE: str = "mcp"  # 可选: mcp / api / cli
-    SORFTIME_BASE_URL: str = "https://mcp.sorftime.com"
-    SORFTIME_MAX_REVIEWS: int = 100  # Sorftime 单次最多返回 100 条
+    # CSV 为一等主源（覆盖全、正文完整）；卖家精灵为可选增强源（输入 ASIN 快速预览）
+    DATA_SOURCE: str = "csv"  # 可选: csv / sellersprite
+    SELLERSPRITE_SECRET_KEY: str = os.getenv("SELLERSPRITE_SECRET_KEY", "")
+    SELLERSPRITE_MAX_REVIEWS: int = 100  # 卖家精灵单次任务最多拉取条数（自动翻页）
 
     # ==================== V2.0: 可视化模板配置 ====================
     TEMPLATE_DIR: Path = field(default_factory=lambda: Path(__file__).parent / "templates")
@@ -166,9 +165,9 @@ class Config:
         import shutil
         return shutil.which(self.LARK_CLI_CMD) is not None
 
-    def check_sorftime_config(self) -> bool:
-        """检查 Sorftime 配置是否可用"""
-        return bool(self.SORFTIME_API_KEY)
+    def check_sellersprite_config(self) -> bool:
+        """检查卖家精灵配置是否可用"""
+        return bool(self.SELLERSPRITE_SECRET_KEY)
 
     def list_templates(self) -> list:
         """列出可用的可视化模板"""

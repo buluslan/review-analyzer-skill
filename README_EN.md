@@ -15,7 +15,7 @@
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README_EN.md)
 [![中文](https://img.shields.io/badge/lang-中文-red.svg)](README.md)
 
-**14-Chapter Deep Insight Report | 6 Themed Visualization Dashboards | Feishu Document Sync | Agent-Native Architecture**
+**15-Chapter Deep Insight Report | 6 Themed Visualization Dashboards | Feishu Document Sync | Agent-Native Architecture**
 
 **Created By Buluu@新西楼**
 
@@ -25,15 +25,15 @@
 
 ## Project Overview
 
-Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code and OpenCode. It supports local CSV data import and [Sorftime](https://www.sorftime.com/) platform integration, and runs with zero API keys.
+Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code and OpenCode. It supports local CSV data import and [SellerSprite](https://www.sellersprite.com/) platform integration (optional), and runs with zero API keys.
 
 ### V2.0 Core Upgrades
 
 | Feature | V1.0 | V2.0 |
 |---------|------|------|
 | Analysis Engine | Gemini API + CLI dual mode | **CLI single mode** (zero API Key) |
-| Data Source | Local CSV | **Local CSV + Sorftime platform** |
-| Insight Report | 7-chapter basic analysis | **14-chapter deep insight** (with action decision dashboard) |
+| Data Source | Local CSV | **Local CSV (primary) + SellerSprite (optional)** |
+| Insight Report | 7-chapter basic analysis | **15-chapter deep insight** (with action decision dashboard + anomaly signal cards) |
 | Visualization Dashboard | 1 black-gold template | **6 themed templates** (Glassmorphism + Chart.js theming) |
 | Feishu Integration | None | **Full sync** (documents + whiteboard + mermaid diagrams) |
 | Architecture | Python scripts | **Agent-native Skill** (SKILL.md instruction-driven) |
@@ -42,11 +42,11 @@ Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi
 ### Workflow
 
 ```
-Data Input: Local CSV or Sorftime platform
+Data Input: Local CSV (primary) or SellerSprite (optional)
      ↓
 Phase 1: AI Deep Tagging (concurrency 4, 22-dimension tags)
 Phase 2: User Persona identification (3-4 personas, 3 positive + 3 negative Golden Samples)
-Phase 3: Insight Report generation (14-chapter structured report)
+Phase 3: Insight Report generation (15-chapter structured report)
 Phase 4: Unified output (MD + HTML Dashboard + Feishu sync)
 ```
 
@@ -86,7 +86,7 @@ HTML reports **ready for work presentations**, with a Shared Base architecture e
 
 Each dashboard includes: 11 sections, interactive Chart.js charts (themed color palettes), responsive design, and Glassmorphism card effects.
 
-### 📋 14-Chapter Deep Insight Report
+### 📋 15-Chapter Deep Insight Report
 
 1. Insight Overview (core findings + strategic direction + market positioning)
 2. Core User Personas (multi-dimensional profiles + core needs + verbatim quotes)
@@ -104,7 +104,7 @@ Each dashboard includes: 11 sections, interactive Chart.js charts (themed color 
 | Output | Format | Description |
 |--------|--------|-------------|
 | Tagging Data | CSV | Raw reviews + 22-dimension tags |
-| Insight Report | Markdown | 14-chapter deep analysis |
+| Insight Report | Markdown | 15-chapter deep analysis |
 | Visualization Dashboard | HTML | 6 themes available, Glassmorphism |
 | Feishu Document | — | Auto-sync report + mermaid whiteboard |
 
@@ -158,8 +158,8 @@ pip install -r requirements.txt
 # Method 1: Local CSV file
 python3 main.py your_reviews.csv --max-reviews 200
 
-# Method 2: Sorftime platform data (requires SORFTIME_API_KEY configuration)
-python3 main.py --source sorftime --asin B09XYZ123 --site US --max-reviews 200
+# Method 2: SellerSprite platform data (optional, requires SELLERSPRITE_SECRET_KEY configuration)
+python3 main.py --source sellersprite --asin B09XYZ123 --site US --max-reviews 200
 
 # === Full Parameters ===
 python3 main.py your_reviews.csv \
@@ -174,9 +174,6 @@ python3 main.py your_reviews.csv \
 
 # === Feishu Sync (requires lark-cli installed and authenticated) ===
 --feishu-sync auto|manual|skip
-
-# === Quick Replay (skip tagging, run Phase 2-5 from a pre-tagged CSV) ===
-python3 replay_phase2to5.py output/B09XYZ123-评论分析项目-6.1/评论采集及打标数据_B09XYZ123.csv
 ```
 
 ---
@@ -246,19 +243,18 @@ Deeply understand your target user groups, build precise User Personas, and opti
 review-analyzer-skill/
 ├── main.py                      # V2.0 main entry (4-Phase workflow)
 ├── SKILL.md                     # Agent instruction file (Claude Code Skill)
-├── replay_phase2to5.py          # Quick replay script (skip tagging)
 ├── requirements.txt             # Python dependencies
 ├── .env.example                 # Environment variable template
 ├── src/
 │   ├── config.py                # CLI single mode configuration
 │   ├── template_engine.py       # Unified template engine (Jinja2 SSR + Shared Base)
 │   ├── chart_engine.py          # Chart.js chart configuration generation
-│   ├── insights_generator.py    # 14-chapter Insight Report generation (CLI subprocess)
+│   ├── insights_generator.py    # 15-chapter Insight Report generation (CLI subprocess)
 │   ├── output_manager.py        # Output management (MD + HTML + Feishu sync)
 │   ├── feishu_sync.py           # Feishu document + whiteboard sync
 │   ├── report_generator.py      # Report generation (compatibility layer)
-│   ├── data_fetchers/           # Data access layer (Sorftime + CSV)
-│   ├── prompts/                 # 14-chapter Prompt system
+│   ├── data_fetchers/           # Data access layer (CSV + SellerSprite)
+│   ├── prompts/                 # 15-chapter Prompt system
 │   └── templates/               # Visualization Dashboard templates
 │       ├── base/                # Shared Base
 │       │   ├── dashboard_base.html   # Base HTML (Jinja2)
@@ -336,7 +332,7 @@ Use `--template none` to skip dashboard generation.
 |---------|---------------------------|-------------|
 | **Architecture** | Agent-native Skill | Typically standalone scripts |
 | **API Key** | Zero (pure CLI) | Most require API keys |
-| **Insight Report** | 14-chapter deep analysis | Basic statistics |
+| **Insight Report** | 15-chapter deep analysis | Basic statistics |
 | **Visualization** | 6 themes + Glassmorphism | Single template or none |
 | **Feishu Integration** | Document + whiteboard auto-sync | Mostly unsupported |
 | **Data Privacy** | Local processing, no third-party uploads | Mostly online services |

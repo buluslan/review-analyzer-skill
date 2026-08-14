@@ -1,7 +1,7 @@
 """
 数据采集器抽象基类
 
-所有数据采集器（CSV、Sorftime 等）必须继承此基类并实现其抽象方法。
+所有数据采集器（CSV、卖家精灵 等）必须继承此基类并实现其抽象方法。
 提供统一的数据获取接口，使上层业务代码无需关心具体数据来源。
 """
 
@@ -72,7 +72,7 @@ class DataFetcher(ABC):
 
         用于在执行 fetch 前预先检查:
         - 文件路径是否存在 (CsvFetcher)
-        - API Key 是否有效 (SorftimeFetcher)
+        - API Key 是否有效 (SellerspriteFetcher)
         - 网络连通性等
 
         Returns:
@@ -85,7 +85,7 @@ class DataFetcher(ABC):
         """返回采集器的显示名称
 
         Returns:
-            如 "CSV本地文件", "Sorftime" 等
+            如 "CSV本地文件", "卖家精灵 SellerSprite" 等
         """
         ...
 
