@@ -308,7 +308,7 @@ review-analyzer-skill/
 │       ├── posthog-analytics/   # Warm orange analytics theme
 │       ├── stripe-executive/    # Emerald enterprise theme
 │       └── warm-editorial/      # Newspaper editorial theme
-├── assets/                      # Static resources (3D avatars)
+├── assets/                      # Static resources (README banner)
 ├── examples/                    # Sample data + output examples
 ├── tools/                       # Utility scripts
 ├── references/                  # Reference documentation

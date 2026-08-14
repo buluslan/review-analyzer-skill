@@ -26,7 +26,6 @@ class Config:
     # 输出目录: 支持环境变量 OUTPUT_DIR 或命令行参数 --output-dir
     OUTPUT_DIR: Path = field(default_factory=lambda: Path(os.getenv("OUTPUT_DIR", "./output")))
     REFERENCES_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent / "references")
-    ASSETS_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent / "assets")
     DATA_DIR: Path = field(default_factory=lambda: Path(__file__).parent.parent / "data")
 
     # ==================== CLI 引擎配置 ====================

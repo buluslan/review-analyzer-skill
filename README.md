@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Review Analyzer](assets/banner.png)
+![Review Analyzer](assets/banner.jpg)
 
 # 📊 Review Analyzer Skill
 
@@ -310,7 +310,7 @@ review-analyzer-skill/
 │       ├── posthog-analytics/   # 暖橙分析主题
 │       ├── stripe-executive/    # 翡翠企业主题
 │       └── warm-editorial/      # 报纸编辑主题
-├── assets/                      # 静态资源（3D 头像）
+├── assets/                      # 静态资源（README banner）
 ├── examples/                    # 示例数据 + 输出样例
 ├── tools/                       # 工具脚本
 ├── references/                  # 参考文档
