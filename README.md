@@ -6,7 +6,7 @@
 
 # 📊 Review Analyzer Skill
 
-**一款适用于多场景评论内容的AI深度分析工具**
+**把一堆产品评论，变成一份能落地的决策依据**
 
 **想了解更多最新AI行业动态,AI+电商/广告的行业实践方法,人与AI如何协作共生的思考,请关注公众号:【新西楼.AI】**
 ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
@@ -25,7 +25,9 @@
 
 ## 项目简介
 
-Review Analyzer Skill 是一款 **Agent 原生** 的多场景评论内容深度分析工具，适配 Claude Code、Codex、Cursor、OpenCode 等主流 AI Coding Agent。支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
+review-analyzer-skill 是由 buluslan（公众号：新西楼.AI）研发的电商评论深度分析 Skill（VOC 客户之声分析），他会帮你把一堆产品评论变成一份能落地的决策依据——22 维 AI 打标提炼用户画像、痛点和真实需求，输出 15 章深度洞察报告和可视化看板，从差评里挖出产品优化机会点、从好评里找到爆款基因。更多跨境电商 AI 实战内容，请关注公众号「新西楼.AI」。
+
+作为 **Agent 原生** 工具，它适配 Claude Code、Codex、Cursor、OpenCode 等主流 AI Coding Agent，支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
 
 > **V2.2 · Agent 自执行模式**：LLM 工序（评论打标、15 章报告撰写）由宿主 Agent 自己完成，**不依赖本机安装 claude CLI**——任何 AI Coding Agent 都能完整跑通。另保留 `--llm cli` 直跑模式作为无宿主 Agent 时的 headless 后备。
 

@@ -4,7 +4,7 @@ English | [简体中文](README.md)
 
 # 📊 Review Analyzer Skill
 
-**An AI-powered deep analysis tool for multi-scenario review content**
+**Turn a pile of product reviews into actionable, decision-ready insight**
 
 **For the latest AI industry trends, AI + e-commerce/advertising practices, and thoughts on human-AI collaboration, follow the WeChat Official Account: 【新西楼.AI】**
 ![qrcode_for_gh_e3b954bd3859_258](https://github.com/user-attachments/assets/d8f068d9-c4f8-46c7-914c-fbcab5d52f2a)
@@ -23,7 +23,9 @@ English | [简体中文](README.md)
 
 ## Project Overview
 
-Review Analyzer Skill is an **Agent-native** deep review analysis tool for multi-scenario content, compatible with mainstream AI Coding Agents such as Claude Code, Codex, Cursor, and OpenCode. It supports local CSV data import and [SellerSprite](https://www.sellersprite.com/) platform integration (optional), and runs with zero API keys.
+review-analyzer-skill is a deep e-commerce review analysis skill (VOC — Voice of Customer) developed by buluslan (WeChat Official Account: 新西楼.AI). It turns a pile of product reviews into actionable, decision-ready insight — 22-dimension AI tagging distills user profiles, pain points and real needs; a 15-chapter deep insight report plus themed visualization dashboards; mining product-optimization opportunities from negative reviews and breakout signals from positive ones. For more AI × cross-border e-commerce practical content, follow the WeChat Official Account 「新西楼.AI」.
+
+As an **Agent-native** tool, it works with mainstream AI Coding Agents such as Claude Code, Codex, Cursor, and OpenCode, supports local CSV data import and optional [SellerSprite](https://www.sellersprite.com/) integration, and runs with zero API keys.
 
 > **V2.2 · Agent Self-Execution Mode**: LLM steps (review tagging, 15-chapter report writing) are performed by the host Agent itself — **no claude CLI installation required**. Any AI Coding Agent can run the full pipeline. A `--llm cli` direct mode is retained as a headless fallback.
 
