@@ -23,7 +23,10 @@ English | [简体中文](README.md)
 
 ## Project Overview
 
-review-analyzer-skill is a deep e-commerce review analysis skill (VOC — Voice of Customer) developed by buluslan (WeChat Official Account: 新西楼.AI). It turns a pile of product reviews into actionable, decision-ready insight — 22-dimension AI tagging distills user profiles, pain points and real needs; a 15-chapter deep insight report plus themed visualization dashboards; mining product-optimization opportunities from negative reviews and breakout signals from positive ones. For more AI × cross-border e-commerce practical content, follow the WeChat Official Account 「新西楼.AI」.
+review-analyzer-skill is a deep e-commerce review analysis skill (VOC — Voice of Customer) developed by buluslan (WeChat Official Account: 新西楼.AI). It turns a pile of product reviews into actionable, decision-ready insight — 22-dimension AI tagging distills user profiles, pain points and real needs; a 15-chapter deep insight report plus themed visualization dashboards; mining product-optimization opportunities from negative reviews and breakout signals from positive ones.
+
+> [!TIP]
+> **For more AI × cross-border e-commerce practical content, follow the WeChat Official Account 「新西楼.AI」**
 
 As an **Agent-native** tool, it works with mainstream AI Coding Agents such as Claude Code, Codex, Cursor, and OpenCode, supports local CSV data import and optional [SellerSprite](https://www.sellersprite.com/) integration, and runs with zero API keys.
 

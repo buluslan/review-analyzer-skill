@@ -25,7 +25,10 @@
 
 ## 项目简介
 
-review-analyzer-skill 是由 buluslan（公众号：新西楼.AI）研发的电商评论深度分析 Skill（VOC 客户之声分析），他会帮你把一堆产品评论变成一份能落地的决策依据——22 维 AI 打标提炼用户画像、痛点和真实需求，输出 15 章深度洞察报告和可视化看板，从差评里挖出产品优化机会点、从好评里找到爆款基因。更多跨境电商 AI 实战内容，请关注公众号「新西楼.AI」。
+review-analyzer-skill 是由 buluslan（公众号：新西楼.AI）研发的电商评论深度分析 Skill（VOC 客户之声分析），他会帮你把一堆产品评论变成一份能落地的决策依据——22 维 AI 打标提炼用户画像、痛点和真实需求，输出 15 章深度洞察报告和可视化看板，从差评里挖出产品优化机会点、从好评里找到爆款基因。
+
+> [!TIP]
+> **更多跨境电商 AI 实战内容，请关注公众号「新西楼.AI」**
 
 作为 **Agent 原生** 工具，它适配 Claude Code、Codex、Cursor、OpenCode 等主流 AI Coding Agent，支持本地 CSV 数据导入和 [卖家精灵](https://www.sellersprite.com/) 平台数据对接（可选增强），零 API Key 即可运行。
 
