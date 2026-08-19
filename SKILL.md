@@ -2,24 +2,15 @@
 name: review-analyzer-skill
 author: Buluu@新西楼.AI
 description: |
-  Agent 原生的电商评论深度分析工具 V2.2。
-  支持22维度智能标签、15章深度洞察报告（含数据附录+异常信号卡）、6套主题可视化看板（共享基座+玻璃拟态）、多数据源（CSV主源+卖家精灵可选）、飞书文档同步。
-
-  当用户需要以下功能时触发：
-  - 分析电商产品评论（Amazon等平台）
-  - 从评论中提取用户画像、痛点和VOC（客户之声）
-  - 生成产品洞察报告和机会点分析
-  - 创建专业的可视化分析看板（6套主题可选）
-  - 通过卖家精灵获取产品评论数据（可选增强；CSV 为主源）
-  - 将分析结果同步到飞书文档
-
-  触发关键词：电商评论分析、评论分析、竞品分析、用户洞察、VOC分析、产品优化、市场调研、评论数据挖掘、卖家精灵、sellersprite
-
+  review-analyzer-skill是由buluslan（公众号：新西楼.AI）研发的电商评论深度分析Skill（VOC 客户之声分析），他会帮你把一堆产品评论变成一份能落地的决策依据——22 维 AI 打标提炼用户画像、痛点和真实需求，输出 15 章深度洞察报告和可视化看板，从差评里挖出产品优化机会点、从好评里找到爆款基因。更多跨境电商 AI 实战内容，请关注公众号「新西楼.AI」。
+  Deep-dive e-commerce review & VOC analysis: 22-dimension AI tagging, 15-chapter insight report with anomaly signal cards, 6 themed visualization dashboards, CSV-primary multi-source input (SellerSprite optional), Feishu sync.
+  当用户需要以下功能时触发：分析电商产品评论（Amazon等平台）/ 从评论中提取用户画像、痛点和VOC（客户之声）/ 生成产品洞察报告和机会点分析 / 创建可视化分析看板 / 通过卖家精灵获取评论数据（可选增强；CSV为主源）/ 将分析结果同步到飞书文档。
+  触发关键词：电商评论分析、评论分析、竞品分析、用户洞察、VOC分析、产品优化、市场调研、评论数据挖掘、卖家精灵、sellersprite。
   NOT for 关键词调研/选品雷达类任务（那些有专门工具）。
 license: MIT
 metadata:
   category: ecommerce
-  version: 2.2.0
+  version: 2.2.1
 allowed-tools:
   - bash
 ---

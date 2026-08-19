@@ -11,7 +11,7 @@ English | [简体中文](README.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.2.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
+[![Version](https://img.shields.io/badge/version-2.2.1-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
 **15-Chapter Deep Insight Report · 6 Themed Visualization Dashboards · Feishu Document Sync · Agent-Native Architecture**
 
@@ -389,6 +389,7 @@ Use `--template none` to skip dashboard generation.
 - [x] **v2.0.0** - Agent-native version (14-chapter report + 6 themes + Feishu sync + Shared Base architecture)
 - [x] **v2.1.0** - Anomaly signal cards + SellerSprite data source + test suite (52 cases)
 - [x] **v2.2.0** - Agent self-execution mode (tagging & report by host Agent, zero CLI dependency; 59 test cases)
+- [x] **v2.2.1** - Three-part description storefront (brand marketing + English summary + triggers preserved)
 - [ ] **v2.3.0** - Web enhancements (frontend template selector + screenshot export)
 - [ ] **v3.0.0** - Multi-platform analysis (batch ASIN + competitive comparison reports)
 

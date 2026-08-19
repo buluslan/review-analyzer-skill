@@ -13,7 +13,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-2.2.0-black.svg)](https://github.com/buluslan/review-analyzer-skill)
+[![Version](https://img.shields.io/badge/version-2.2.1-black.svg)](https://github.com/buluslan/review-analyzer-skill)
 
 **15章深度洞察报告 · 6套主题可视化看板 · 飞书文档同步 · Agent原生架构**
 
@@ -391,6 +391,7 @@ review-analyzer-skill/
 - [x] **v2.0.0** - Agent 原生版（14章报告 + 6套主题 + 飞书同步 + 共享基座架构）
 - [x] **v2.1.0** - 异常信号卡 + 卖家精灵数据源 + 测试套件（52 用例）
 - [x] **v2.2.0** - Agent 自执行模式（打标与报告由宿主 Agent 完成，零 CLI 依赖；测试 59 用例）
+- [x] **v2.2.1** - description 三段式门面（品牌营销 + 英文概述 + 触发保留）
 - [ ] **v2.3.0** - Web 端增强（前端模板选择器 + 截图导出）
 - [ ] **v3.0.0** - 多平台分析（批量 ASIN + 竞品对比报告）
 
